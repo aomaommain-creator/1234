@@ -163,29 +163,28 @@
       </div>
 
       <div v-if="viewMode === 'ALL'" class="space-y-6">
-        <!-- การ์ดตัวเลขสรุป 4 ช่อง (ปรับปรุงข้อความและแสดงรายรับงวดนี้ตรงตามที่ต้องการ) -->
+        <!-- การ์ดตัวเลขสรุป 4 ช่อง จัดวางตำแหน่งและชื่อให้อ่านง่ายที่สุด -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <!-- 1. ยอดขายรวมทั้งหมด -->
+          <!-- 1. ยอดขายรวมทั้งหมด + ยอดขายหลังหักส่วนลด -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
             <div>
               <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">ยอดขายรวมทั้งหมด</span>
               <div class="text-3xl font-extrabold mt-1 text-slate-800">฿{{ formatNum(overallStats.totalGross) }}</div>
             </div>
             <div class="text-xs text-slate-500 mt-2.5 pt-2 border-t border-slate-100 flex flex-col gap-0.5">
-              <span>ยอดปกติ: ฿{{ formatNum(overallStats.totalNormalGross) }}</span>
-              <span class="font-medium text-indigo-600">ยอดวิ่ง: ฿{{ formatNum(overallStats.totalRunGross) }}</span>
+              <span>ปกติ: ฿{{ formatNum(overallStats.totalNormalGross) }} | วิ่ง: ฿{{ formatNum(overallStats.totalRunGross) }}</span>
+              <span class="font-bold text-indigo-700 mt-0.5">ยอดขายหลังหักส่วนลด: ฿{{ formatNum(overallStats.totalCustomerNetAll) }}</span>
             </div>
           </div>
 
-          <!-- 2. รอยอดลูกค้า (ปรับหัวข้อ & เพิ่มแจกแจงรายรับงวดนี้/ยอดค้างเก่า) -->
+          <!-- 2. รอยอดลูกค้า (เน้นติดตามสถานะการรับเงิน) -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
             <div>
               <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">รอยอดลูกค้า</span>
               <div class="text-3xl font-extrabold text-blue-700 mt-1">฿{{ formatNum(overallStats.totalRemainingToCollect) }}</div>
             </div>
             <div class="text-xs text-slate-500 mt-2.5 pt-2 border-t border-slate-100 flex flex-col gap-0.5">
-              <span class="text-indigo-900 font-bold">รายรับงวดนี้: ฿{{ formatNum(overallStats.totalCustomerNetAll) }}</span>
-              <span class="text-emerald-600 font-medium">✓ จ่ายแล้ว: ฿{{ formatNum(overallStats.totalPaidNet) }}</span>
+              <span class="text-emerald-600 font-semibold">✓ ชำระแล้ว: ฿{{ formatNum(overallStats.totalPaidNet) }}</span>
               <span class="text-amber-600 font-medium">ยอดค้างเก่า: ฿{{ formatNum(overallStats.totalOverdue) }}</span>
             </div>
           </div>
@@ -208,7 +207,7 @@
               <div class="text-3xl font-black mt-1 text-amber-300">฿{{ formatNum(overallStats.netProfit) }}</div>
             </div>
             <div class="text-xs text-emerald-100 mt-2.5 pt-2 border-t border-emerald-500/60 leading-relaxed">
-              รายรับงวดนี้ − ยอดจ่ายเจ้านาย <br>
+              ยอดขายหลังหักส่วนลด − ยอดจ่ายเจ้านาย <br>
               <span class="text-amber-200 text-[11px] font-medium">*(฿{{ formatNum(overallStats.totalCustomerNetAll) }} − ฿{{ formatNum(overallStats.totalToBoss) }})</span>
             </div>
           </div>
@@ -298,7 +297,7 @@
         
         let totalNormalGross = 0;
         let totalRunGross = 0;
-        let totalCustomerNetAll = 0; // รายรับงวดนี้ (ยอดขายสุทธิหลังหักส่วนลดลูกค้าทุกคน ไม่รวมค้างเก่า)
+        let totalCustomerNetAll = 0; // ยอดขายหลังหักส่วนลดลูกค้าทุกคน (งวดนี้ ทุกบิล)
         let totalPaidNet = 0;        // ยอดสุทธิของบิลที่จ่ายแล้วจริง
 
         this.currentPeriod.bills.forEach(b => {
@@ -328,7 +327,7 @@
           totalOverdue += s.overdue;
         });
 
-        // กำไรสุทธิ = รายรับงวดนี้ (หักส่วนลดลูกค้าแล้ว) - ยอดรวมจ่ายเจ้านาย
+        // กำไรสุทธิ = ยอดขายหลังหักส่วนลด - ยอดรวมจ่ายเจ้านาย
         const netProfit = totalCustomerNetAll - totalToBoss;
 
         return { 
