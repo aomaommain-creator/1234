@@ -163,7 +163,7 @@
       </div>
 
       <div v-if="viewMode === 'ALL'" class="space-y-6">
-        <!-- การ์ดตัวเลขสรุป 4 ช่อง ปรับโครงสร้างใหม่ไม่งง -->
+        <!-- การ์ดตัวเลขสรุป 4 ช่อง (ปรับปรุงข้อความและแสดงรายรับงวดนี้ตรงตามที่ต้องการ) -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- 1. ยอดขายรวมทั้งหมด -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
@@ -177,15 +177,16 @@
             </div>
           </div>
 
-          <!-- 2. ยอดเรียกเก็บคงเหลือ (ยอดที่ต้องตามเก็บจริง) -->
+          <!-- 2. รอยอดลูกค้า (ปรับหัวข้อ & เพิ่มแจกแจงรายรับงวดนี้/ยอดค้างเก่า) -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
             <div>
-              <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">ยอดเรียกเก็บคงเหลือ</span>
+              <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">รอยอดลูกค้า</span>
               <div class="text-3xl font-extrabold text-blue-700 mt-1">฿{{ formatNum(overallStats.totalRemainingToCollect) }}</div>
             </div>
             <div class="text-xs text-slate-500 mt-2.5 pt-2 border-t border-slate-100 flex flex-col gap-0.5">
-              <span class="text-emerald-600 font-semibold">✓ จ่ายแล้ว: ฿{{ formatNum(overallStats.totalPaidNet) }}</span>
-              <span class="text-slate-500">ยอดเต็มทั้งงวด: ฿{{ formatNum(overallStats.totalGrandNet) }} (รวมค้าง ฿{{ formatNum(overallStats.totalOverdue) }})</span>
+              <span class="text-indigo-900 font-bold">รายรับงวดนี้: ฿{{ formatNum(overallStats.totalCustomerNetAll) }}</span>
+              <span class="text-emerald-600 font-medium">✓ จ่ายแล้ว: ฿{{ formatNum(overallStats.totalPaidNet) }}</span>
+              <span class="text-amber-600 font-medium">ยอดค้างเก่า: ฿{{ formatNum(overallStats.totalOverdue) }}</span>
             </div>
           </div>
 
@@ -207,8 +208,8 @@
               <div class="text-3xl font-black mt-1 text-amber-300">฿{{ formatNum(overallStats.netProfit) }}</div>
             </div>
             <div class="text-xs text-emerald-100 mt-2.5 pt-2 border-t border-emerald-500/60 leading-relaxed">
-              ยอดขายงวดนี้หักส่วนลดลูกค้า − ยอดจ่ายเจ้านาย <br>
-              <span class="text-amber-200 text-[11px] font-medium">*คิดจากยอดทั้งงวด ไม่รวมยอดค้างเก่า</span>
+              รายรับงวดนี้ − ยอดจ่ายเจ้านาย <br>
+              <span class="text-amber-200 text-[11px] font-medium">*(฿{{ formatNum(overallStats.totalCustomerNetAll) }} − ฿{{ formatNum(overallStats.totalToBoss) }})</span>
             </div>
           </div>
         </div>
@@ -293,12 +294,12 @@
         return Array.from(names);
       },
       overallStats() {
-        if (!this.currentPeriod) return { totalGross: 0, totalNormalGross: 0, totalRunGross: 0, totalRemainingToCollect: 0, totalPaidNet: 0, totalGrandNet: 0, totalToBoss: 0, netProfit: 0, totalOverdue: 0 };
+        if (!this.currentPeriod) return { totalGross: 0, totalNormalGross: 0, totalRunGross: 0, totalRemainingToCollect: 0, totalPaidNet: 0, totalCustomerNetAll: 0, totalToBoss: 0, netProfit: 0, totalOverdue: 0 };
         
         let totalNormalGross = 0;
         let totalRunGross = 0;
-        let totalCustomerNetAll = 0; // ยอดขายสุทธิของลูกค้าทุกคนรวมกัน (งวดนี้ ทุกบิล)
-        let totalPaidNet = 0;        // ยอดสุทธิของบิลที่จ่ายแล้วจริง (หลังหักส่วนลด)
+        let totalCustomerNetAll = 0; // รายรับงวดนี้ (ยอดขายสุทธิหลังหักส่วนลดลูกค้าทุกคน ไม่รวมค้างเก่า)
+        let totalPaidNet = 0;        // ยอดสุทธิของบิลที่จ่ายแล้วจริง
 
         this.currentPeriod.bills.forEach(b => {
           const n = Number(b.normalAmount) || 0;
@@ -317,7 +318,7 @@
         // ยอดจ่ายเจ้านาย: ปกติ -30% (จ่าย 70%), วิ่ง -10% (จ่าย 90%)
         const totalToBoss = (totalNormalGross * 0.70) + (totalRunGross * 0.90);
 
-        // ยอดที่ยังค้างชำระในรอบนี้ (ดึงจากยอดรวมในตารางด้านล่าง)
+        // รอยอดลูกค้า (ดึงยอดรวมที่ต้องชำระจากตารางด้านล่าง)
         let totalRemainingToCollect = 0;
         let totalOverdue = 0;
 
@@ -327,10 +328,7 @@
           totalOverdue += s.overdue;
         });
 
-        // ยอดเต็มทั้งงวด = ยอดสุทธิงวดนี้ทั้งหมด + ยอดค้างเก่า
-        const totalGrandNet = totalCustomerNetAll + totalOverdue;
-
-        // กำไรสุทธิ = ยอดขายของลูกค้าทุกคนในงวดนี้หักส่วนลดแล้ว (ทุกบิล) - ยอดรวมจ่ายเจ้านาย
+        // กำไรสุทธิ = รายรับงวดนี้ (หักส่วนลดลูกค้าแล้ว) - ยอดรวมจ่ายเจ้านาย
         const netProfit = totalCustomerNetAll - totalToBoss;
 
         return { 
@@ -339,7 +337,7 @@
           totalRunGross, 
           totalRemainingToCollect,
           totalPaidNet,
-          totalGrandNet,
+          totalCustomerNetAll,
           totalToBoss, 
           netProfit, 
           totalOverdue 
