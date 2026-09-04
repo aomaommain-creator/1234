@@ -105,9 +105,13 @@
 
       <div v-if="currentPeriod">
         <div class="bg-indigo-50/70 p-5 rounded-2xl border border-indigo-100 mb-6">
-          <h3 class="font-bold text-sm mb-2"><i class="fa-solid fa-paste"></i> วางข้อมูลด่วน (ลำดับ | ยอดปกติ | ชื่อลูกค้า | ยอดวิ่ง)</h3>
-          <textarea v-model="pasteText" rows="3" class="w-full border rounded-lg p-2.5 text-xs font-mono"></textarea>
-          <button @click="processPaste" class="mt-2 bg-indigo-600 text-white text-xs py-2 px-5 rounded-lg">แปลงข้อมูลลงตาราง</button>
+          <div class="flex flex-wrap justify-between items-center mb-1 gap-2">
+            <h3 class="font-bold text-sm text-indigo-950"><i class="fa-solid fa-paste text-indigo-600"></i> วางข้อมูลด่วน (Ctrl + V)</h3>
+            <span class="text-xs bg-indigo-100 text-indigo-800 font-medium px-2 py-0.5 rounded">วางเฉพาะตัวเลขยอดขายช่องเดียว หรือวางครบทุกคอลัมน์ก็ได้</span>
+          </div>
+          <p class="text-xs text-slate-500 mb-2">💡 หากคัดลอกเฉพาะตัวเลขยอดขายมาวางอย่างเดียว ระบบจะลงยอดให้ทันที แล้วสามารถพิมพ์ชื่อลูกค้าในตารางต่อได้เลย</p>
+          <textarea v-model="pasteText" rows="3" placeholder="วางข้อมูลที่นี่..." class="w-full border rounded-lg p-2.5 text-xs font-mono bg-white focus:ring-2 focus:ring-indigo-400"></textarea>
+          <button @click="processPaste" class="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 px-5 rounded-lg shadow transition">แปลงข้อมูลลงตาราง</button>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border mb-6">
@@ -121,10 +125,10 @@
               <tbody class="divide-y">
                 <tr v-for="(b, idx) in currentPeriod.bills" :key="idx" :class="{'bg-emerald-50': b.isPaid}">
                   <td class="p-2 text-center text-xs text-slate-400">{{ idx + 1 }}</td>
-                  <td class="p-2"><input v-model.number="b.normalAmount" type="number" class="w-full border rounded px-2 py-1 text-right"></td>
-                  <td class="p-2"><input list="customer-list" v-model="b.customerName" class="w-full border rounded px-2 py-1 font-semibold"></td>
-                  <td class="p-2"><input v-model.number="b.runAmount" type="number" class="w-full border rounded px-2 py-1 text-right text-indigo-700"></td>
-                  <td class="p-2 text-center"><input type="checkbox" v-model="b.isPaid" class="w-4 h-4 cursor-pointer"></td>
+                  <td class="p-2"><input v-model.number="b.normalAmount" type="number" placeholder="0" class="w-full border rounded px-2 py-1 text-right font-medium"></td>
+                  <td class="p-2"><input list="customer-list" v-model="b.customerName" placeholder="เลือก/พิมพ์ชื่อลูกค้า" class="w-full border rounded px-2 py-1 font-semibold text-slate-800"></td>
+                  <td class="p-2"><input v-model.number="b.runAmount" type="number" placeholder="0" class="w-full border rounded px-2 py-1 text-right text-indigo-700 font-medium"></td>
+                  <td class="p-2 text-center"><input type="checkbox" v-model="b.isPaid" class="w-4 h-4 cursor-pointer text-emerald-600"></td>
                   <td class="p-2 text-center"><button @click="removeBillRow(idx)" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td>
                 </tr>
               </tbody>
@@ -163,7 +167,6 @@
       </div>
 
       <div v-if="viewMode === 'ALL'" class="space-y-6">
-        <!-- การ์ดตัวเลขสรุป 4 ช่อง จัดวางตำแหน่งและชื่อให้อ่านง่ายที่สุด -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- 1. ยอดขายรวมทั้งหมด + ยอดขายหลังหักส่วนลด -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
@@ -177,7 +180,7 @@
             </div>
           </div>
 
-          <!-- 2. รอยอดลูกค้า (เน้นติดตามสถานะการรับเงิน) -->
+          <!-- 2. รอยอดลูกค้า -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
             <div>
               <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">รอยอดลูกค้า</span>
@@ -396,18 +399,57 @@
       async savePeriodData() { await this.saveToStorage(); alert('บันทึกข้อมูลงวดนี้ขึ้นคลาวด์เรียบร้อยแล้ว'); },
       processPaste() {
         if (!this.pasteText.trim()) return;
-        const rows = this.pasteText.trim().split('\n'); let added = 0;
+        const rows = this.pasteText.trim().split('\n');
+        let added = 0;
+
         rows.forEach(r => {
-          const cols = r.split(/\t+/).map(s => s.trim()).filter(s => s !== '');
-          if (cols.length >= 2) {
-            let normal = 0, name = '', run = 0;
-            if (cols.length >= 4) { normal = Number(cols[1].replace(/,/g, ''))||0; name = cols[2]; run = Number(cols[3].replace(/,/g, ''))||0; }
-            else if (cols.length === 3) { normal = Number(cols[1].replace(/,/g, ''))||0; name = cols[2]; run = 0; }
-            else if (cols.length === 2) { if (!isNaN(Number(cols[0].replace(/,/g, '')))) { normal = Number(cols[0].replace(/,/g, ''))||0; name = cols[1]; } else { name = cols[0]; normal = Number(cols[1].replace(/,/g, ''))||0; } }
-            if (name) { this.currentPeriod.bills.push({ customerName: name, normalAmount: normal, runAmount: run, isPaid: false }); added++; }
+          const rawCols = r.split(/\t+/).map(s => s.trim()).filter(s => s !== '');
+          if (rawCols.length === 0) return;
+
+          let normal = 0, name = '', run = 0;
+
+          // รูปแบบ 1 คอลัมน์: มีเฉพาะตัวเลขยอดขายอย่างเดียว
+          if (rawCols.length === 1) {
+            const cleanVal = rawCols[0].replace(/,/g, '');
+            if (!isNaN(Number(cleanVal)) && cleanVal !== '') {
+              normal = Number(cleanVal);
+              name = ''; // ให้ว่างไว้เพื่อไปพิมพ์หรือเลือกชื่อลูกค้าในแอปต่อได้ทันที
+            }
+          }
+          // รูปแบบ 2 คอลัมน์: ยอดปกติ | ชื่อลูกค้า หรือ ชื่อลูกค้า | ยอดปกติ
+          else if (rawCols.length === 2) {
+            const val0 = rawCols[0].replace(/,/g, '');
+            const val1 = rawCols[1].replace(/,/g, '');
+            if (!isNaN(Number(val0)) && isNaN(Number(val1))) {
+              normal = Number(val0);
+              name = rawCols[1];
+            } else if (isNaN(Number(val0)) && !isNaN(Number(val1))) {
+              name = rawCols[0];
+              normal = Number(val1);
+            }
+          }
+          // รูปแบบ 3 คอลัมน์: ลำดับ | ยอดปกติ | ชื่อลูกค้า
+          else if (rawCols.length === 3) {
+            normal = Number(rawCols[1].replace(/,/g, '')) || 0;
+            name = rawCols[2];
+            run = 0;
+          }
+          // รูปแบบ 4 คอลัมน์ขึ้นไป: ลำดับ | ยอดปกติ | ชื่อลูกค้า | ยอดวิ่ง
+          else if (rawCols.length >= 4) {
+            normal = Number(rawCols[1].replace(/,/g, '')) || 0;
+            name = rawCols[2];
+            run = Number(rawCols[3].replace(/,/g, '')) || 0;
+          }
+
+          if (normal > 0 || name !== '') {
+            this.currentPeriod.bills.push({ customerName: name, normalAmount: normal, runAmount: run, isPaid: false });
+            added++;
           }
         });
-        this.pasteText = ''; if (added > 0) alert(`เพิ่ม ${added} บิล`);
+
+        this.pasteText = '';
+        if (added > 0) alert(`เพิ่มรายการบิลเรียบร้อยแล้วทั้งหมด ${added} รายการ`);
+        else alert('ไม่พบข้อมูลที่ถูกต้อง กรุณาตรวจสอบข้อความที่คัดลอกมา');
       },
       getCustomerDiscount(name) { const c = this.customers.find(x => x.name.trim() === name.trim()); return { normal: c ? c.normalDiscount : 0, run: c ? c.runDiscount : 0 }; },
       getCustomerBills(name) { if (!this.currentPeriod) return []; return this.currentPeriod.bills.filter(b => b.customerName && b.customerName.trim() === name.trim()); },
