@@ -40,40 +40,113 @@
       <nav class="flex flex-wrap gap-1 md:gap-2">
         <button @click="currentTab = 'dashboard'" :class="tabClass('dashboard')"><i class="fa-solid fa-chart-line mr-1"></i> แดชบอร์ด</button>
         <button @click="currentTab = 'entry'" :class="tabClass('entry')"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> ลงข้อมูลยอด</button>
-        <button @click="currentTab = 'customers'" :class="tabClass('customers')"><i class="fa-solid fa-users mr-1"></i> ลูกค้า & ส่วนลด</button>
+        <button @click="currentTab = 'customers'" :class="tabClass('customers')"><i class="fa-solid fa-users mr-1"></i> ลูกค้า & ส่วนลด & ราคาจ่าย</button>
         <button @click="currentTab = 'bank'" :class="tabClass('bank')"><i class="fa-solid fa-building-columns mr-1"></i> บัญชี</button>
       </nav>
     </div>
   </header>
 
   <main class="max-w-7xl mx-auto px-4 py-6">
-    <!-- TAB 1: ลูกค้า -->
+    <!-- TAB 1: ลูกค้า & ส่วนลด & ราคาจ่ายลูกค้า -->
     <section v-if="currentTab === 'customers'" class="space-y-6">
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h2 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-user-plus text-indigo-600"></i> เพิ่ม/แก้ไข รายชื่อลูกค้า</h2>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-          <div><label class="block text-sm font-medium mb-1">ชื่อลูกค้า</label><input v-model="customerForm.name" type="text" class="w-full border rounded-lg px-3 py-2"></div>
-          <div><label class="block text-sm font-medium mb-1">ลดปกติ (%)</label><input v-model.number="customerForm.normalDiscount" type="number" class="w-full border rounded-lg px-3 py-2"></div>
-          <div><label class="block text-sm font-medium mb-1">ลดวิ่ง (%)</label><input v-model.number="customerForm.runDiscount" type="number" class="w-full border rounded-lg px-3 py-2"></div>
-          <div class="flex gap-2">
-            <button @click="saveCustomer" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg">{{ editingCustomerIndex === -1 ? 'เพิ่ม' : 'อัปเดต' }}</button>
-            <button v-if="editingCustomerIndex !== -1" @click="resetCustomerForm" class="bg-slate-300 py-2 px-3 rounded-lg">ยกเลิก</button>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold text-slate-800">
+            <i class="fa-solid fa-user-gear text-indigo-600 mr-1"></i> เพิ่ม/แก้ไข ข้อมูลลูกค้า & ราคาจ่ายลูกค้า (เรทรางวัล)
+          </h2>
+          <span v-if="editingCustomerIndex !== -1" class="text-xs bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-semibold">
+            กำลังแก้ไข: {{ customerForm.name }}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-3 items-end">
+          <div class="col-span-2 md:col-span-2 lg:col-span-2">
+            <label class="block text-xs font-semibold mb-1 text-slate-700">ชื่อลูกค้า</label>
+            <input v-model="customerForm.name" type="text" placeholder="ระบุชื่อลูกค้า" class="w-full border rounded-lg px-3 py-2 text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-emerald-700">ลดปกติ (%)</label>
+            <input v-model.number="customerForm.normalDiscount" type="number" placeholder="0" class="w-full border rounded-lg px-3 py-2 text-sm font-medium">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-indigo-700">ลดวิ่ง (%)</label>
+            <input v-model.number="customerForm.runDiscount" type="number" placeholder="0" class="w-full border rounded-lg px-3 py-2 text-sm font-medium">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-purple-700">จ่าย 2 ตัว</label>
+            <input v-model.number="customerForm.rate2Digit" type="number" placeholder="60" class="w-full border rounded-lg px-3 py-2 text-sm font-bold text-purple-900">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-purple-700">จ่าย 3 ตรง</label>
+            <input v-model.number="customerForm.rate3Direct" type="number" placeholder="500" class="w-full border rounded-lg px-3 py-2 text-sm font-semibold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-purple-700">จ่าย 3 โต๊ด</label>
+            <input v-model.number="customerForm.rate3Tod" type="number" placeholder="90" class="w-full border rounded-lg px-3 py-2 text-sm font-semibold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-purple-700">จ่าย 3 ล่าง</label>
+            <input v-model.number="customerForm.rate3Bottom" type="number" placeholder="100" class="w-full border rounded-lg px-3 py-2 text-sm font-semibold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-purple-700">จ่าย วิ่งบน</label>
+            <input v-model.number="customerForm.rateRunTop" type="number" placeholder="3" class="w-full border rounded-lg px-3 py-2 text-sm font-semibold">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 items-end">
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-purple-700">จ่าย วิ่งล่าง</label>
+            <input v-model.number="customerForm.rateRunBottom" type="number" placeholder="4" class="w-full border rounded-lg px-3 py-2 text-sm font-semibold">
+          </div>
+          <div class="col-span-1 md:col-span-3 flex gap-2">
+            <button @click="saveCustomer" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-lg font-semibold text-sm shadow transition">
+              {{ editingCustomerIndex === -1 ? '+ เพิ่มลูกค้า' : '✓ บันทึกข้อมูลลูกค้า' }}
+            </button>
+            <button v-if="editingCustomerIndex !== -1" @click="resetCustomerForm" class="bg-slate-200 hover:bg-slate-300 text-slate-700 py-2 px-4 rounded-lg text-sm transition">
+              ยกเลิก
+            </button>
           </div>
         </div>
       </div>
+
+      <!-- ตารางรายชื่อลูกค้าและเรทจ่าย -->
       <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-        <table class="w-full text-left text-sm">
-          <thead class="bg-slate-50 border-b"><tr><th class="p-3">ชื่อ</th><th class="p-3 text-right">ลดปกติ</th><th class="p-3 text-right">ลดวิ่ง</th><th class="p-3 text-center">จัดการ</th></tr></thead>
-          <tbody class="divide-y">
-            <tr v-for="(c, idx) in customers" :key="idx" class="hover:bg-slate-50">
-              <td class="p-3 font-semibold">{{ c.name }}</td><td class="p-3 text-right text-emerald-600">{{ c.normalDiscount || 0 }}%</td><td class="p-3 text-right text-indigo-600">{{ c.runDiscount || 0 }}%</td>
-              <td class="p-3 text-center">
-                <button @click="editCustomer(idx)" class="text-blue-600 mr-3">แก้ไข</button>
-                <button @click="deleteCustomer(idx)" class="text-rose-600">ลบ</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm whitespace-nowrap">
+            <thead class="bg-slate-50 border-b text-xs text-slate-500">
+              <tr>
+                <th class="p-3">ชื่อลูกค้า</th>
+                <th class="p-3 text-right">ลดปกติ</th>
+                <th class="p-3 text-right">ลดวิ่ง</th>
+                <th class="p-3 text-right text-purple-900 font-bold">จ่าย 2 ตัว</th>
+                <th class="p-3 text-right text-purple-900">จ่าย 3 ตรง</th>
+                <th class="p-3 text-right text-purple-900">จ่าย 3 โต๊ด</th>
+                <th class="p-3 text-right text-purple-900">จ่าย 3 ล่าง</th>
+                <th class="p-3 text-right text-purple-900">จ่าย วิ่งบน</th>
+                <th class="p-3 text-right text-purple-900">จ่าย วิ่งล่าง</th>
+                <th class="p-3 text-center">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y">
+              <tr v-for="(c, idx) in customers" :key="idx" class="hover:bg-slate-50">
+                <td class="p-3 font-semibold text-slate-800">{{ c.name }}</td>
+                <td class="p-3 text-right text-emerald-600 font-medium">{{ c.normalDiscount || 0 }}%</td>
+                <td class="p-3 text-right text-indigo-600 font-medium">{{ c.runDiscount || 0 }}%</td>
+                <td class="p-3 text-right text-purple-700 font-bold">฿{{ c.rate2Digit || 60 }}</td>
+                <td class="p-3 text-right text-slate-600">฿{{ c.rate3Direct || 500 }}</td>
+                <td class="p-3 text-right text-slate-600">฿{{ c.rate3Tod || 90 }}</td>
+                <td class="p-3 text-right text-slate-600">฿{{ c.rate3Bottom || 100 }}</td>
+                <td class="p-3 text-right text-slate-600">฿{{ c.rateRunTop || 3 }}</td>
+                <td class="p-3 text-right text-slate-600">฿{{ c.rateRunBottom || 4 }}</td>
+                <td class="p-3 text-center">
+                  <button @click="editCustomer(idx)" class="text-blue-600 hover:text-blue-800 mr-3 font-semibold text-xs bg-blue-50 px-2.5 py-1 rounded-md">แก้ไข</button>
+                  <button @click="deleteCustomer(idx)" class="text-rose-600 hover:text-rose-800 font-semibold text-xs bg-rose-50 px-2.5 py-1 rounded-md">ลบ</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -164,7 +237,7 @@
           <div class="px-6 py-4 border-b bg-purple-50 flex justify-between items-center">
             <div>
               <h3 class="font-bold text-purple-900">3. บันทึกยอดถูกรางวัล</h3>
-              <p class="text-xs text-purple-700 mt-0.5">ระบบจะคำนวณยอดเบิกเจ้านาย ยอดจ่ายลูกค้า และส่วนต่างโบนัสให้อัตโนมัติ</p>
+              <p class="text-xs text-purple-700 mt-0.5">ระบบจะดึงราคาจ่ายของลูกค้าแต่ละคนมาคำนวณส่วนต่างให้อัตโนมัติ (ติ๊กอั้นจ่ายครึ่งราคา ยกเว้นเลขวิ่ง)</p>
             </div>
             <button @click="addPrizeRow" class="bg-purple-200 text-purple-900 text-xs px-3 py-1.5 rounded-md font-semibold">+ เพิ่มรายการถูกรางวัล</button>
           </div>
@@ -175,6 +248,7 @@
                   <th class="p-2 text-center">ลำดับ</th>
                   <th class="p-2">ชื่อลูกค้า</th>
                   <th class="p-2">ประเภทรางวัล</th>
+                  <th class="p-2 text-center text-rose-600 font-bold">เลขอั้น</th>
                   <th class="p-2 text-right">จำนวนถูก (บาท)</th>
                   <th class="p-2 text-right">เรทลูกค้า</th>
                   <th class="p-2 text-right">ยอดจ่ายลูกค้า</th>
@@ -185,22 +259,34 @@
                 </tr>
               </thead>
               <tbody class="divide-y">
-                <tr v-for="(pz, idx) in currentPeriod.prizes" :key="idx" class="hover:bg-slate-50">
+                <tr v-for="(pz, idx) in currentPeriod.prizes" :key="idx" class="hover:bg-slate-50" :class="{'bg-amber-50/50': pz.isHalf && !isRunType(pz.type)}">
                   <td class="p-2 text-center text-xs text-slate-400">{{ idx + 1 }}</td>
-                  <td class="p-2"><input list="customer-list" v-model="pz.customerName" placeholder="ชื่อลูกค้า" class="w-32 border rounded px-2 py-1 font-semibold"></td>
+                  <td class="p-2">
+                    <input list="customer-list" v-model="pz.customerName" @input="updatePrizeRates(pz)" placeholder="ชื่อลูกค้า" class="w-28 border rounded px-2 py-1 font-semibold">
+                  </td>
                   <td class="p-2">
                     <select v-model="pz.type" @change="onPrizeTypeChange(pz)" class="border rounded px-2 py-1 bg-white text-xs font-medium">
                       <option value="3_DIRECT">3 ตัวตรง</option>
                       <option value="3_TOD">3 ตัวโต๊ด</option>
+                      <option value="3_BOTTOM">3 ตัวล่าง</option>
                       <option value="2_DIGIT">2 ตัว</option>
-                      <option value="RUN_TOP">เลขวิ่งบน</option>
-                      <option value="RUN_BOTTOM">เลขวิ่งล่าง</option>
+                      <option value="RUN_TOP">เลขวิ่งบน (เรท 3)</option>
+                      <option value="RUN_BOTTOM">เลขวิ่งล่าง (เรท 4)</option>
                     </select>
                   </td>
-                  <td class="p-2"><input v-model.number="pz.amount" type="number" placeholder="0" class="w-24 border rounded px-2 py-1 text-right font-semibold text-purple-900"></td>
-                  <td class="p-2"><input v-model.number="pz.customerRate" type="number" placeholder="0" class="w-20 border rounded px-2 py-1 text-right"></td>
+                  <td class="p-2 text-center">
+                    <template v-if="!isRunType(pz.type)">
+                      <label class="inline-flex items-center gap-1 cursor-pointer bg-white px-1.5 py-0.5 border rounded text-xs">
+                        <input type="checkbox" v-model="pz.isHalf" @change="updatePrizeRates(pz)" class="w-3.5 h-3.5 cursor-pointer text-rose-600">
+                        <span :class="pz.isHalf ? 'text-rose-600 font-bold' : 'text-slate-400'">อั้น</span>
+                      </label>
+                    </template>
+                    <span v-else class="text-slate-300 text-xs">-</span>
+                  </td>
+                  <td class="p-2"><input v-model.number="pz.amount" type="number" placeholder="0" class="w-20 border rounded px-2 py-1 text-right font-semibold text-purple-900"></td>
+                  <td class="p-2"><input v-model.number="pz.customerRate" type="number" placeholder="0" class="w-16 border rounded px-2 py-1 text-right"></td>
                   <td class="p-2 text-right font-bold text-slate-700">฿{{ formatNum((pz.amount || 0) * (pz.customerRate || 0)) }}</td>
-                  <td class="p-2"><input v-model.number="pz.bossRate" type="number" placeholder="0" class="w-20 border rounded px-2 py-1 text-right bg-slate-50"></td>
+                  <td class="p-2"><input v-model.number="pz.bossRate" type="number" placeholder="0" class="w-16 border rounded px-2 py-1 text-right bg-slate-50"></td>
                   <td class="p-2 text-right font-bold text-rose-700">฿{{ formatNum((pz.amount || 0) * (pz.bossRate || 0)) }}</td>
                   <td class="p-2 text-right font-extrabold text-emerald-600">
                     +฿{{ formatNum(((pz.amount || 0) * (pz.bossRate || 0)) - ((pz.amount || 0) * (pz.customerRate || 0))) }}
@@ -232,7 +318,6 @@
 
       <div v-if="viewMode === 'ALL'" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <!-- 1. ยอดขายรวมทั้งหมด -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
             <div>
               <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">ยอดขายรวมทั้งหมด</span>
@@ -244,7 +329,6 @@
             </div>
           </div>
 
-          <!-- 2. รอยอดลูกค้า -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
             <div>
               <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">รอยอดลูกค้า</span>
@@ -256,7 +340,6 @@
             </div>
           </div>
 
-          <!-- 3. ยอดรวมจ่ายเจ้านาย -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
             <div>
               <span class="text-xs font-semibold text-rose-600 uppercase tracking-wider">ยอดรวมจ่ายเจ้านาย</span>
@@ -267,7 +350,6 @@
             </div>
           </div>
 
-          <!-- 4. กำไรสุทธิงวดนี้ -->
           <div class="bg-emerald-600 text-white p-5 rounded-2xl shadow-md flex flex-col justify-between">
             <div>
               <span class="text-xs font-semibold text-emerald-100 uppercase tracking-wider">กำไรสุทธิงวดนี้</span>
@@ -281,7 +363,6 @@
           </div>
         </div>
 
-        <!-- กล่องสรุปยอดเคลียร์เงินรางวัล -->
         <div class="bg-gradient-to-r from-purple-900 to-indigo-900 text-white p-6 rounded-3xl shadow-md border border-purple-800">
           <div class="flex items-center justify-between border-b border-purple-700/60 pb-3 mb-4">
             <div class="flex items-center gap-2">
@@ -306,7 +387,6 @@
           </div>
         </div>
 
-        <!-- ตารางแจกแจงรายบุคคล -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
           <table class="w-full text-left text-sm">
             <thead class="bg-slate-50 border-b"><tr><th class="p-3">ชื่อลูกค้า</th><th class="p-3 text-right">ยอดปกติหักส่วนลด</th><th class="p-3 text-right">ยอดวิ่งหักส่วนลด</th><th class="p-3 text-right">ค้างเก่า (ยังไม่จ่าย)</th><th class="p-3 text-right font-bold text-blue-700">ต้องชำระรอบนี้</th><th class="p-3 text-center">ดูใบเสร็จ</th></tr></thead>
@@ -369,7 +449,17 @@
         currentTab: 'dashboard', 
         viewMode: 'ALL',
         customers: [], 
-        customerForm: { name: '', normalDiscount: 0, runDiscount: 0 }, 
+        customerForm: { 
+          name: '', 
+          normalDiscount: 0, 
+          runDiscount: 0,
+          rate2Digit: 60, // เรทเริ่มต้น 2 ตัว 60
+          rate3Direct: 500,
+          rate3Tod: 90,
+          rate3Bottom: 100,
+          rateRunTop: 3,
+          rateRunBottom: 4
+        }, 
         editingCustomerIndex: -1,
         bankInfo: '— ธ.กรุงศรี 0594166287 * ♡ Ⓜ️📖 𝐍𝐀𝐌𝐄 : พรพิมล เพิ่มไธสง 👓',
         periods: [], 
@@ -470,6 +560,7 @@
     methods: {
       tabClass(tab) { return this.currentTab === tab ? 'bg-amber-400 text-indigo-950 font-bold px-3 py-1.5 rounded-lg text-sm' : 'text-indigo-100 hover:bg-indigo-800 px-3 py-1.5 rounded-lg text-sm'; },
       formatNum(val) { return Number(val || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); },
+      isRunType(type) { return type === 'RUN_TOP' || type === 'RUN_BOTTOM'; },
       async fetchData() {
         this.isLoading = true;
         try {
@@ -484,6 +575,12 @@
               p.overdues = p.overdues.map(o => ({ ...o, isPaid: o.isPaid === true || o.isPaid === 'true' }));
             }
             if (!p.prizes) p.prizes = [];
+            else {
+              p.prizes = p.prizes.map(z => ({ 
+                ...z, 
+                isHalf: (z.isHalf === true || z.isHalf === 'true') && !this.isRunType(z.type) 
+              }));
+            }
             return p;
           });
           if(this.periods.length > 0) {
@@ -506,11 +603,29 @@
         if (this.editingCustomerIndex === -1) this.customers.push({ ...this.customerForm });
         else { this.customers[this.editingCustomerIndex] = { ...this.customerForm }; this.editingCustomerIndex = -1; }
         this.resetCustomerForm();
-        await this.saveToStorage(); alert('อัปเดตข้อมูลลูกค้าสำเร็จ');
+        await this.saveToStorage(); 
+        alert('บันทึกข้อมูลลูกค้าและราคาจ่ายสำเร็จ');
       },
-      editCustomer(idx) { this.editingCustomerIndex = idx; this.customerForm = { ...this.customers[idx] }; },
+      editCustomer(idx) { 
+        this.editingCustomerIndex = idx; 
+        const c = this.customers[idx];
+        this.customerForm = { 
+          name: c.name,
+          normalDiscount: c.normalDiscount || 0,
+          runDiscount: c.runDiscount || 0,
+          rate2Digit: c.rate2Digit !== undefined ? c.rate2Digit : 60,
+          rate3Direct: c.rate3Direct || 500,
+          rate3Tod: c.rate3Tod || 90,
+          rate3Bottom: c.rate3Bottom || 100,
+          rateRunTop: c.rateRunTop || 3,
+          rateRunBottom: c.rateRunBottom || 4
+        }; 
+      },
       async deleteCustomer(idx) { if (confirm('ยืนยันลบลูกค้า?')) { this.customers.splice(idx, 1); await this.saveToStorage(); } },
-      resetCustomerForm() { this.customerForm = { name: '', normalDiscount: 0, runDiscount: 0 }; this.editingCustomerIndex = -1; },
+      resetCustomerForm() { 
+        this.customerForm = { name: '', normalDiscount: 0, runDiscount: 0, rate2Digit: 60, rate3Direct: 500, rate3Tod: 90, rate3Bottom: 100, rateRunTop: 3, rateRunBottom: 4 }; 
+        this.editingCustomerIndex = -1; 
+      },
       async saveBankInfo() { await this.saveToStorage(); alert('บันทึกข้อมูลบัญชีสำเร็จ'); },
       async createNewPeriod() {
         if (!this.newPeriodName.trim()) return alert('ระบุชื่องวด');
@@ -543,21 +658,57 @@
       addPrizeRow() {
         if (!this.currentPeriod) return;
         if (!this.currentPeriod.prizes) this.currentPeriod.prizes = [];
-        this.currentPeriod.prizes.push({
+        const pz = {
           customerName: '',
           type: '2_DIGIT',
+          isHalf: false,
           amount: 0,
-          customerRate: 70,
+          customerRate: 60, // เรทเริ่มต้น 2 ตัว 60
           bossRate: 70
-        });
+        };
+        this.currentPeriod.prizes.push(pz);
       },
       removePrizeRow(idx) { if (this.currentPeriod && this.currentPeriod.prizes) this.currentPeriod.prizes.splice(idx, 1); },
       onPrizeTypeChange(pz) {
-        if (pz.type === '3_DIRECT') { pz.bossRate = 500; pz.customerRate = 500; }
-        else if (pz.type === '3_TOD') { pz.bossRate = 100; pz.customerRate = 90; }
-        else if (pz.type === '2_DIGIT') { pz.bossRate = 70; pz.customerRate = 70; }
-        else if (pz.type === 'RUN_TOP') { pz.bossRate = 3; pz.customerRate = 3; }
-        else if (pz.type === 'RUN_BOTTOM') { pz.bossRate = 4; pz.customerRate = 4; }
+        if (this.isRunType(pz.type)) {
+          pz.isHalf = false;
+        }
+        this.updatePrizeRates(pz);
+      },
+      updatePrizeRates(pz) {
+        const c = this.customers.find(x => x && x.name && x.name.trim() === (pz.customerName || '').trim());
+        let bRate = 70;
+        let cRate = 60;
+
+        if (pz.type === '3_DIRECT') {
+          bRate = 500;
+          cRate = c ? (c.rate3Direct || 500) : 500;
+        } else if (pz.type === '3_TOD') {
+          bRate = 100;
+          cRate = c ? (c.rate3Tod || 90) : 90;
+        } else if (pz.type === '3_BOTTOM') {
+          bRate = 100;
+          cRate = c ? (c.rate3Bottom || 100) : 100;
+        } else if (pz.type === '2_DIGIT') {
+          bRate = 70;
+          cRate = c ? (c.rate2Digit !== undefined ? c.rate2Digit : 60) : 60;
+        } else if (pz.type === 'RUN_TOP') {
+          bRate = 3;
+          cRate = c ? (c.rateRunTop || 3) : 3;
+          pz.isHalf = false;
+        } else if (pz.type === 'RUN_BOTTOM') {
+          bRate = 4;
+          cRate = c ? (c.rateRunBottom || 4) : 4;
+          pz.isHalf = false;
+        }
+
+        if (pz.isHalf && !this.isRunType(pz.type)) {
+          bRate = bRate / 2;
+          cRate = cRate / 2;
+        }
+
+        pz.bossRate = bRate;
+        pz.customerRate = cRate;
       },
 
       async savePeriodData() { await this.saveToStorage(); alert('บันทึกข้อมูลงวดนี้ขึ้นคลาวด์เรียบร้อยแล้ว'); },
