@@ -103,7 +103,6 @@
       </div>
 
       <div v-if="currentPeriod">
-        <!-- กล่องวางข้อมูลด่วน -->
         <div class="bg-indigo-50/70 p-5 rounded-2xl border border-indigo-100 mb-6">
           <div class="flex flex-wrap justify-between items-center mb-1 gap-2">
             <h3 class="font-bold text-sm text-indigo-950"><i class="fa-solid fa-paste text-indigo-600"></i> วางข้อมูลด่วน (Ctrl + V)</h3>
@@ -117,7 +116,7 @@
         <!-- 1. บิลทั้งหมดในงวด -->
         <div class="bg-white rounded-2xl shadow-sm border mb-6">
           <div class="px-6 py-4 border-b bg-slate-50 flex justify-between items-center">
-            <h3 class="font-bold text-slate-800">1. บิลทั้งหมดในงวด ({{ currentPeriod.bills.length }} บิล)</h3>
+            <h3 class="font-bold text-slate-800">1. บิลทั้งหมดในงวด ({{ (currentPeriod.bills || []).length }} บิล)</h3>
             <button @click="addEmptyBillRow" class="bg-slate-200 text-xs px-3 py-1.5 rounded-md">+ เพิ่มแถว</button>
           </div>
           <div class="overflow-x-auto max-h-96">
@@ -156,11 +155,11 @@
               </label>
               <button @click="removeOverdueRow(idx)" class="text-rose-500 px-2 hover:text-rose-700"><i class="fa-solid fa-trash"></i></button>
             </div>
-            <div v-if="currentPeriod.overdues.length === 0" class="text-slate-400 text-sm py-2 text-center">ไม่มีรายการยอดค้างเก่าในงวดนี้</div>
+            <div v-if="!currentPeriod.overdues || currentPeriod.overdues.length === 0" class="text-slate-400 text-sm py-2 text-center">ไม่มีรายการยอดค้างเก่าในงวดนี้</div>
           </div>
         </div>
 
-        <!-- 3. บันทึกยอดถูกรางวัล (ใหม่) -->
+        <!-- 3. บันทึกยอดถูกรางวัล -->
         <div class="bg-white rounded-2xl shadow-sm border mb-6">
           <div class="px-6 py-4 border-b bg-purple-50 flex justify-between items-center">
             <div>
@@ -232,7 +231,6 @@
       </div>
 
       <div v-if="viewMode === 'ALL'" class="space-y-6">
-        <!-- การ์ดตัวเลขสรุป 4 ช่อง -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- 1. ยอดขายรวมทั้งหมด -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
@@ -269,7 +267,7 @@
             </div>
           </div>
 
-          <!-- 4. กำไรสุทธิงวดนี้ (รวมโบนัสรางวัลแล้ว) -->
+          <!-- 4. กำไรสุทธิงวดนี้ -->
           <div class="bg-emerald-600 text-white p-5 rounded-2xl shadow-md flex flex-col justify-between">
             <div>
               <span class="text-xs font-semibold text-emerald-100 uppercase tracking-wider">กำไรสุทธิงวดนี้</span>
@@ -283,14 +281,14 @@
           </div>
         </div>
 
-        <!-- กล่องสรุปยอดเคลียร์เงินรางวัล (ใหม่) -->
+        <!-- กล่องสรุปยอดเคลียร์เงินรางวัล -->
         <div class="bg-gradient-to-r from-purple-900 to-indigo-900 text-white p-6 rounded-3xl shadow-md border border-purple-800">
           <div class="flex items-center justify-between border-b border-purple-700/60 pb-3 mb-4">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-trophy text-amber-400 text-xl"></i>
               <h3 class="font-bold text-lg">สรุปยอดเคลียร์เงินรางวัล (งวดนี้)</h3>
             </div>
-            <span class="text-xs bg-purple-800/80 px-3 py-1 rounded-full text-purple-200 font-medium">ถูกรางวัล {{ (currentPeriod.prizes || []).length }} รายการ</span>
+            <span class="text-xs bg-purple-800/80 px-3 py-1 rounded-full text-purple-200 font-medium">ถูกรางวัล {{ (currentPeriod && currentPeriod.prizes ? currentPeriod.prizes.length : 0) }} รายการ</span>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
             <div class="bg-white/10 p-4 rounded-2xl border border-white/10">
@@ -317,7 +315,7 @@
         </div>
       </div>
 
-      <!-- VIEW 2: ใบเสร็จรายบุคคล (คงเดิมตามความต้องการ) -->
+      <!-- VIEW 2: ใบเสร็จรายบุคคล -->
       <div v-else class="space-y-4">
         <div class="flex justify-between items-center no-print">
           <button @click="viewMode = 'ALL'" class="text-slate-600 font-medium"><i class="fa-solid fa-arrow-left"></i> กลับหน้ารวม</button>
@@ -328,7 +326,7 @@
 
         <div id="printable-bill" class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border max-w-4xl mx-auto">
           <div class="border-b pb-4 mb-6 flex justify-between items-start gap-2">
-            <div><span class="text-xs font-bold text-indigo-600 uppercase">ใบแจ้งสรุปยอดชำระ</span><h2 class="text-3xl font-extrabold mt-1">คุณ: {{ viewMode }}</h2><p class="text-xs text-slate-500">งวดประจำวันที่: {{ currentPeriod.name }}</p></div>
+            <div><span class="text-xs font-bold text-indigo-600 uppercase">ใบแจ้งสรุปยอดชำระ</span><h2 class="text-3xl font-extrabold mt-1">คุณ: {{ viewMode }}</h2><p class="text-xs text-slate-500">งวดประจำวันที่: {{ currentPeriod ? currentPeriod.name : '' }}</p></div>
             <div class="text-right"><span class="inline-block bg-slate-100 text-xs px-3.5 py-1.5 rounded-full font-medium">ส่วนลดปกติ: <b>{{ getCustomerDiscount(viewMode).normal }}%</b> | วิ่ง: <b>{{ getCustomerDiscount(viewMode).run }}%</b></span></div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -368,10 +366,16 @@
       return {
         isLoading: false,
         isSavingImg: false,
-        currentTab: 'dashboard', viewMode: 'ALL',
-        customers: [], customerForm: { name: '', normalDiscount: 0, runDiscount: 0 }, editingCustomerIndex: -1,
+        currentTab: 'dashboard', 
+        viewMode: 'ALL',
+        customers: [], 
+        customerForm: { name: '', normalDiscount: 0, runDiscount: 0 }, 
+        editingCustomerIndex: -1,
         bankInfo: '— ธ.กรุงศรี 0594166287 * ♡ Ⓜ️📖 𝐍𝐀𝐌𝐄 : พรพิมล เพิ่มไธสง 👓',
-        periods: [], selectedPeriodId: '', newPeriodName: '', pasteText: ''
+        periods: [], 
+        selectedPeriodId: '', 
+        newPeriodName: '', 
+        pasteText: ''
       }
     },
     mounted() {
@@ -379,13 +383,16 @@
       else this.fetchData();
     },
     computed: {
-      currentPeriod() { return this.periods.find(p => p.id === this.selectedPeriodId) || this.periods[0]; },
+      currentPeriod() { 
+        if (!this.periods || this.periods.length === 0) return null;
+        return this.periods.find(p => p.id === this.selectedPeriodId) || this.periods[0]; 
+      },
       customersInCurrentPeriod() {
         if (!this.currentPeriod) return [];
         const names = new Set();
-        (this.currentPeriod.bills || []).forEach(b => { if (b.customerName) names.add(b.customerName.trim()); });
-        (this.currentPeriod.overdues || []).forEach(o => { if (o.customerName) names.add(o.customerName.trim()); });
-        (this.currentPeriod.prizes || []).forEach(z => { if (z.customerName) names.add(z.customerName.trim()); });
+        (this.currentPeriod.bills || []).forEach(b => { if (b && b.customerName) names.add(b.customerName.trim()); });
+        (this.currentPeriod.overdues || []).forEach(o => { if (o && o.customerName) names.add(o.customerName.trim()); });
+        (this.currentPeriod.prizes || []).forEach(z => { if (z && z.customerName) names.add(z.customerName.trim()); });
         return Array.from(names);
       },
       overallStats() {
@@ -427,7 +434,6 @@
           totalRemainingToCollect += s.totalPayable;
         });
 
-        // คิดคำนวณยอดเงินรางวัล & โบนัสส่วนต่าง
         let totalPrizeFromBoss = 0;
         let totalPrizeToCustomer = 0;
 
@@ -441,7 +447,7 @@
 
         const totalPrizeBonus = Math.max(0, totalPrizeFromBoss - totalPrizeToCustomer);
         const salesProfit = totalCustomerNetAll - totalToBoss;
-        const netProfit = salesProfit + totalPrizeBonus; // กำไรหวย + กำไรโบนัสรางวัล
+        const netProfit = salesProfit + totalPrizeBonus;
 
         return { 
           totalGross: totalNormalGross + totalRunGross, 
@@ -467,17 +473,25 @@
       async fetchData() {
         this.isLoading = true;
         try {
-          const res = await fetch(SCRIPT_URL); const data = await res.json();
-          this.customers = data.customers || []; this.bankInfo = data.bankInfo || this.bankInfo;
+          const res = await fetch(SCRIPT_URL); 
+          const data = await res.json();
+          this.customers = data.customers || []; 
+          this.bankInfo = data.bankInfo || this.bankInfo;
           this.periods = (data.periods || []).map(p => {
-            if (p.overdues) {
+            if (!p.bills) p.bills = [];
+            if (!p.overdues) p.overdues = [];
+            else {
               p.overdues = p.overdues.map(o => ({ ...o, isPaid: o.isPaid === true || o.isPaid === 'true' }));
             }
             if (!p.prizes) p.prizes = [];
             return p;
           });
-          if(this.periods.length > 0) this.selectedPeriodId = this.periods[0].id;
-        } catch(e) { alert('เชื่อมต่อฐานข้อมูลล้มเหลว กรุณารีเฟรชหน้าเว็บ'); }
+          if(this.periods.length > 0) {
+            this.selectedPeriodId = this.periods[0].id;
+          }
+        } catch(e) { 
+          alert('เชื่อมต่อฐานข้อมูลล้มเหลว กรุณารีเฟรชหน้าเว็บ'); 
+        }
         this.isLoading = false;
       },
       async saveToStorage() {
@@ -513,13 +527,21 @@
           await this.saveToStorage(); alert('ลบงวดเรียบร้อยแล้ว');
         }
       },
-      addEmptyBillRow() { this.currentPeriod.bills.push({ customerName: '', normalAmount: 0, runAmount: 0, isPaid: false }); },
-      removeBillRow(idx) { this.currentPeriod.bills.splice(idx, 1); },
-      addOverdueRow() { this.currentPeriod.overdues.push({ customerName: '', amount: 0, isPaid: false }); },
-      removeOverdueRow(idx) { this.currentPeriod.overdues.splice(idx, 1); },
+      addEmptyBillRow() { 
+        if (!this.currentPeriod) return;
+        if (!this.currentPeriod.bills) this.currentPeriod.bills = [];
+        this.currentPeriod.bills.push({ customerName: '', normalAmount: 0, runAmount: 0, isPaid: false }); 
+      },
+      removeBillRow(idx) { if (this.currentPeriod && this.currentPeriod.bills) this.currentPeriod.bills.splice(idx, 1); },
+      addOverdueRow() { 
+        if (!this.currentPeriod) return;
+        if (!this.currentPeriod.overdues) this.currentPeriod.overdues = [];
+        this.currentPeriod.overdues.push({ customerName: '', amount: 0, isPaid: false }); 
+      },
+      removeOverdueRow(idx) { if (this.currentPeriod && this.currentPeriod.overdues) this.currentPeriod.overdues.splice(idx, 1); },
       
-      // ฟังก์ชันจัดการรายการรางวัล
       addPrizeRow() {
+        if (!this.currentPeriod) return;
         if (!this.currentPeriod.prizes) this.currentPeriod.prizes = [];
         this.currentPeriod.prizes.push({
           customerName: '',
@@ -529,7 +551,7 @@
           bossRate: 70
         });
       },
-      removePrizeRow(idx) { this.currentPeriod.prizes.splice(idx, 1); },
+      removePrizeRow(idx) { if (this.currentPeriod && this.currentPeriod.prizes) this.currentPeriod.prizes.splice(idx, 1); },
       onPrizeTypeChange(pz) {
         if (pz.type === '3_DIRECT') { pz.bossRate = 500; pz.customerRate = 500; }
         else if (pz.type === '3_TOD') { pz.bossRate = 100; pz.customerRate = 90; }
@@ -543,6 +565,9 @@
         if (!this.pasteText.trim()) return;
         const rows = this.pasteText.trim().split('\n');
         let added = 0;
+
+        if (!this.currentPeriod) return;
+        if (!this.currentPeriod.bills) this.currentPeriod.bills = [];
 
         rows.forEach(r => {
           const rawCols = r.split(/\t+/).map(s => s.trim()).filter(s => s !== '');
@@ -584,16 +609,33 @@
         if (added > 0) alert(`เพิ่มรายการบิลเรียบร้อยแล้วทั้งหมด ${added} รายการ`);
         else alert('ไม่พบข้อมูลที่ถูกต้อง กรุณาตรวจสอบข้อความที่คัดลอกมา');
       },
-      getCustomerDiscount(name) { const c = this.customers.find(x => x.name.trim() === name.trim()); return { normal: c ? c.normalDiscount : 0, run: c ? c.runDiscount : 0 }; },
-      getCustomerBills(name) { if (!this.currentPeriod) return []; return this.currentPeriod.bills.filter(b => b.customerName && b.customerName.trim() === name.trim()); },
+      getCustomerDiscount(name) { 
+        if (!name) return { normal: 0, run: 0 };
+        const c = this.customers.find(x => x && x.name && x.name.trim() === name.trim()); 
+        return { normal: c ? (c.normalDiscount || 0) : 0, run: c ? (c.runDiscount || 0) : 0 }; 
+      },
+      getCustomerBills(name) { 
+        if (!this.currentPeriod || !this.currentPeriod.bills || !name) return []; 
+        return this.currentPeriod.bills.filter(b => b && b.customerName && b.customerName.trim() === name.trim()); 
+      },
       getCustomerSummary(name) {
-        const bills = this.getCustomerBills(name), disc = this.getCustomerDiscount(name);
+        if (!this.currentPeriod || !name) {
+          return { normalGrossUnpaid: 0, normalDiscountAmount: 0, normalNet: 0, runGrossUnpaid: 0, runDiscountAmount: 0, runNet: 0, overdueUnpaid: 0, totalPayable: 0 };
+        }
+        const bills = this.getCustomerBills(name);
+        const disc = this.getCustomerDiscount(name);
         let normalGrossUnpaid = 0, runGrossUnpaid = 0;
-        bills.forEach(b => { if (!b.isPaid) { normalGrossUnpaid += Number(b.normalAmount) || 0; runGrossUnpaid += Number(b.runAmount) || 0; } });
-        const normalNet = normalGrossUnpaid - (normalGrossUnpaid * (disc.normal / 100)), runNet = runGrossUnpaid - (runGrossUnpaid * (disc.run / 100));
+        bills.forEach(b => { 
+          if (!b.isPaid) { 
+            normalGrossUnpaid += Number(b.normalAmount) || 0; 
+            runGrossUnpaid += Number(b.runAmount) || 0; 
+          } 
+        });
+        const normalNet = normalGrossUnpaid - (normalGrossUnpaid * (disc.normal / 100));
+        const runNet = runGrossUnpaid - (runGrossUnpaid * (disc.run / 100));
         
         const overdueUnpaid = (this.currentPeriod.overdues || [])
-          .filter(o => o.customerName && o.customerName.trim() === name.trim() && !o.isPaid)
+          .filter(o => o && o.customerName && o.customerName.trim() === name.trim() && !o.isPaid)
           .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
 
         return { 
@@ -614,7 +656,7 @@
         try {
           const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
           canvas.toBlob(async (blob) => {
-            const fileName = `บิล_${this.viewMode}_${this.currentPeriod.name}.png`;
+            const fileName = `บิล_${this.viewMode}_${this.currentPeriod ? this.currentPeriod.name : ''}.png`;
             const file = new File([blob], fileName, { type: 'image/png' });
 
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
