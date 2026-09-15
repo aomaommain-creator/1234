@@ -186,7 +186,7 @@
           <button @click="processPaste" class="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 px-5 rounded-lg shadow transition">แปลงข้อมูลลงตาราง</button>
         </div>
 
-        <!-- 1. บิลทั้งหมดในงวด -->
+        <!-- 1. บิลทั้งหมดในงวด (ติ๊กทีละบิลตามปกติ) -->
         <div class="bg-white rounded-2xl shadow-sm border mb-6">
           <div class="px-6 py-4 border-b bg-slate-50 flex justify-between items-center">
             <h3 class="font-bold text-slate-800">1. บิลทั้งหมดในงวด ({{ (currentPeriod.bills || []).length }} บิล)</h3>
@@ -209,7 +209,7 @@
           </div>
         </div>
 
-        <!-- 2. ยอดค้างเก่า มาเก็บรอบนี้ -->
+        <!-- 2. ยอดค้างเก่า มาเก็บรอบนี้ (ติ๊กทีละรายการตามปกติ) -->
         <div class="bg-white rounded-2xl shadow-sm border mb-6">
           <div class="px-6 py-4 border-b bg-amber-50 flex justify-between items-center">
             <div>
@@ -387,7 +387,7 @@
           </div>
         </div>
 
-        <!-- ตารางแจกแจงรายบุคคล (ปรับปรุงเงื่อนไข จ่ายครบแล้ว / มียอดค้าง / ไม่ได้เล่นงวดนี้) -->
+        <!-- ตารางแจกแจงรายบุคคล (เพิ่มคอลัมน์ ติ๊กรับชำระยอดรวม) -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm whitespace-nowrap">
@@ -398,6 +398,9 @@
                   <th class="p-3 text-right">ยอดวิ่งหักส่วนลด</th>
                   <th class="p-3 text-right">ค้างเก่า (ยังไม่จ่าย)</th>
                   <th class="p-3 text-right font-bold text-blue-700">สถานะ / ต้องชำระรอบนี้</th>
+                  <th class="p-3 text-center text-emerald-800 font-bold bg-emerald-50/70 border-x border-emerald-100">
+                    <i class="fa-solid fa-money-bill-check mr-1"></i> รับชำระยอดรวม
+                  </th>
                   <th class="p-3 text-center">ดูใบเสร็จ</th>
                 </tr>
               </thead>
@@ -415,6 +418,7 @@
                         ไม่ได้เล่นงวดนี้
                       </span>
                     </td>
+                    <td class="p-3 text-center text-slate-300 bg-slate-50/50 border-x">-</td>
                     <td class="p-3 text-center text-slate-300">-</td>
                   </template>
 
@@ -438,6 +442,18 @@
                       <span v-else class="font-extrabold text-blue-700 text-base">
                         ฿{{ formatNum(getCustomerSummary(cName).totalPayable) }}
                       </span>
+                    </td>
+
+                    <!-- ช่องติ๊กรับชำระยอดรวม (คลิกเดียวปรับทุกบิลของลูกค้ารายนี้) -->
+                    <td class="p-3 text-center bg-emerald-50/30 border-x border-emerald-100">
+                      <label class="inline-flex items-center gap-1.5 cursor-pointer select-none px-2.5 py-1 rounded-lg border transition"
+                             :class="isCustomerFullyPaid(cName) ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' : 'bg-white hover:bg-slate-50 text-slate-600 border-slate-300'">
+                        <input type="checkbox" 
+                               :checked="isCustomerFullyPaid(cName)" 
+                               @change="toggleCustomerPayment(cName, $event.target.checked)" 
+                               class="w-4 h-4 cursor-pointer text-emerald-600 rounded">
+                        <span class="text-xs font-bold">{{ isCustomerFullyPaid(cName) ? 'โอนแล้ว' : 'ติ๊กชำระ' }}</span>
+                      </label>
                     </td>
                     
                     <td class="p-3 text-center">
@@ -512,11 +528,22 @@
                   <div class="flex justify-between text-indigo-700"><span class="font-medium">3. ยอดวิ่งหักส่วนลด ({{ getCustomerDiscount(viewMode).run }}%):</span><span class="font-bold text-base">฿{{ formatNum(getCustomerSummary(viewMode).runNet) }}</span></div>
                   <div class="flex justify-between text-amber-700"><span class="font-medium">4. ยอดค้างชำระเก่า:</span><span class="font-bold text-base">฿{{ formatNum(getCustomerSummary(viewMode).overdueUnpaid) }}</span></div>
                 </div>
+                
                 <div class="mt-6 pt-4 border-t-2 border-indigo-200 bg-indigo-900 text-white p-5 rounded-2xl text-center shadow-md">
                   <div class="text-xs uppercase text-indigo-200 font-semibold">ยอดที่ต้องชำระทั้งสิ้น</div>
                   <div class="text-4xl font-black mt-1.5" :class="getCustomerSummary(viewMode).totalPayable === 0 ? 'text-emerald-400' : 'text-amber-300'">
                     {{ getCustomerSummary(viewMode).totalPayable === 0 ? 'จ่ายครบแล้ว' : '฿' + formatNum(getCustomerSummary(viewMode).totalPayable) }}
                   </div>
+                </div>
+
+                <!-- ปุ่มติ๊กรับชำระยอดรวมในหน้ารายคน (ไม่พิมพ์ลงในรูปภาพ/ใบเสร็จ) -->
+                <div class="mt-3 text-center no-print">
+                  <button @click="toggleCustomerPayment(viewMode, !isCustomerFullyPaid(viewMode))"
+                          class="w-full py-2.5 px-4 rounded-xl font-bold text-sm shadow-sm transition flex items-center justify-center gap-2"
+                          :class="isCustomerFullyPaid(viewMode) ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300'">
+                    <i class="fa-solid" :class="isCustomerFullyPaid(viewMode) ? 'fa-circle-check text-white' : 'fa-circle text-slate-300'"></i>
+                    {{ isCustomerFullyPaid(viewMode) ? '✓ ลูกค้าชำระยอดนี้เรียบร้อยแล้ว (คลิกเพื่อยกเลิก)' : 'คลิกเพื่อบันทึกว่า: ลูกค้าชำระยอดนี้แล้ว' }}
+                  </button>
                 </div>
               </div>
               <div class="mt-5 p-4 bg-amber-50 border-2 border-amber-300/80 rounded-2xl text-center shadow-sm">
@@ -571,7 +598,6 @@
         if (!this.periods || this.periods.length === 0) return null;
         return this.periods.find(p => p.id === this.selectedPeriodId) || this.periods[0]; 
       },
-      // ดึงรายชื่อลูกค้าทั้งหมด (รวมทั้งที่มีในระบบและที่มีบิลในงวดนี้) เพื่อแสดงในตารางให้เห็นครบทุกคน
       allDisplayCustomers() {
         const names = new Set();
         (this.customers || []).forEach(c => { if (c && c.name) names.add(c.name.trim()); });
@@ -658,6 +684,41 @@
       tabClass(tab) { return this.currentTab === tab ? 'bg-amber-400 text-indigo-950 font-bold px-3 py-1.5 rounded-lg text-sm' : 'text-indigo-100 hover:bg-indigo-800 px-3 py-1.5 rounded-lg text-sm'; },
       formatNum(val) { return Number(val || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); },
       isRunType(type) { return type === 'RUN_TOP' || type === 'RUN_BOTTOM'; },
+      
+      // ตรวจสอบว่าลูกค้าคนนี้จ่ายครบทุกรายการแล้วหรือยัง
+      isCustomerFullyPaid(name) {
+        if (!this.currentPeriod || !name) return false;
+        const bills = (this.currentPeriod.bills || []).filter(b => b && b.customerName && b.customerName.trim() === name.trim());
+        const overdues = (this.currentPeriod.overdues || []).filter(o => o && o.customerName && o.customerName.trim() === name.trim());
+        
+        if (bills.length === 0 && overdues.length === 0) return false;
+        const allBillsPaid = bills.every(b => b.isPaid);
+        const allOverduesPaid = overdues.every(o => o.isPaid);
+        return allBillsPaid && allOverduesPaid;
+      },
+
+      // ฟังก์ชันคลิกเดียวเพื่อปรับสถานะทุกบิลของลูกค้ารายนั้นให้จ่ายแล้ว/ยกเลิกจ่าย
+      async toggleCustomerPayment(name, status) {
+        if (!this.currentPeriod || !name) return;
+        
+        // 1. ปรับบิลทั้งหมดในงวดของลูกค้ารายนี้
+        (this.currentPeriod.bills || []).forEach(b => {
+          if (b && b.customerName && b.customerName.trim() === name.trim()) {
+            b.isPaid = status;
+          }
+        });
+
+        // 2. ปรับยอดค้างเก่าของลูกค้ารายนี้
+        (this.currentPeriod.overdues || []).forEach(o => {
+          if (o && o.customerName && o.customerName.trim() === name.trim()) {
+            o.isPaid = status;
+          }
+        });
+
+        // 3. บันทึกขึ้นระบบคลาวด์อัตโนมัติ
+        await this.saveToStorage();
+      },
+
       async fetchData() {
         this.isLoading = true;
         try {
@@ -874,12 +935,9 @@
         const bills = this.getCustomerBills(name);
         const disc = this.getCustomerDiscount(name);
         
-        // ตรวจสอบว่ามีรายการค้างเก่าหรือไม่
         const customerOverdues = (this.currentPeriod.overdues || []).filter(o => o && o.customerName && o.customerName.trim() === name.trim());
-        // ตรวจสอบว่ามีรายการถูกรางวัลหรือไม่
         const customerPrizes = (this.currentPeriod.prizes || []).filter(z => z && z.customerName && z.customerName.trim() === name.trim());
 
-        // ตรวจสอบว่าลูกค้ารายนี้มีข้อมูลในงวดนี้หรือไม่ (เล่นบิล / มีค้าง / มีถูกรางวัล)
         const hasActivity = bills.length > 0 || customerOverdues.length > 0 || customerPrizes.length > 0;
 
         let normalGrossUnpaid = 0, runGrossUnpaid = 0;
