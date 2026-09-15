@@ -312,7 +312,7 @@
         </select>
         <select v-model="viewMode" class="border border-indigo-400 rounded-lg px-4 py-2 bg-indigo-50 font-bold text-indigo-900">
           <option value="ALL">👁️ ภาพรวมทั้งหมด (ยอด & กำไร)</option>
-          <option v-for="c in customersInCurrentPeriod" :key="c" :value="c">👤 {{ c }} (ใบสรุปรายบุคคล)</option>
+          <option v-for="c in allDisplayCustomers" :key="c" :value="c">👤 {{ c }} (ใบสรุปรายบุคคล)</option>
         </select>
       </div>
 
@@ -387,11 +387,69 @@
           </div>
         </div>
 
+        <!-- ตารางแจกแจงรายบุคคล (ปรับปรุงเงื่อนไข จ่ายครบแล้ว / มียอดค้าง / ไม่ได้เล่นงวดนี้) -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-          <table class="w-full text-left text-sm">
-            <thead class="bg-slate-50 border-b"><tr><th class="p-3">ชื่อลูกค้า</th><th class="p-3 text-right">ยอดปกติหักส่วนลด</th><th class="p-3 text-right">ยอดวิ่งหักส่วนลด</th><th class="p-3 text-right">ค้างเก่า (ยังไม่จ่าย)</th><th class="p-3 text-right font-bold text-blue-700">ต้องชำระรอบนี้</th><th class="p-3 text-center">ดูใบเสร็จ</th></tr></thead>
-            <tbody class="divide-y"><tr v-for="cName in customersInCurrentPeriod" :key="cName" class="hover:bg-slate-50"><td class="p-3 font-bold text-base">{{ cName }}</td><td class="p-3 text-right">฿{{ formatNum(getCustomerSummary(cName).normalNet) }}</td><td class="p-3 text-right text-indigo-700">฿{{ formatNum(getCustomerSummary(cName).runNet) }}</td><td class="p-3 text-right text-amber-600">฿{{ formatNum(getCustomerSummary(cName).overdueUnpaid) }}</td><td class="p-3 text-right font-extrabold text-blue-700 text-base">฿{{ formatNum(getCustomerSummary(cName).totalPayable) }}</td><td class="p-3 text-center"><button @click="viewMode = cName" class="text-indigo-600 font-bold text-xs bg-indigo-50 px-3 py-1.5 rounded-lg">ดูบิลเดี่ยว <i class="fa-solid fa-arrow-right"></i></button></td></tr></tbody>
-          </table>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm whitespace-nowrap">
+              <thead class="bg-slate-50 border-b">
+                <tr>
+                  <th class="p-3">ชื่อลูกค้า</th>
+                  <th class="p-3 text-right">ยอดปกติหักส่วนลด</th>
+                  <th class="p-3 text-right">ยอดวิ่งหักส่วนลด</th>
+                  <th class="p-3 text-right">ค้างเก่า (ยังไม่จ่าย)</th>
+                  <th class="p-3 text-right font-bold text-blue-700">สถานะ / ต้องชำระรอบนี้</th>
+                  <th class="p-3 text-center">ดูใบเสร็จ</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y">
+                <tr v-for="cName in allDisplayCustomers" :key="cName" class="hover:bg-slate-50">
+                  <td class="p-3 font-bold text-base text-slate-800">{{ cName }}</td>
+                  
+                  <!-- กรณี: ลูกค้าไม่ได้เล่นในงวดนี้ -->
+                  <template v-if="!getCustomerSummary(cName).hasActivity">
+                    <td class="p-3 text-right text-slate-400">-</td>
+                    <td class="p-3 text-right text-slate-400">-</td>
+                    <td class="p-3 text-right text-slate-400">-</td>
+                    <td class="p-3 text-right">
+                      <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 border border-slate-200">
+                        ไม่ได้เล่นงวดนี้
+                      </span>
+                    </td>
+                    <td class="p-3 text-center text-slate-300">-</td>
+                  </template>
+
+                  <!-- กรณี: มีการเล่นในงวดนี้ หรือ มียอดค้างเก่า -->
+                  <template v-else>
+                    <td class="p-3 text-right">
+                      {{ getCustomerSummary(cName).normalNet > 0 ? '฿' + formatNum(getCustomerSummary(cName).normalNet) : '-' }}
+                    </td>
+                    <td class="p-3 text-right text-indigo-700">
+                      {{ getCustomerSummary(cName).runNet > 0 ? '฿' + formatNum(getCustomerSummary(cName).runNet) : '-' }}
+                    </td>
+                    <td class="p-3 text-right text-amber-600">
+                      {{ getCustomerSummary(cName).overdueUnpaid > 0 ? '฿' + formatNum(getCustomerSummary(cName).overdueUnpaid) : '-' }}
+                    </td>
+                    
+                    <!-- ช่องแสดงยอดคงค้าง หรือ จ่ายครบแล้ว -->
+                    <td class="p-3 text-right">
+                      <span v-if="getCustomerSummary(cName).totalPayable === 0" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-sm">
+                        <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> จ่ายครบแล้ว
+                      </span>
+                      <span v-else class="font-extrabold text-blue-700 text-base">
+                        ฿{{ formatNum(getCustomerSummary(cName).totalPayable) }}
+                      </span>
+                    </td>
+                    
+                    <td class="p-3 text-center">
+                      <button @click="viewMode = cName" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition">
+                        ดูบิลเดี่ยว <i class="fa-solid fa-arrow-right ml-0.5"></i>
+                      </button>
+                    </td>
+                  </template>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -406,15 +464,43 @@
 
         <div id="printable-bill" class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border max-w-4xl mx-auto">
           <div class="border-b pb-4 mb-6 flex justify-between items-start gap-2">
-            <div><span class="text-xs font-bold text-indigo-600 uppercase">ใบแจ้งสรุปยอดชำระ</span><h2 class="text-3xl font-extrabold mt-1">คุณ: {{ viewMode }}</h2><p class="text-xs text-slate-500">งวดประจำวันที่: {{ currentPeriod ? currentPeriod.name : '' }}</p></div>
-            <div class="text-right"><span class="inline-block bg-slate-100 text-xs px-3.5 py-1.5 rounded-full font-medium">ส่วนลดปกติ: <b>{{ getCustomerDiscount(viewMode).normal }}%</b> | วิ่ง: <b>{{ getCustomerDiscount(viewMode).run }}%</b></span></div>
+            <div>
+              <span class="text-xs font-bold text-indigo-600 uppercase">ใบแจ้งสรุปยอดชำระ</span>
+              <h2 class="text-3xl font-extrabold mt-1">คุณ: {{ viewMode }}</h2>
+              <p class="text-xs text-slate-500">งวดประจำวันที่: {{ currentPeriod ? currentPeriod.name : '' }}</p>
+            </div>
+            <div class="text-right">
+              <span class="inline-block bg-slate-100 text-xs px-3.5 py-1.5 rounded-full font-medium">
+                ส่วนลดปกติ: <b>{{ getCustomerDiscount(viewMode).normal }}%</b> | วิ่ง: <b>{{ getCustomerDiscount(viewMode).run }}%</b>
+              </span>
+            </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
             <div class="md:col-span-6 space-y-3">
               <h3 class="font-bold text-slate-700 text-sm border-b pb-2">รายการบิลในงวด</h3>
               <table class="w-full text-sm">
-                <thead><tr class="text-slate-500 border-b text-xs"><th class="py-1.5 text-left">ลำดับ</th><th class="py-1.5 text-right">ยอดปกติ</th><th class="py-1.5 text-right">ยอดวิ่ง</th><th class="py-1.5 text-center">สถานะ</th></tr></thead>
-                <tbody class="divide-y"><tr v-for="(b, idx) in getCustomerBills(viewMode)" :key="idx"><td class="py-2 text-slate-500 text-xs">{{ idx + 1 }}</td><td class="py-2 text-right font-semibold">฿{{ formatNum(b.normalAmount) }}</td><td class="py-2 text-right text-indigo-700 font-semibold">{{ b.runAmount ? '฿' + formatNum(b.runAmount) : '-' }}</td><td class="py-2 text-center"><span v-if="b.isPaid" class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full">จ่ายแล้ว</span><span v-else class="text-slate-400 text-xs">-</span></td></tr></tbody>
+                <thead>
+                  <tr class="text-slate-500 border-b text-xs">
+                    <th class="py-1.5 text-left">ลำดับ</th>
+                    <th class="py-1.5 text-right">ยอดปกติ</th>
+                    <th class="py-1.5 text-right">ยอดวิ่ง</th>
+                    <th class="py-1.5 text-center">สถานะ</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y">
+                  <tr v-for="(b, idx) in getCustomerBills(viewMode)" :key="idx">
+                    <td class="py-2 text-slate-500 text-xs">{{ idx + 1 }}</td>
+                    <td class="py-2 text-right font-semibold">฿{{ formatNum(b.normalAmount) }}</td>
+                    <td class="py-2 text-right text-indigo-700 font-semibold">{{ b.runAmount ? '฿' + formatNum(b.runAmount) : '-' }}</td>
+                    <td class="py-2 text-center">
+                      <span v-if="b.isPaid" class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full">จ่ายแล้ว</span>
+                      <span v-else class="text-slate-400 text-xs">-</span>
+                    </td>
+                  </tr>
+                  <tr v-if="getCustomerBills(viewMode).length === 0">
+                    <td colspan="4" class="py-4 text-center text-slate-400 text-xs">ไม่มีรายการซื้อในงวดนี้</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
             <div class="md:col-span-6 flex flex-col justify-between bg-slate-50 p-5 rounded-2xl border">
@@ -426,9 +512,17 @@
                   <div class="flex justify-between text-indigo-700"><span class="font-medium">3. ยอดวิ่งหักส่วนลด ({{ getCustomerDiscount(viewMode).run }}%):</span><span class="font-bold text-base">฿{{ formatNum(getCustomerSummary(viewMode).runNet) }}</span></div>
                   <div class="flex justify-between text-amber-700"><span class="font-medium">4. ยอดค้างชำระเก่า:</span><span class="font-bold text-base">฿{{ formatNum(getCustomerSummary(viewMode).overdueUnpaid) }}</span></div>
                 </div>
-                <div class="mt-6 pt-4 border-t-2 border-indigo-200 bg-indigo-900 text-white p-5 rounded-2xl text-center shadow-md"><div class="text-xs uppercase text-indigo-200 font-semibold">ยอดที่ต้องชำระทั้งสิ้น</div><div class="text-4xl font-black mt-1.5 text-amber-300">฿{{ formatNum(getCustomerSummary(viewMode).totalPayable) }}</div></div>
+                <div class="mt-6 pt-4 border-t-2 border-indigo-200 bg-indigo-900 text-white p-5 rounded-2xl text-center shadow-md">
+                  <div class="text-xs uppercase text-indigo-200 font-semibold">ยอดที่ต้องชำระทั้งสิ้น</div>
+                  <div class="text-4xl font-black mt-1.5" :class="getCustomerSummary(viewMode).totalPayable === 0 ? 'text-emerald-400' : 'text-amber-300'">
+                    {{ getCustomerSummary(viewMode).totalPayable === 0 ? 'จ่ายครบแล้ว' : '฿' + formatNum(getCustomerSummary(viewMode).totalPayable) }}
+                  </div>
+                </div>
               </div>
-              <div class="mt-5 p-4 bg-amber-50 border-2 border-amber-300/80 rounded-2xl text-center shadow-sm"><div class="text-xs text-amber-800 font-bold uppercase mb-1"><i class="fa-solid fa-building-columns mr-1"></i> ช่องทางชำระเงิน</div><div class="text-base md:text-lg text-slate-900 font-extrabold leading-relaxed">{{ bankInfo }}</div></div>
+              <div class="mt-5 p-4 bg-amber-50 border-2 border-amber-300/80 rounded-2xl text-center shadow-sm">
+                <div class="text-xs text-amber-800 font-bold uppercase mb-1"><i class="fa-solid fa-building-columns mr-1"></i> ช่องทางชำระเงิน</div>
+                <div class="text-base md:text-lg text-slate-900 font-extrabold leading-relaxed">{{ bankInfo }}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -453,7 +547,7 @@
           name: '', 
           normalDiscount: 0, 
           runDiscount: 0,
-          rate2Digit: 60, // เรทเริ่มต้น 2 ตัว 60
+          rate2Digit: 60,
           rate3Direct: 500,
           rate3Tod: 90,
           rate3Bottom: 100,
@@ -477,12 +571,15 @@
         if (!this.periods || this.periods.length === 0) return null;
         return this.periods.find(p => p.id === this.selectedPeriodId) || this.periods[0]; 
       },
-      customersInCurrentPeriod() {
-        if (!this.currentPeriod) return [];
+      // ดึงรายชื่อลูกค้าทั้งหมด (รวมทั้งที่มีในระบบและที่มีบิลในงวดนี้) เพื่อแสดงในตารางให้เห็นครบทุกคน
+      allDisplayCustomers() {
         const names = new Set();
-        (this.currentPeriod.bills || []).forEach(b => { if (b && b.customerName) names.add(b.customerName.trim()); });
-        (this.currentPeriod.overdues || []).forEach(o => { if (o && o.customerName) names.add(o.customerName.trim()); });
-        (this.currentPeriod.prizes || []).forEach(z => { if (z && z.customerName) names.add(z.customerName.trim()); });
+        (this.customers || []).forEach(c => { if (c && c.name) names.add(c.name.trim()); });
+        if (this.currentPeriod) {
+          (this.currentPeriod.bills || []).forEach(b => { if (b && b.customerName) names.add(b.customerName.trim()); });
+          (this.currentPeriod.overdues || []).forEach(o => { if (o && o.customerName) names.add(o.customerName.trim()); });
+          (this.currentPeriod.prizes || []).forEach(z => { if (z && z.customerName) names.add(z.customerName.trim()); });
+        }
         return Array.from(names);
       },
       overallStats() {
@@ -519,7 +616,7 @@
         const totalToBoss = (totalNormalGross * 0.70) + (totalRunGross * 0.90);
 
         let totalRemainingToCollect = 0;
-        this.customersInCurrentPeriod.forEach(cName => {
+        this.allDisplayCustomers.forEach(cName => {
           const s = this.getCustomerSummary(cName);
           totalRemainingToCollect += s.totalPayable;
         });
@@ -663,7 +760,7 @@
           type: '2_DIGIT',
           isHalf: false,
           amount: 0,
-          customerRate: 60, // เรทเริ่มต้น 2 ตัว 60
+          customerRate: 60,
           bossRate: 70
         };
         this.currentPeriod.prizes.push(pz);
@@ -771,10 +868,20 @@
       },
       getCustomerSummary(name) {
         if (!this.currentPeriod || !name) {
-          return { normalGrossUnpaid: 0, normalDiscountAmount: 0, normalNet: 0, runGrossUnpaid: 0, runDiscountAmount: 0, runNet: 0, overdueUnpaid: 0, totalPayable: 0 };
+          return { hasActivity: false, normalGrossUnpaid: 0, normalDiscountAmount: 0, normalNet: 0, runGrossUnpaid: 0, runDiscountAmount: 0, runNet: 0, overdueUnpaid: 0, totalPayable: 0 };
         }
+
         const bills = this.getCustomerBills(name);
         const disc = this.getCustomerDiscount(name);
+        
+        // ตรวจสอบว่ามีรายการค้างเก่าหรือไม่
+        const customerOverdues = (this.currentPeriod.overdues || []).filter(o => o && o.customerName && o.customerName.trim() === name.trim());
+        // ตรวจสอบว่ามีรายการถูกรางวัลหรือไม่
+        const customerPrizes = (this.currentPeriod.prizes || []).filter(z => z && z.customerName && z.customerName.trim() === name.trim());
+
+        // ตรวจสอบว่าลูกค้ารายนี้มีข้อมูลในงวดนี้หรือไม่ (เล่นบิล / มีค้าง / มีถูกรางวัล)
+        const hasActivity = bills.length > 0 || customerOverdues.length > 0 || customerPrizes.length > 0;
+
         let normalGrossUnpaid = 0, runGrossUnpaid = 0;
         bills.forEach(b => { 
           if (!b.isPaid) { 
@@ -785,11 +892,12 @@
         const normalNet = normalGrossUnpaid - (normalGrossUnpaid * (disc.normal / 100));
         const runNet = runGrossUnpaid - (runGrossUnpaid * (disc.run / 100));
         
-        const overdueUnpaid = (this.currentPeriod.overdues || [])
-          .filter(o => o && o.customerName && o.customerName.trim() === name.trim() && !o.isPaid)
+        const overdueUnpaid = customerOverdues
+          .filter(o => !o.isPaid)
           .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
 
         return { 
+          hasActivity,
           normalGrossUnpaid, 
           normalDiscountAmount: normalGrossUnpaid * (disc.normal / 100), 
           normalNet, 
