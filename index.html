@@ -27,7 +27,7 @@
               200: '#EFE6D4',
               300: '#E3D3B5',
               400: '#D5BE91',
-              500: '#C5A059', // สีทองแชมเปญหลัก
+              500: '#C5A059',
               600: '#B08B43',
               700: '#8C6C30',
               800: '#695026',
@@ -60,7 +60,7 @@
     <span>{{ toastMessage }}</span>
   </div>
 
-  <!-- Header บนคอมพิวเตอร์ (ธีม Luxury ขาวคลีน & ทองแชมเปญ) -->
+  <!-- Header บนคอมพิวเตอร์ -->
   <header class="no-print hidden md:block sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-champagne-200/80 dark:border-slate-800 shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -122,10 +122,9 @@
 
   <main class="max-w-7xl mx-auto px-4 md:px-6 py-5">
 
-    <!-- 1. แดชบอร์ด (Dashboard) -->
+    <!-- 1. แดชบอร์ด (Dashboard) - นำสร้างงวดใหม่ออก เหลือเฉพาะตัวเลือกดูงวด -->
     <section v-if="currentTab === 'dashboard'" class="space-y-5">
-      <!-- กล่องเลือกงวดในหน้าแดชบอร์ด -->
-      <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/70 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-3">
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/70 dark:border-slate-700 shadow-sm flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           <span class="text-xs font-bold uppercase tracking-wider text-champagne-600 dark:text-champagne-400 flex items-center gap-1.5">
             <i class="fa-solid fa-calendar-days text-sm"></i> เลือกดูงวดวันที่:
@@ -134,15 +133,11 @@
             <option v-for="p in periods" :key="p.id" :value="p.id">{{ p.name }}</option>
           </select>
         </div>
-        <div class="flex items-center gap-2">
-          <input v-model="newPeriodName" placeholder="ชื่องวดใหม่" class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs outline-none">
-          <button @click="createNewPeriod" class="px-3.5 py-1.5 rounded-xl bg-slate-900 dark:bg-champagne-500 text-white dark:text-slate-950 text-xs font-bold hover:opacity-90 transition">+ สร้างงวด</button>
-        </div>
+        <span class="text-[11px] text-slate-400 hidden sm:inline">สลับดูข้อมูลและรายรับ-รายจ่ายของแต่ละงวดได้ทันที</span>
       </div>
 
-      <!-- กล่องสรุปยอด 4 ช่อง (Luxury Champagne Cards) -->
+      <!-- กล่องสรุปยอด 4 ช่อง -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- ยอดขายรวม -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between">
           <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">ยอดขายรวม</span>
           <div class="my-2 text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white">฿{{ formatNum(overallStats.totalGross) }}</div>
@@ -152,7 +147,6 @@
           </div>
         </div>
 
-        <!-- รอยอดลูกค้า -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between">
           <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider">รอยอดชำระ</span>
           <div class="my-2 text-2xl lg:text-3xl font-extrabold text-blue-600 dark:text-blue-400">฿{{ formatNum(overallStats.totalRemainingToCollect) }}</div>
@@ -162,7 +156,6 @@
           </div>
         </div>
 
-        <!-- ยอดส่งเจ้านาย -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between">
           <span class="text-xs font-semibold text-rose-500 uppercase tracking-wider">ยอดส่งเจ้านาย</span>
           <div class="my-2 text-2xl lg:text-3xl font-extrabold text-rose-500">฿{{ formatNum(overallStats.totalToBoss) }}</div>
@@ -171,7 +164,6 @@
           </div>
         </div>
 
-        <!-- กำไรสุทธิ -->
         <div class="bg-gradient-to-br from-champagne-50 via-white to-champagne-100/50 dark:from-slate-800 dark:via-slate-800 dark:to-slate-800/80 p-5 rounded-3xl border border-champagne-300 dark:border-champagne-800/60 shadow-sm flex flex-col justify-between">
           <span class="text-xs font-bold text-champagne-600 dark:text-champagne-400 uppercase tracking-wider">กำไรสุทธิงวดนี้</span>
           <div class="my-2 text-2xl lg:text-3xl font-black text-champagne-600 dark:text-champagne-300">฿{{ formatNum(overallStats.netProfit) }}</div>
@@ -272,7 +264,7 @@
       </div>
     </section>
 
-    <!-- 2. บันทึกบิล (Bills Entry พร้อมติ๊กถูกรางวัล & หักรับ/ไม่หักรับ) -->
+    <!-- 2. บันทึกบิล (Bills Entry พร้อมกรอกประเภท/ยอดถูกในหน้านี้ได้เลย) -->
     <section v-if="currentTab === 'entry'" class="space-y-4">
       <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
@@ -302,7 +294,7 @@
         <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
           <div>
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">รายการบิลในงวด ({{ (currentPeriod.bills || []).length }} บิล)</h3>
-            <p class="text-[11px] text-slate-400">ติ๊กถูกรางวัล พร้อมเลือกหักรับ/ไม่หักรับ ข้อมูลจะส่งไปหน้าถูกรางวัลอัตโนมัติ</p>
+            <p class="text-[11px] text-slate-400">ติ๊กถูกรางวัลแล้วกรอกประเภท/ยอดถูกในหน้านี้ หรือไปลงหน้าถูกรางวัลก็ได้</p>
           </div>
           <button @click="addEmptyBillRow" class="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-xs font-semibold transition">+ เพิ่มแถว</button>
         </div>
@@ -317,6 +309,8 @@
                 <th class="py-2.5 px-3 text-center">จ่ายแล้ว</th>
                 <th class="py-2.5 px-3 text-center text-champagne-600 font-bold">ถูกรางวัล</th>
                 <th class="py-2.5 px-3 text-center text-purple-600 font-bold">หักค่าหวย?</th>
+                <th class="py-2.5 px-3">ประเภทรางวัล</th>
+                <th class="py-2.5 px-3 text-right">ยอดถูก (บาท)</th>
                 <th class="py-2.5 px-3 text-center">ลบ</th>
               </tr>
             </thead>
@@ -337,8 +331,27 @@
                 <td class="py-2 px-3 text-center">
                   <label v-if="b.isWonPrize" class="inline-flex items-center gap-1 cursor-pointer select-none">
                     <input type="checkbox" v-model="b.isDeduct" @change="onDeductChange(b)" class="w-4 h-4 rounded text-purple-600">
-                    <span :class="b.isDeduct ? 'text-purple-600 font-bold' : 'text-slate-400'">{{ b.isDeduct ? 'หักรับ' : 'ไม่หัก' }}</span>
+                    <span :class="b.isDeduct ? 'text-purple-600 font-bold' : 'text-slate-400'">{{ b.isDeduct ? 'หักค่าหวย' : 'ไม่หัก' }}</span>
                   </label>
+                  <span v-else class="text-slate-300">-</span>
+                </td>
+
+                <!-- ลงประเภทรางวัลที่บิลนี้ได้เลย -->
+                <td class="py-2 px-3">
+                  <select v-if="b.isWonPrize" :value="getPrizeOfBill(b.id).type" @change="updateBillPrizeField(b.id, 'type', $event.target.value)" class="p-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none">
+                    <option value="2_DIGIT">2 ตัว</option>
+                    <option value="3_DIRECT">3 ตรง</option>
+                    <option value="3_TOD">3 โต๊ด</option>
+                    <option value="3_BOTTOM">3 ล่าง</option>
+                    <option value="RUN_TOP">วิ่งบน (3)</option>
+                    <option value="RUN_BOTTOM">วิ่งล่าง (4)</option>
+                  </select>
+                  <span v-else class="text-slate-300">-</span>
+                </td>
+
+                <!-- ลงยอดถูกที่บิลนี้ได้เลย (ยอดเริ่มต้นเป็น 0 เสมอ ไม่ใช่ยอดซื้อ) -->
+                <td class="py-2 px-3 text-right">
+                  <input v-if="b.isWonPrize" type="number" :value="getPrizeOfBill(b.id).amount" @input="updateBillPrizeField(b.id, 'amount', Number($event.target.value))" placeholder="0" class="w-20 p-1.5 rounded-lg border border-champagne-300 dark:border-slate-700 bg-champagne-50/50 dark:bg-slate-900 text-right font-bold text-champagne-700 dark:text-champagne-300 outline-none">
                   <span v-else class="text-slate-300">-</span>
                 </td>
 
@@ -460,7 +473,7 @@
           <div v-for="(od, idx) in currentPeriod.overdues" :key="od.id || idx"
                class="p-3.5 rounded-2xl bg-[#FAFAFA] dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-2">
-              <span class="text-[10px] bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-lg font-bold">{{ od.fromPeriodName }}</span>
+              <span class="text-[10px] bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg font-bold">{{ od.fromPeriodName }}</span>
               <input list="cust-list" v-model="od.customerName" placeholder="ชื่อลูกค้า" class="bg-transparent font-bold text-xs outline-none w-28">
             </div>
             <div class="flex items-center gap-4 text-xs">
@@ -486,13 +499,13 @@
       </div>
     </section>
 
-    <!-- 5. ถูกรางวัล (Prizes - ดึงจากบิลที่ติ๊ก + นับลำดับบิลของลูกค้าคนนั้น) -->
+    <!-- 5. ถูกรางวัล (Prizes - ดึงจากบิลที่ติ๊ก + มีสวิตช์ติ๊กหักค่าหวยที่เชื่อมกับหน้าบิล) -->
     <section v-if="currentTab === 'prizes'" class="space-y-4">
       <div class="bg-white dark:bg-slate-800 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm overflow-hidden">
         <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
           <div>
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">รายการถูกรางวัล (ดึงอัตโนมัติจากหน้าบิล)</h3>
-            <p class="text-[11px] text-slate-400">แสดงลำดับบิลเฉพาะของลูกค้าคนนั้น พร้อมคำนวณเรทให้อัตโนมัติ</p>
+            <p class="text-[11px] text-slate-400">แสดงลำดับบิลเฉพาะของลูกค้าคนนั้น และสามารถติ๊กเปลี่ยนสถานะ "หักค่าหวย" ได้ในหน้านี้</p>
           </div>
           <button @click="addManualPrizeRow" class="px-3 py-1.5 rounded-xl bg-champagne-500 text-white text-xs font-bold">+ เพิ่มรางวัลเอง</button>
         </div>
@@ -502,7 +515,7 @@
               <tr>
                 <th class="py-3 px-3">ลูกค้า</th>
                 <th class="py-3 px-3">บิลที่ถูก (ลำดับของลูกค้า)</th>
-                <th class="py-3 px-3 text-center">หักรับค่าหวย?</th>
+                <th class="py-3 px-3 text-center text-purple-600 font-bold">หักค่าหวย?</th>
                 <th class="py-3 px-3">ประเภท</th>
                 <th class="py-3 px-3 text-center">อั้น (1/2)</th>
                 <th class="py-3 px-3 text-right">จำนวนถูก (บาท)</th>
@@ -525,18 +538,20 @@
                   </span>
                 </td>
 
-                <!-- สถานะหักรับค่าหวย -->
+                <!-- สวิตช์ติ๊กหักรับ / ไม่หัก ในหน้าถูกรางวัล (เชื่อมโยงกลับหน้าบันทึกบิล) -->
                 <td class="py-2.5 px-3 text-center">
-                  <span v-if="pz.isDeduct" class="px-2 py-0.5 rounded-md bg-purple-50 text-purple-600 font-bold">✓ หักค่าหวย</span>
-                  <span v-else class="text-slate-400">ไม่หัก</span>
+                  <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
+                    <input type="checkbox" v-model="pz.isDeduct" @change="onPrizeDeductToggle(pz)" class="w-4 h-4 rounded text-purple-600">
+                    <span :class="pz.isDeduct ? 'text-purple-600 font-bold' : 'text-slate-400'">{{ pz.isDeduct ? 'หักค่าหวย' : 'ไม่หัก' }}</span>
+                  </label>
                 </td>
 
                 <td class="py-2.5 px-3">
                   <select v-model="pz.type" @change="onPrizeTypeChange(pz)" class="p-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none">
+                    <option value="2_DIGIT">2 ตัว</option>
                     <option value="3_DIRECT">3 ตรง</option>
                     <option value="3_TOD">3 โต๊ด</option>
                     <option value="3_BOTTOM">3 ล่าง</option>
-                    <option value="2_DIGIT">2 ตัว</option>
                     <option value="RUN_TOP">วิ่งบน (3)</option>
                     <option value="RUN_BOTTOM">วิ่งล่าง (4)</option>
                   </select>
@@ -545,7 +560,7 @@
                   <input v-if="!isRunType(pz.type)" type="checkbox" v-model="pz.isHalf" @change="updatePrizeRates(pz)" class="w-4 h-4 rounded text-rose-500">
                   <span v-else class="text-slate-300">-</span>
                 </td>
-                <td class="py-2.5 px-3"><input v-model.number="pz.amount" type="number" class="w-20 p-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right font-bold outline-none"></td>
+                <td class="py-2.5 px-3"><input v-model.number="pz.amount" type="number" placeholder="0" class="w-20 p-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right font-bold outline-none"></td>
                 <td class="py-2.5 px-3"><input v-model.number="pz.customerRate" type="number" class="w-16 p-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right outline-none"></td>
                 <td class="py-2.5 px-3 text-right font-bold text-slate-800 dark:text-slate-200">฿{{ formatNum((pz.amount || 0) * (pz.customerRate || 0)) }}</td>
                 <td class="py-2.5 px-3"><input v-model.number="pz.bossRate" type="number" class="w-16 p-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-right outline-none"></td>
@@ -562,7 +577,7 @@
       </div>
     </section>
 
-    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (Payout & Share Card ตามเงื่อนไขหักรับ/ไม่หักรับ) -->
+    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (Payout & Share Card หักค้างเก่าเสมอ + หักงวดปัจจุบันตามติ๊ก) -->
     <section v-if="currentTab === 'payout'" class="space-y-5">
       <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-3 no-print">
         <div class="flex items-center gap-2">
@@ -626,7 +641,7 @@
             <span class="text-sm font-black text-champagne-700">+฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).totalCustomerPrize) }}</span>
           </div>
 
-          <!-- หักค่าหวยงวดปัจจุบัน (กรณีติ๊กหักรับ) -->
+          <!-- หักค่าหวยงวดปัจจุบัน (เฉพาะกรณีติ๊กหักค่าหวย) -->
           <div v-if="getCustomerPrizeCalculation(selectedPrizeCustomer).isDeductCurrent" class="flex justify-between items-center p-2.5 px-3 rounded-xl bg-slate-50 text-slate-600">
             <span>หัก ค่าหวยงวดปัจจุบัน ({{ currentPeriod.name }}):</span>
             <span class="font-bold text-rose-500">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).currentPeriodCost) }}</span>
@@ -635,7 +650,7 @@
             <span>*บิลนี้ไม่หักค่าหวยงวดปัจจุบัน (รับเงินรางวัลเต็ม)</span>
           </div>
 
-          <!-- หักค้างเก่างวดก่อน (หักเสมอถ้ามี) -->
+          <!-- หักค้างเก่างวดก่อน (หักเสมอถ้ามียอดค้าง) -->
           <div v-if="getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost > 0" class="flex justify-between items-center p-2.5 px-3 rounded-xl bg-amber-50/70 border border-amber-200/50 text-amber-900">
             <span>หัก ยอดค้างเก่างวดก่อน ({{ getCustomerPrizeCalculation(selectedPrizeCustomer).overduePeriodName }}):</span>
             <span class="font-bold text-rose-600">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost) }}</span>
@@ -669,7 +684,7 @@
           <input v-model.number="settings.dueDays" type="number" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none">
         </div>
 
-        <div class="flex items-center justify-between p-3 rounded-2xl bg-[#FAFAFA] dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-[#FAFAFA] dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
           <div>
             <div class="text-xs font-semibold">เปิดใช้กฎตัดสิทธิ์ส่วนลดเมื่อเลยกำหนด</div>
             <div class="text-[11px] text-slate-400">หากเกินกำหนดวันชำระ ส่วนลดงวดค้างจะกลายเป็น 0% ทันที</div>
@@ -838,7 +853,7 @@
         this.showToast(`คัดลอกเลขบัญชีคุณ ${this.selectedPrizeCustomer} แล้ว`);
       },
 
-      // คำนวณลำดับบิลของลูกค้าคนนั้น (นับเฉพาะบิลของคนนั้นคนเดียว)
+      // คำนวณลำดับบิลเฉพาะของลูกค้าคนนั้น
       getCustomerSpecificBillOrder(bill) {
         if (!bill || !bill.customerName) return 'บิลทั่วไป';
         const customerBills = (this.currentPeriod.bills || []).filter(b => b.customerName && b.customerName.trim() === bill.customerName.trim());
@@ -846,13 +861,29 @@
         return `บิลที่ ${order} ของคุณ${bill.customerName}`;
       },
 
-      // เชื่อมบิลขายสู่หน้าถูกรางวัล + ระบุลำดับบิลของคนนั้น
+      // ดึงรายการรางวัลที่ผูกกับบิล
+      getPrizeOfBill(billId) {
+        if (!this.currentPeriod || !this.currentPeriod.prizes) return { type: '2_DIGIT', amount: 0 };
+        return this.currentPeriod.prizes.find(p => p.billId === billId) || { type: '2_DIGIT', amount: 0 };
+      },
+
+      // อัปเดตข้อมูลประเภทรางวัล/ยอดถูก จากหน้าบันทึกบิล
+      updateBillPrizeField(billId, field, value) {
+        if (!this.currentPeriod || !this.currentPeriod.prizes) return;
+        const pz = this.currentPeriod.prizes.find(p => p.billId === billId);
+        if (pz) {
+          pz[field] = value;
+          this.updatePrizeRates(pz);
+        }
+      },
+
+      // เมื่อติ๊กถูกรางวัลที่หน้าบิล: ยอดถูกเริ่มต้นเป็น 0 เสมอ (ไม่ดึงยอดซื้อมาใส่)
       onToggleBillWon(bill) {
         if (!this.currentPeriod) return;
         if (!this.currentPeriod.prizes) this.currentPeriod.prizes = [];
 
         if (bill.isWonPrize) {
-          bill.isDeduct = true; // ค่าเริ่มต้นติ๊กหักรับค่าหวย
+          bill.isDeduct = true; // เริ่มต้นติ๊กหักรับ
           const orderText = this.getCustomerSpecificBillOrder(bill);
           const exists = this.currentPeriod.prizes.find(p => p.billId === bill.id);
           if (!exists) {
@@ -863,7 +894,7 @@
               isDeduct: true,
               type: '2_DIGIT',
               isHalf: false,
-              amount: bill.normalAmount || 0,
+              amount: 0, // ยอดถูกเริ่มต้นเป็น 0 เสมอ ให้กรอกเอง
               customerRate: 60,
               bossRate: 70,
               isPaidOut: false
@@ -877,10 +908,21 @@
         }
       },
 
+      // สลับติ๊กหักค่าหวยที่หน้าบิล -> อัปเดตไปหน้าถูกรางวัล
       onDeductChange(bill) {
         const pz = (this.currentPeriod.prizes || []).find(p => p.billId === bill.id);
         if (pz) {
           pz.isDeduct = bill.isDeduct;
+        }
+      },
+
+      // สลับติ๊กหักค่าหวยที่หน้าถูกรางวัล -> อัปเดตกลับไปที่หน้าบิล
+      onPrizeDeductToggle(pz) {
+        if (pz.billId) {
+          const bill = (this.currentPeriod.bills || []).find(b => b.id === pz.billId);
+          if (bill) {
+            bill.isDeduct = pz.isDeduct;
+          }
         }
       },
 
@@ -891,7 +933,7 @@
         this.currentPeriod.prizes.push(pz);
       },
 
-      // คำนวณสรุปโอนรางวัล: หักค่าหวยปัจจุบัน (ถ้าหักรับ) + หักค้างเก่าเสมอ
+      // คำนวณสรุปโอนรางวัล: หักค้างเก่าเสมอ + หักงวดปัจจุบันเฉพาะบิลที่ติ๊กหักรับ
       getCustomerPrizeCalculation(name) {
         if (!this.currentPeriod || !name) return { totalBossPrize: 0, totalCustomerPrize: 0, prizeBonus: 0, isDeductCurrent: false, currentPeriodCost: 0, overdueCost: 0, overduePeriodName: '', netPayoutToCustomer: 0 };
         
@@ -910,10 +952,10 @@
         const prizeBonus = Math.max(0, totalBoss - totalCust);
         const summary = this.getCustomerSummary(name);
 
-        // ค่าหวยงวดปัจจุบัน: จะหักก็ต่อเมื่อติ๊ก "หักรับ"
+        // หักค่าหวยงวดปัจจุบันเฉพาะเมื่อติ๊ก "หักค่าหวย"
         const currentPeriodCost = isDeductCurrent ? (summary.normalNet + summary.runNet) : 0;
 
-        // ยอดค้างเก่า: นำมาหักลบเสมอโดยอัตโนมัติ
+        // หักยอดค้างเก่าเสมอ (ถ้ามีหนี้ค้างจากงวดก่อน)
         const overdueUnpaid = summary.overdueUnpaid;
         const overdueObj = (this.currentPeriod.overdues || []).find(o => o && o.customerName && o.customerName.trim() === name.trim() && !o.isPaid);
         const overduePeriodName = overdueObj ? overdueObj.fromPeriodName : 'งวดก่อนหน้า';
@@ -956,6 +998,13 @@
           this.settings = data.settings || this.settings;
           this.periods = (data.periods || []).map(p => {
             if (!p.bills) p.bills = [];
+            else {
+              p.bills = p.bills.map(b => ({
+                ...b,
+                isWonPrize: b.isWonPrize === true || b.isWonPrize === 'true',
+                isDeduct: b.isDeduct !== undefined ? (b.isDeduct === true || b.isDeduct === 'true') : true
+              }));
+            }
             if (!p.overdues) p.overdues = [];
             else p.overdues = p.overdues.map(o => ({ ...o, isPaid: o.isPaid === true || o.isPaid === 'true' }));
             if (!p.prizes) p.prizes = [];
