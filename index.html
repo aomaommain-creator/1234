@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sales & Rewards - Luxury Minimalist Edition</title>
+  <title>PornpiBoon - Luxury Edition</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -21,26 +21,18 @@
             serif: ['Cinzel', 'serif']
           },
           colors: {
-            gold: {
-              50: '#FBF8F2',
-              100: '#F5EFE1',
-              200: '#EBDCBF',
-              300: '#DEC498',
-              400: '#D1AC72',
-              500: '#C5A059', // Champagne Gold หลัก
-              600: '#AF8843',
-              700: '#8E6B30'
-            },
-            luxury: {
-              card: '#FFFFFF',
-              border: '#EAE6DF',
-              darkCard: '#1E2229',
-              darkBorder: '#2E3440'
+            champagne: {
+              50: '#FDFBF7',
+              100: '#F8F4EB',
+              200: '#EFE6D4',
+              300: '#E3D3B5',
+              400: '#D5BE91',
+              500: '#C5A059', // สีทองแชมเปญหลัก
+              600: '#B08B43',
+              700: '#8C6C30',
+              800: '#695026',
+              900: '#48361B'
             }
-          },
-          boxShadow: {
-            'luxury-card': '0 10px 30px -10px rgba(197, 160, 89, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
-            'luxury-gold': '0 6px 20px -4px rgba(197, 160, 89, 0.3)'
           }
         }
       }
@@ -49,14 +41,6 @@
 
   <style>
     body { font-family: 'Prompt', sans-serif; }
-    .luxury-glass {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .dark .luxury-glass {
-      background: rgba(26, 30, 37, 0.85);
-    }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     @media print {
@@ -67,32 +51,32 @@
     }
   </style>
 </head>
-<body class="bg-[#F8F9FA] dark:bg-[#14171C] text-slate-700 dark:text-slate-200 min-h-screen antialiased pb-24 md:pb-12 transition-colors duration-200">
+<body class="bg-[#F9F8F6] dark:bg-[#14161A] text-slate-800 dark:text-slate-100 min-h-screen antialiased pb-24 md:pb-12 transition-colors duration-200">
 <div id="app">
 
-  <!-- Toast Notification -->
-  <div v-if="toastMessage" class="fixed top-5 right-5 z-50 luxury-glass border border-gold-300 dark:border-gold-700 text-slate-800 dark:text-white px-5 py-3 rounded-2xl shadow-luxury-card text-xs font-medium flex items-center gap-2.5 transition-all">
-    <i class="fa-solid fa-sparkles text-gold-500"></i>
+  <!-- Toast Notification นุ่มนวล -->
+  <div v-if="toastMessage" class="fixed top-5 right-5 z-50 bg-white/95 dark:bg-slate-800/95 border border-champagne-300 dark:border-champagne-700 text-slate-800 dark:text-white px-5 py-3 rounded-2xl shadow-xl text-xs font-semibold flex items-center gap-2.5 transition-all">
+    <i class="fa-solid fa-sparkles text-champagne-500"></i>
     <span>{{ toastMessage }}</span>
   </div>
 
-  <!-- Header (Desktop) -->
-  <header class="no-print hidden md:block sticky top-0 z-40 luxury-glass border-b border-luxury-border dark:border-luxury-darkBorder">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+  <!-- Header บนคอมพิวเตอร์ (ธีม Luxury ขาวคลีน & ทองแชมเปญ) -->
+  <header class="no-print hidden md:block sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-champagne-200/80 dark:border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-gold-400 to-gold-600 text-white flex items-center justify-center text-sm shadow-luxury-gold">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-champagne-500 to-champagne-400 text-white flex items-center justify-center text-sm shadow-md shadow-champagne-500/20">
           <i class="fa-solid fa-crown"></i>
         </div>
         <div>
-          <h1 class="text-base font-bold font-serif tracking-wider text-slate-900 dark:text-white uppercase">PRESTIGE SALES</h1>
-          <p class="text-[10px] text-gold-600 dark:text-gold-400 tracking-widest uppercase font-medium">LUXURY MANAGEMENT ENGINE</p>
+          <h1 class="text-base font-extrabold font-serif tracking-wider text-slate-900 dark:text-white uppercase leading-tight">PRESTIGE SALES & REWARDS</h1>
+          <p class="text-[10px] text-champagne-600 dark:text-champagne-400 tracking-widest uppercase font-semibold">ระบบบริหารยอดขาย & สรุปรางวัลพรีเมียม</p>
         </div>
       </div>
 
-      <!-- Navigation Tabs -->
-      <nav class="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/50">
+      <!-- Navigation Tabs (Desktop) -->
+      <nav class="flex items-center gap-1 bg-champagne-50 dark:bg-slate-800 p-1.5 rounded-2xl border border-champagne-200/60 dark:border-slate-700">
         <button v-for="tab in tabs" :key="tab.id" @click="currentTab = tab.id"
-                :class="currentTab === tab.id ? 'bg-white dark:bg-slate-700 text-gold-600 dark:text-gold-300 shadow-sm font-semibold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white font-medium'"
+                :class="currentTab === tab.id ? 'bg-white dark:bg-slate-700 text-champagne-600 dark:text-champagne-400 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white font-medium'"
                 class="px-3.5 py-1.5 rounded-xl text-xs transition-all flex items-center gap-1.5">
           <i :class="tab.icon"></i>
           <span>{{ tab.name }}</span>
@@ -101,128 +85,133 @@
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-2.5">
-        <button @click="fetchData" title="รีเฟรชข้อมูลล่าสุด" class="w-9 h-9 rounded-xl border border-luxury-border dark:border-luxury-darkBorder flex items-center justify-center text-xs text-slate-500 hover:text-gold-500 hover:border-gold-300 transition">
+        <button @click="fetchData" title="ดึงข้อมูลล่าสุดจากชีท" class="w-9 h-9 rounded-xl border border-champagne-200 dark:border-slate-700 flex items-center justify-center text-xs text-slate-600 dark:text-slate-300 hover:text-champagne-600 hover:border-champagne-400 transition bg-white dark:bg-slate-800">
           <i class="fa-solid fa-rotate"></i>
         </button>
-        <button @click="toggleTheme" class="w-9 h-9 rounded-xl border border-luxury-border dark:border-luxury-darkBorder flex items-center justify-center text-xs text-slate-500 hover:text-gold-500 transition">
-          <i :class="isDark ? 'fa-solid fa-sun text-gold-400' : 'fa-solid fa-moon'"></i>
+        <button @click="toggleTheme" class="w-9 h-9 rounded-xl border border-champagne-200 dark:border-slate-700 flex items-center justify-center text-xs text-slate-600 dark:text-slate-300 hover:text-champagne-600 transition bg-white dark:bg-slate-800">
+          <i :class="isDark ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon'"></i>
         </button>
-        <button @click="saveToStorage" :disabled="isSaving" class="px-4 py-2 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white text-xs font-semibold shadow-luxury-gold flex items-center gap-2 transition disabled:opacity-50">
-          <i class="fa-solid" :class="isSaving ? 'fa-spinner fa-spin' : 'fa-check'"></i>
-          <span>{{ isSaving ? 'กำลังบันทึก...' : 'บันทึกระบบ' }}</span>
+        <button @click="saveToStorage" :disabled="isSaving" class="px-4 py-2 rounded-xl bg-gradient-to-r from-champagne-500 to-champagne-600 hover:from-champagne-600 hover:to-champagne-700 text-white text-xs font-bold shadow-md shadow-champagne-500/20 flex items-center gap-2 transition disabled:opacity-50">
+          <i class="fa-solid" :class="isSaving ? 'fa-spinner fa-spin' : 'fa-cloud-arrow-up'"></i>
+          <span>{{ isSaving ? 'กำลังบันทึก...' : 'บันทึกชีท' }}</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- Mobile Top Bar -->
-  <div class="no-print md:hidden flex items-center justify-between px-5 pt-4 pb-3 bg-white dark:bg-slate-900 border-b border-luxury-border dark:border-luxury-darkBorder">
+  <div class="no-print md:hidden flex items-center justify-between px-4 pt-3.5 pb-2.5 bg-white dark:bg-slate-900 border-b border-champagne-200/80 dark:border-slate-800">
     <div class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-gold-400 to-gold-600 text-white flex items-center justify-center text-xs shadow-sm">
+      <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-champagne-500 to-champagne-400 text-white flex items-center justify-center text-xs shadow-sm">
         <i class="fa-solid fa-crown"></i>
       </div>
       <h1 class="text-sm font-bold font-serif tracking-wider text-slate-900 dark:text-white">PRESTIGE</h1>
     </div>
     <div class="flex items-center gap-2">
-      <button @click="fetchData" class="w-8 h-8 rounded-xl border border-luxury-border dark:border-luxury-darkBorder flex items-center justify-center text-xs text-slate-500">
+      <button @click="fetchData" class="w-8 h-8 rounded-xl border border-champagne-200 dark:border-slate-700 flex items-center justify-center text-xs text-slate-600">
         <i class="fa-solid fa-rotate"></i>
       </button>
-      <button @click="toggleTheme" class="w-8 h-8 rounded-xl border border-luxury-border dark:border-luxury-darkBorder flex items-center justify-center text-xs text-slate-500">
-        <i :class="isDark ? 'fa-solid fa-sun text-gold-400' : 'fa-solid fa-moon'"></i>
+      <button @click="toggleTheme" class="w-8 h-8 rounded-xl border border-champagne-200 dark:border-slate-700 flex items-center justify-center text-xs text-slate-600">
+        <i :class="isDark ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon'"></i>
       </button>
-      <button @click="saveToStorage" :disabled="isSaving" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 text-white text-xs font-semibold">
+      <button @click="saveToStorage" :disabled="isSaving" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-champagne-500 to-champagne-600 text-white text-xs font-bold">
         <i class="fa-solid" :class="isSaving ? 'fa-spinner fa-spin' : 'fa-cloud-arrow-up'"></i>
       </button>
     </div>
   </div>
 
-  <main class="max-w-7xl mx-auto px-4 md:px-6 py-6">
+  <main class="max-w-7xl mx-auto px-4 md:px-6 py-5">
 
     <!-- 1. แดชบอร์ด (Dashboard) -->
-    <section v-if="currentTab === 'dashboard'" class="space-y-6">
-      <!-- Selector เลือกงวด -->
-      <div class="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-luxury-darkCard p-4 rounded-2xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card">
+    <section v-if="currentTab === 'dashboard'" class="space-y-5">
+      <!-- กล่องเลือกงวดในหน้าแดชบอร์ด -->
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/70 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-          <span class="text-xs font-semibold tracking-wider uppercase text-gold-600 dark:text-gold-400">งวดที่กำลังดู:</span>
-          <select v-model="selectedPeriodId" class="px-4 py-1.5 rounded-xl border border-gold-200 dark:border-gold-800 bg-gold-50/50 dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-white outline-none">
+          <span class="text-xs font-bold uppercase tracking-wider text-champagne-600 dark:text-champagne-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-calendar-days text-sm"></i> เลือกดูงวดวันที่:
+          </span>
+          <select v-model="selectedPeriodId" class="px-4 py-2 rounded-2xl border border-champagne-300 dark:border-slate-700 bg-champagne-50/50 dark:bg-slate-900 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-champagne-400">
             <option v-for="p in periods" :key="p.id" :value="p.id">{{ p.name }}</option>
           </select>
         </div>
-        <span class="text-xs text-slate-400">สถานะ: ข้อมูลตรงกับชีท 100%</span>
+        <div class="flex items-center gap-2">
+          <input v-model="newPeriodName" placeholder="ชื่องวดใหม่" class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs outline-none">
+          <button @click="createNewPeriod" class="px-3.5 py-1.5 rounded-xl bg-slate-900 dark:bg-champagne-500 text-white dark:text-slate-950 text-xs font-bold hover:opacity-90 transition">+ สร้างงวด</button>
+        </div>
       </div>
 
-      <!-- กล่องสรุปยอด 4 ช่อง (Luxury Cards) -->
+      <!-- กล่องสรุปยอด 4 ช่อง (Luxury Champagne Cards) -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- ยอดขายรวม -->
-        <div class="bg-white dark:bg-luxury-darkCard p-5 rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card flex flex-col justify-between">
-          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">ยอดขายรวมทั้งหมด</span>
-          <div class="my-2.5 text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white">฿{{ formatNum(overallStats.totalGross) }}</div>
-          <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between">
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">ยอดขายรวม</span>
+          <div class="my-2 text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white">฿{{ formatNum(overallStats.totalGross) }}</div>
+          <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700 flex justify-between font-medium">
             <span>สุทธิหลังลด:</span>
-            <span class="font-bold text-gold-600 dark:text-gold-400">฿{{ formatNum(overallStats.totalCustomerNetAll) }}</span>
+            <span class="font-bold text-champagne-600 dark:text-champagne-400">฿{{ formatNum(overallStats.totalCustomerNetAll) }}</span>
           </div>
         </div>
 
         <!-- รอยอดลูกค้า -->
-        <div class="bg-white dark:bg-luxury-darkCard p-5 rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card flex flex-col justify-between">
-          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">รอยอดชำระ</span>
-          <div class="my-2.5 text-2xl lg:text-3xl font-extrabold text-slate-800 dark:text-slate-100">฿{{ formatNum(overallStats.totalRemainingToCollect) }}</div>
-          <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between">
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider">รอยอดชำระ</span>
+          <div class="my-2 text-2xl lg:text-3xl font-extrabold text-blue-600 dark:text-blue-400">฿{{ formatNum(overallStats.totalRemainingToCollect) }}</div>
+          <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700 flex justify-between font-medium">
             <span>ชำระแล้ว:</span>
             <span class="font-bold text-emerald-500">฿{{ formatNum(overallStats.totalPaidNet) }}</span>
           </div>
         </div>
 
-        <!-- ยอดจ่ายเจ้านาย -->
-        <div class="bg-white dark:bg-luxury-darkCard p-5 rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card flex flex-col justify-between">
-          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">ยอดส่งเจ้านาย</span>
-          <div class="my-2.5 text-2xl lg:text-3xl font-extrabold text-rose-500">฿{{ formatNum(overallStats.totalToBoss) }}</div>
-          <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+        <!-- ยอดส่งเจ้านาย -->
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-semibold text-rose-500 uppercase tracking-wider">ยอดส่งเจ้านาย</span>
+          <div class="my-2 text-2xl lg:text-3xl font-extrabold text-rose-500">฿{{ formatNum(overallStats.totalToBoss) }}</div>
+          <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700 font-medium">
             ปกติหัก 30% | วิ่งหัก 10%
           </div>
         </div>
 
         <!-- กำไรสุทธิ -->
-        <div class="bg-gradient-to-br from-gold-50 via-white to-gold-100/50 dark:from-slate-800 dark:via-luxury-darkCard dark:to-slate-800 p-5 rounded-3xl border border-gold-200 dark:border-gold-800/60 shadow-luxury-card flex flex-col justify-between">
-          <span class="text-xs font-bold text-gold-600 dark:text-gold-400 uppercase tracking-wider">กำไรสุทธิงวดนี้</span>
-          <div class="my-2.5 text-2xl lg:text-3xl font-black text-gold-700 dark:text-gold-300">฿{{ formatNum(overallStats.netProfit) }}</div>
-          <div class="text-[11px] text-slate-400 pt-2 border-t border-gold-200/50 dark:border-gold-900/50 flex justify-between">
+        <div class="bg-gradient-to-br from-champagne-50 via-white to-champagne-100/50 dark:from-slate-800 dark:via-slate-800 dark:to-slate-800/80 p-5 rounded-3xl border border-champagne-300 dark:border-champagne-800/60 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-bold text-champagne-600 dark:text-champagne-400 uppercase tracking-wider">กำไรสุทธิงวดนี้</span>
+          <div class="my-2 text-2xl lg:text-3xl font-black text-champagne-600 dark:text-champagne-300">฿{{ formatNum(overallStats.netProfit) }}</div>
+          <div class="text-[11px] text-slate-400 pt-2 border-t border-champagne-200/60 dark:border-slate-700 flex justify-between font-medium">
             <span>กำไรบิล: ฿{{ formatNum(overallStats.salesProfit) }}</span>
-            <span v-if="overallStats.totalPrizeBonus > 0" class="font-bold text-gold-600 dark:text-gold-400">+โบนัส ฿{{ formatNum(overallStats.totalPrizeBonus) }}</span>
+            <span v-if="overallStats.totalPrizeBonus > 0" class="font-bold text-champagne-600 dark:text-champagne-400">+โบนัส ฿{{ formatNum(overallStats.totalPrizeBonus) }}</span>
           </div>
         </div>
       </div>
 
       <!-- สรุปรางวัล & โบนัสส่วนต่าง -->
-      <div class="bg-white dark:bg-luxury-darkCard p-6 rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+      <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700 mb-3">
           <div class="flex items-center gap-2">
-            <i class="fa-solid fa-award text-gold-500"></i>
+            <i class="fa-solid fa-award text-champagne-500"></i>
             <h3 class="text-xs font-bold tracking-wider uppercase text-slate-800 dark:text-white">สรุปยอดเคลียร์เงินรางวัล</h3>
           </div>
-          <span class="text-xs px-3 py-1 bg-gold-50 dark:bg-slate-800 text-gold-600 dark:text-gold-400 rounded-full font-semibold border border-gold-200/60 dark:border-gold-900/60">
+          <span class="text-xs px-3 py-1 bg-champagne-50 dark:bg-slate-900 text-champagne-600 dark:text-champagne-400 rounded-full font-semibold border border-champagne-200 dark:border-slate-700">
             ถูก {{ (currentPeriod.prizes || []).length }} รายการ
           </span>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="p-4 rounded-2xl bg-[#FAFAFA] dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="p-3.5 rounded-2xl bg-[#FAFAFA] dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
             <span class="text-[11px] text-slate-400 uppercase font-medium">1. ยอดเบิกเจ้านาย</span>
-            <div class="text-xl font-bold text-rose-500 mt-1">฿{{ formatNum(overallStats.totalPrizeFromBoss) }}</div>
+            <div class="text-lg font-bold text-rose-500 mt-0.5">฿{{ formatNum(overallStats.totalPrizeFromBoss) }}</div>
           </div>
-          <div class="p-4 rounded-2xl bg-[#FAFAFA] dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+          <div class="p-3.5 rounded-2xl bg-[#FAFAFA] dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
             <span class="text-[11px] text-slate-400 uppercase font-medium">2. ยอดจ่ายลูกค้า</span>
-            <div class="text-xl font-bold text-slate-700 dark:text-slate-200 mt-1">฿{{ formatNum(overallStats.totalPrizeToCustomer) }}</div>
+            <div class="text-lg font-bold text-slate-700 dark:text-slate-200 mt-0.5">฿{{ formatNum(overallStats.totalPrizeToCustomer) }}</div>
           </div>
-          <div class="p-4 rounded-2xl bg-gold-50/50 dark:bg-gold-950/20 border border-gold-200/50 dark:border-gold-900/50">
-            <span class="text-[11px] text-gold-600 dark:text-gold-400 uppercase font-bold">3. กำไรส่วนต่าง/โบนัสเรา</span>
-            <div class="text-xl font-black text-gold-600 dark:text-gold-400 mt-1">+฿{{ formatNum(overallStats.totalPrizeBonus) }}</div>
+          <div class="p-3.5 rounded-2xl bg-champagne-50/70 dark:bg-champagne-950/20 border border-champagne-200/60 dark:border-slate-800">
+            <span class="text-[11px] text-champagne-600 dark:text-champagne-400 uppercase font-bold">3. กำไรส่วนต่าง/โบนัสเรา</span>
+            <div class="text-lg font-black text-champagne-600 dark:text-champagne-400 mt-0.5">+฿{{ formatNum(overallStats.totalPrizeBonus) }}</div>
           </div>
         </div>
       </div>
 
       <!-- ตารางรายชื่อลูกค้าและสถานะงวดนี้ -->
-      <div class="bg-white dark:bg-luxury-darkCard rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card overflow-hidden">
-        <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+      <div class="bg-white dark:bg-slate-800 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">ตารางสรุปรายบุคคล</h3>
           <span class="text-xs text-slate-400">ทั้งหมด {{ allDisplayCustomers.length }} คน</span>
         </div>
@@ -230,48 +219,48 @@
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="bg-[#FAFAFA] dark:bg-slate-900 text-slate-400 border-b border-slate-100 dark:border-slate-800">
               <tr>
-                <th class="py-3 px-5">ลูกค้า</th>
-                <th class="py-3 px-5 text-right">ยอดสุทธิ</th>
-                <th class="py-3 px-5 text-right">ค้างเก่า</th>
-                <th class="py-3 px-5 text-right">ยอดต้องชำระ</th>
-                <th class="py-3 px-5 text-center">รับชำระยอดรวม</th>
-                <th class="py-3 px-5 text-center">ใบเสร็จ</th>
+                <th class="py-3 px-4">ลูกค้า</th>
+                <th class="py-3 px-4 text-right">ยอดสุทธิ</th>
+                <th class="py-3 px-4 text-right">ค้างเก่า</th>
+                <th class="py-3 px-4 text-right">ยอดต้องชำระ</th>
+                <th class="py-3 px-4 text-center">รับชำระยอดรวม</th>
+                <th class="py-3 px-4 text-center">ใบเสร็จ</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-for="cName in allDisplayCustomers" :key="cName" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition">
-                <td class="py-3.5 px-5 font-bold text-slate-800 dark:text-slate-100">{{ cName }}</td>
+                <td class="py-3 px-4 font-bold text-slate-800 dark:text-slate-100">{{ cName }}</td>
                 <template v-if="!getCustomerSummary(cName).hasActivity">
-                  <td class="py-3.5 px-5 text-right text-slate-400" colspan="3">
+                  <td class="py-3 px-4 text-right text-slate-400" colspan="3">
                     <span class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-400 px-2.5 py-1 rounded-md">ไม่ได้เล่นงวดนี้</span>
                   </td>
-                  <td class="py-3.5 px-5 text-center text-slate-300">-</td>
-                  <td class="py-3.5 px-5 text-center text-slate-300">-</td>
+                  <td class="py-3 px-4 text-center text-slate-300">-</td>
+                  <td class="py-3 px-4 text-center text-slate-300">-</td>
                 </template>
                 <template v-else>
-                  <td class="py-3.5 px-5 text-right font-medium text-slate-600 dark:text-slate-300">
+                  <td class="py-3 px-4 text-right font-medium text-slate-600 dark:text-slate-300">
                     ฿{{ formatNum(getCustomerSummary(cName).normalNet + getCustomerSummary(cName).runNet) }}
                   </td>
-                  <td class="py-3.5 px-5 text-right text-amber-500 font-semibold">
+                  <td class="py-3 px-4 text-right text-amber-500 font-semibold">
                     {{ getCustomerSummary(cName).overdueUnpaid > 0 ? '฿' + formatNum(getCustomerSummary(cName).overdueUnpaid) : '-' }}
                   </td>
-                  <td class="py-3.5 px-5 text-right">
-                    <span v-if="getCustomerSummary(cName).totalPayable === 0" class="text-[11px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-bold px-2.5 py-1 rounded-lg">
+                  <td class="py-3 px-4 text-right">
+                    <span v-if="getCustomerSummary(cName).totalPayable === 0" class="text-[11px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-bold px-2 py-0.5 rounded-lg">
                       ✓ จ่ายครบแล้ว
                     </span>
                     <span v-else class="font-extrabold text-slate-900 dark:text-white text-sm">
                       ฿{{ formatNum(getCustomerSummary(cName).totalPayable) }}
                     </span>
                   </td>
-                  <td class="py-3.5 px-5 text-center">
+                  <td class="py-3 px-4 text-center">
                     <button @click="toggleCustomerPayment(cName, !isCustomerFullyPaid(cName))"
                             :class="isCustomerFullyPaid(cName) ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200'"
-                            class="px-3 py-1 rounded-lg text-[11px] font-semibold transition">
+                            class="px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">
                       {{ isCustomerFullyPaid(cName) ? 'โอนแล้ว' : 'ติ๊กชำระ' }}
                     </button>
                   </td>
-                  <td class="py-3.5 px-5 text-center">
-                    <button @click="openReceipt(cName)" class="w-8 h-8 rounded-xl bg-gold-50 dark:bg-slate-800 text-gold-600 dark:text-gold-400 inline-flex items-center justify-center text-xs hover:bg-gold-100 transition">
+                  <td class="py-3 px-4 text-center">
+                    <button @click="openReceipt(cName)" class="w-7 h-7 rounded-lg bg-champagne-50 dark:bg-slate-800 text-champagne-600 dark:text-champagne-400 inline-flex items-center justify-center text-xs hover:bg-champagne-100 transition">
                       <i class="fa-solid fa-arrow-right"></i>
                     </button>
                   </td>
@@ -283,59 +272,77 @@
       </div>
     </section>
 
-    <!-- 2. บันทึกบิล (Bills Entry) -->
-    <section v-if="currentTab === 'entry'" class="space-y-5">
-      <div class="bg-white dark:bg-luxury-darkCard p-4 rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card flex flex-wrap items-center justify-between gap-3">
+    <!-- 2. บันทึกบิล (Bills Entry พร้อมติ๊กถูกรางวัล & หักรับ/ไม่หักรับ) -->
+    <section v-if="currentTab === 'entry'" class="space-y-4">
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
           <label class="text-xs font-semibold text-slate-400 uppercase">งวด:</label>
-          <select v-model="selectedPeriodId" class="px-3.5 py-1.5 rounded-xl border border-gold-200 dark:border-gold-800 bg-gold-50/40 dark:bg-slate-800 text-xs font-bold outline-none">
+          <select v-model="selectedPeriodId" class="px-3.5 py-1.5 rounded-xl border border-champagne-200 dark:border-slate-700 bg-champagne-50/40 dark:bg-slate-900 text-xs font-bold outline-none">
             <option v-for="p in periods" :key="p.id" :value="p.id">{{ p.name }}</option>
           </select>
         </div>
         <div class="flex gap-2">
-          <input v-model="newPeriodName" placeholder="ชื่องวดใหม่" class="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none">
-          <button @click="createNewPeriod" class="px-4 py-1.5 rounded-xl bg-slate-900 dark:bg-gold-500 text-white dark:text-slate-950 text-xs font-bold hover:opacity-90 transition">+ สร้างงวด</button>
+          <input v-model="newPeriodName" placeholder="ชื่องวดใหม่" class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs outline-none">
+          <button @click="createNewPeriod" class="px-4 py-1.5 rounded-xl bg-slate-900 dark:bg-champagne-500 text-white dark:text-slate-950 text-xs font-bold hover:opacity-90 transition">+ สร้างงวด</button>
         </div>
       </div>
 
       <!-- Quick Paste Box -->
-      <div class="bg-white dark:bg-luxury-darkCard p-5 rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card space-y-2">
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm space-y-2">
         <h3 class="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-paste text-gold-500"></i> วางข้อมูลยอดด่วน (Paste ตัวเลข)
+          <i class="fa-solid fa-paste text-champagne-500"></i> วางข้อมูลยอดด่วน (Paste ตัวเลข)
         </h3>
         <textarea v-model="pasteText" rows="3" placeholder="วางตัวเลขยอดเงินแถวละยอดที่นี่..."
-                  class="w-full p-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-[#FAFAFA] dark:bg-slate-900 text-xs font-mono outline-none focus:border-gold-400"></textarea>
-        <button @click="processPaste" class="px-4 py-2 rounded-xl bg-slate-900 dark:bg-gold-500 text-white dark:text-slate-950 text-xs font-bold hover:opacity-90 transition">แปลงข้อมูลลงตาราง</button>
+                  class="w-full p-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-[#FAFAFA] dark:bg-slate-900 text-xs font-mono outline-none focus:border-champagne-400"></textarea>
+        <button @click="processPaste" class="px-4 py-1.5 rounded-xl bg-slate-900 dark:bg-champagne-500 text-white dark:text-slate-950 text-xs font-bold hover:opacity-90 transition">แปลงข้อมูลลงตาราง</button>
       </div>
 
       <!-- ตารางบิลขาย -->
-      <div class="bg-white dark:bg-luxury-darkCard rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card overflow-hidden">
-        <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">รายการบิลในงวด ({{ (currentPeriod.bills || []).length }} บิล)</h3>
+      <div class="bg-white dark:bg-slate-800 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">รายการบิลในงวด ({{ (currentPeriod.bills || []).length }} บิล)</h3>
+            <p class="text-[11px] text-slate-400">ติ๊กถูกรางวัล พร้อมเลือกหักรับ/ไม่หักรับ ข้อมูลจะส่งไปหน้าถูกรางวัลอัตโนมัติ</p>
+          </div>
           <button @click="addEmptyBillRow" class="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-xs font-semibold transition">+ เพิ่มแถว</button>
         </div>
         <div class="overflow-x-auto max-h-[30rem] hide-scrollbar">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="sticky top-0 bg-[#FAFAFA] dark:bg-slate-900 text-slate-400 border-b border-slate-100 dark:border-slate-800">
               <tr>
-                <th class="py-2.5 px-4 text-center">#</th>
-                <th class="py-2.5 px-4">ยอดปกติ (บาท)</th>
-                <th class="py-2.5 px-4">ชื่อลูกค้า</th>
-                <th class="py-2.5 px-4">ยอดวิ่ง/ลอย</th>
-                <th class="py-2.5 px-4 text-center">จ่ายแล้ว</th>
-                <th class="py-2.5 px-4 text-center">ถูกรางวัล?</th>
-                <th class="py-2.5 px-4 text-center">ลบ</th>
+                <th class="py-2.5 px-3 text-center">#</th>
+                <th class="py-2.5 px-3">ยอดปกติ (บาท)</th>
+                <th class="py-2.5 px-3">ชื่อลูกค้า</th>
+                <th class="py-2.5 px-3">ยอดวิ่ง/ลอย</th>
+                <th class="py-2.5 px-3 text-center">จ่ายแล้ว</th>
+                <th class="py-2.5 px-3 text-center text-champagne-600 font-bold">ถูกรางวัล</th>
+                <th class="py-2.5 px-3 text-center text-purple-600 font-bold">หักค่าหวย?</th>
+                <th class="py-2.5 px-3 text-center">ลบ</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-for="(b, idx) in currentPeriod.bills" :key="b.id || idx" :class="{'bg-emerald-50/40 dark:bg-emerald-950/20': b.isPaid}">
-                <td class="py-2 px-4 text-center text-slate-400">{{ idx + 1 }}</td>
-                <td class="py-2 px-4"><input v-model.number="b.normalAmount" type="number" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right font-bold outline-none"></td>
-                <td class="py-2 px-4"><input list="cust-list" v-model="b.customerName" placeholder="ชื่อลูกค้า" class="w-32 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-medium outline-none"></td>
-                <td class="py-2 px-4"><input v-model.number="b.runAmount" type="number" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right text-indigo-500 font-bold outline-none"></td>
-                <td class="py-2 px-4 text-center"><input type="checkbox" v-model="b.isPaid" class="w-4 h-4 rounded text-gold-500"></td>
-                <td class="py-2 px-4 text-center"><input type="checkbox" v-model="b.isWonPrize" @change="onToggleBillWon(b)" class="w-4 h-4 rounded text-gold-500"></td>
-                <td class="py-2 px-4 text-center"><button @click="removeBillRow(idx)" class="text-rose-400 hover:text-rose-600"><i class="fa-solid fa-trash"></i></button></td>
+                <td class="py-2 px-3 text-center text-slate-400">{{ idx + 1 }}</td>
+                <td class="py-2 px-3"><input v-model.number="b.normalAmount" type="number" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right font-bold outline-none"></td>
+                <td class="py-2 px-3"><input list="cust-list" v-model="b.customerName" placeholder="ชื่อลูกค้า" class="w-32 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-medium outline-none"></td>
+                <td class="py-2 px-3"><input v-model.number="b.runAmount" type="number" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right text-indigo-500 font-bold outline-none"></td>
+                <td class="py-2 px-3 text-center"><input type="checkbox" v-model="b.isPaid" class="w-4 h-4 rounded text-champagne-500"></td>
+                
+                <!-- ติ๊กถูกรางวัล -->
+                <td class="py-2 px-3 text-center">
+                  <input type="checkbox" v-model="b.isWonPrize" @change="onToggleBillWon(b)" class="w-4 h-4 rounded text-champagne-500">
+                </td>
+
+                <!-- ติ๊กหักรับ หรือ ไม่หักรับ -->
+                <td class="py-2 px-3 text-center">
+                  <label v-if="b.isWonPrize" class="inline-flex items-center gap-1 cursor-pointer select-none">
+                    <input type="checkbox" v-model="b.isDeduct" @change="onDeductChange(b)" class="w-4 h-4 rounded text-purple-600">
+                    <span :class="b.isDeduct ? 'text-purple-600 font-bold' : 'text-slate-400'">{{ b.isDeduct ? 'หักรับ' : 'ไม่หัก' }}</span>
+                  </label>
+                  <span v-else class="text-slate-300">-</span>
+                </td>
+
+                <td class="py-2 px-3 text-center"><button @click="removeBillRow(idx)" class="text-rose-400 hover:text-rose-600"><i class="fa-solid fa-trash"></i></button></td>
               </tr>
             </tbody>
           </table>
@@ -344,12 +351,12 @@
     </section>
 
     <!-- 3. ลูกค้า & เรท (Customers) -->
-    <section v-if="currentTab === 'customers'" class="space-y-5">
-      <div class="bg-white dark:bg-luxury-darkCard p-6 rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card space-y-4">
+    <section v-if="currentTab === 'customers'" class="space-y-4">
+      <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm space-y-3">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white flex items-center gap-2">
-          <i class="fa-solid fa-user-plus text-gold-500"></i> ลูกค้า & เรทรางวัล & บัญชีธนาคาร
+          <i class="fa-solid fa-user-plus text-champagne-500"></i> ลูกค้า & เรทรางวัล & บัญชีธนาคาร
         </h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-3 items-end">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-2.5 items-end">
           <div class="col-span-2">
             <label class="text-[11px] text-slate-400">ชื่อลูกค้า</label>
             <input v-model="customerForm.name" class="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold outline-none">
@@ -363,8 +370,8 @@
             <input v-model.number="customerForm.runDiscount" type="number" class="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none">
           </div>
           <div>
-            <label class="text-[11px] text-gold-600 font-bold">จ่าย 2 ตัว</label>
-            <input v-model.number="customerForm.rate2Digit" type="number" class="w-full p-2 rounded-xl border border-gold-200 dark:border-gold-800 bg-gold-50/40 dark:bg-slate-900 text-xs font-bold outline-none">
+            <label class="text-[11px] text-champagne-600 font-bold">จ่าย 2 ตัว</label>
+            <input v-model.number="customerForm.rate2Digit" type="number" class="w-full p-2 rounded-xl border border-champagne-200 dark:border-slate-700 bg-champagne-50/40 dark:bg-slate-900 text-xs font-bold outline-none">
           </div>
           <div>
             <label class="text-[11px] text-slate-400">จ่าย 3 ตรง</label>
@@ -383,7 +390,7 @@
             <input v-model.number="customerForm.rateRunTop" type="number" class="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none">
           </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 items-end">
           <div>
             <label class="text-[11px] text-slate-400">จ่าย วิ่งล่าง</label>
             <input v-model.number="customerForm.rateRunBottom" type="number" class="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none">
@@ -393,41 +400,41 @@
             <input v-model="customerForm.bankAccount" placeholder="เช่น กสิกร 123-4-56789-0" class="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none">
           </div>
         </div>
-        <div class="pt-2 flex gap-2">
-          <button @click="saveCustomer" class="px-5 py-2 rounded-xl bg-slate-900 dark:bg-gold-500 text-white dark:text-slate-950 text-xs font-bold hover:opacity-90 transition">
+        <div class="pt-1 flex gap-2">
+          <button @click="saveCustomer" class="px-4 py-2 rounded-xl bg-slate-900 dark:bg-champagne-500 text-white dark:text-slate-950 text-xs font-bold hover:opacity-90 transition">
             {{ editingCustomerIndex === -1 ? '+ เพิ่มลูกค้า' : 'อัปเดตข้อมูลลูกค้า' }}
           </button>
-          <button v-if="editingCustomerIndex !== -1" @click="resetCustomerForm" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs">ยกเลิก</button>
+          <button v-if="editingCustomerIndex !== -1" @click="resetCustomerForm" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs">ยกเลิก</button>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-luxury-darkCard rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card overflow-hidden">
+      <div class="bg-white dark:bg-slate-800 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm overflow-hidden">
         <div class="overflow-x-auto hide-scrollbar">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="bg-[#FAFAFA] dark:bg-slate-900 text-slate-400 border-b border-slate-100 dark:border-slate-800">
               <tr>
-                <th class="py-3 px-5">ชื่อลูกค้า</th>
-                <th class="py-3 px-5 text-right">ลดปกติ</th>
-                <th class="py-3 px-5 text-right">ลดวิ่ง</th>
-                <th class="py-3 px-5 text-right text-gold-600 font-bold">2 ตัว</th>
-                <th class="py-3 px-5 text-right">3 ตรง</th>
-                <th class="py-3 px-5 text-right">3 โต๊ด</th>
-                <th class="py-3 px-5 text-right">3 ล่าง</th>
-                <th class="py-3 px-5">บัญชีลูกค้า</th>
-                <th class="py-3 px-5 text-center">จัดการ</th>
+                <th class="py-3 px-4">ชื่อลูกค้า</th>
+                <th class="py-3 px-4 text-right">ลดปกติ</th>
+                <th class="py-3 px-4 text-right">ลดวิ่ง</th>
+                <th class="py-3 px-4 text-right text-champagne-600 font-bold">2 ตัว</th>
+                <th class="py-3 px-4 text-right">3 ตรง</th>
+                <th class="py-3 px-4 text-right">3 โต๊ด</th>
+                <th class="py-3 px-4 text-right">3 ล่าง</th>
+                <th class="py-3 px-4">บัญชีลูกค้า</th>
+                <th class="py-3 px-4 text-center">จัดการ</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-for="(c, idx) in customers" :key="idx" class="hover:bg-slate-50/50">
-                <td class="py-3.5 px-5 font-bold text-slate-800 dark:text-slate-100">{{ c.name }}</td>
-                <td class="py-3.5 px-5 text-right text-emerald-600 font-medium">{{ c.normalDiscount || 0 }}%</td>
-                <td class="py-3.5 px-5 text-right text-indigo-600 font-medium">{{ c.runDiscount || 0 }}%</td>
-                <td class="py-3.5 px-5 text-right text-gold-600 font-bold">฿{{ c.rate2Digit || 60 }}</td>
-                <td class="py-3.5 px-5 text-right">{{ c.rate3Direct || 500 }}</td>
-                <td class="py-3.5 px-5 text-right">{{ c.rate3Tod || 90 }}</td>
-                <td class="py-3.5 px-5 text-right">{{ c.rate3Bottom || 100 }}</td>
-                <td class="py-3.5 px-5 text-slate-500">{{ c.bankAccount || '-' }}</td>
-                <td class="py-3.5 px-5 text-center">
+                <td class="py-3 px-4 font-bold text-slate-800 dark:text-slate-100">{{ c.name }}</td>
+                <td class="py-3 px-4 text-right text-emerald-600 font-medium">{{ c.normalDiscount || 0 }}%</td>
+                <td class="py-3 px-4 text-right text-indigo-600 font-medium">{{ c.runDiscount || 0 }}%</td>
+                <td class="py-3 px-4 text-right text-champagne-600 font-bold">฿{{ c.rate2Digit || 60 }}</td>
+                <td class="py-3 px-4 text-right">{{ c.rate3Direct || 500 }}</td>
+                <td class="py-3 px-4 text-right">{{ c.rate3Tod || 90 }}</td>
+                <td class="py-3 px-4 text-right">{{ c.rate3Bottom || 100 }}</td>
+                <td class="py-3 px-4 text-slate-500">{{ c.bankAccount || '-' }}</td>
+                <td class="py-3 px-4 text-center">
                   <button @click="editCustomer(idx)" class="text-blue-500 mr-2.5 font-semibold">แก้ไข</button>
                   <button @click="deleteCustomer(idx)" class="text-rose-500 font-semibold">ลบ</button>
                 </td>
@@ -440,20 +447,20 @@
 
     <!-- 4. ยอดค้าง (Overdues) -->
     <section v-if="currentTab === 'overdue'" class="space-y-4">
-      <div class="bg-white dark:bg-luxury-darkCard p-6 rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card space-y-4">
-        <div class="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800">
+      <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm space-y-3">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-700">
           <div>
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">รายการยอดค้างชำระ</h3>
-            <p class="text-[11px] text-slate-400">เชื่อมโยงยอดค้างข้ามงวด และตัดส่วนลดอัตโนมัติหากเลยกำหนด</p>
+            <p class="text-[11px] text-slate-400">ระบบเชื่อมโยงยอดค้างข้ามงวด และจะถูกนำมาหักลบตอนโอนเงินรางวัลเสมอ</p>
           </div>
           <button @click="addOverdueRow" class="px-3.5 py-1.5 rounded-xl bg-amber-500 text-white text-xs font-bold">+ เพิ่มยอดค้าง</button>
         </div>
 
-        <div class="space-y-2.5">
+        <div class="space-y-2">
           <div v-for="(od, idx) in currentPeriod.overdues" :key="od.id || idx"
                class="p-3.5 rounded-2xl bg-[#FAFAFA] dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-2">
-              <span class="text-[10px] bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg font-bold">{{ od.fromPeriodName }}</span>
+              <span class="text-[10px] bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-lg font-bold">{{ od.fromPeriodName }}</span>
               <input list="cust-list" v-model="od.customerName" placeholder="ชื่อลูกค้า" class="bg-transparent font-bold text-xs outline-none w-28">
             </div>
             <div class="flex items-center gap-4 text-xs">
@@ -466,50 +473,66 @@
                 <input v-model.number="od.amount" type="number" class="w-24 text-right font-bold text-rose-500 bg-transparent outline-none">
               </div>
               <label class="flex items-center gap-1.5 font-bold cursor-pointer">
-                <input type="checkbox" v-model="od.isPaid" class="w-4 h-4 rounded text-gold-500">
+                <input type="checkbox" v-model="od.isPaid" class="w-4 h-4 rounded text-champagne-500">
                 <span :class="od.isPaid ? 'text-emerald-500' : 'text-slate-400'">จ่ายแล้ว</span>
               </label>
               <button @click="removeOverdueRow(idx)" class="text-rose-400 hover:text-rose-600"><i class="fa-solid fa-trash"></i></button>
             </div>
           </div>
-          <div v-if="!currentPeriod.overdues || currentPeriod.overdues.length === 0" class="text-center py-8 text-xs text-slate-400">
+          <div v-if="!currentPeriod.overdues || currentPeriod.overdues.length === 0" class="text-center py-6 text-xs text-slate-400">
             ไม่มีรายการค้างในงวดนี้
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 5. ถูกรางวัล (Prizes) -->
+    <!-- 5. ถูกรางวัล (Prizes - ดึงจากบิลที่ติ๊ก + นับลำดับบิลของลูกค้าคนนั้น) -->
     <section v-if="currentTab === 'prizes'" class="space-y-4">
-      <div class="bg-white dark:bg-luxury-darkCard rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card overflow-hidden">
-        <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+      <div class="bg-white dark:bg-slate-800 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
           <div>
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">รายการถูกรางวัล</h3>
-            <p class="text-[11px] text-slate-400">คำนวณเบิกเจ้านาย & โบนัสส่วนต่างเราอัตโนมัติ</p>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">รายการถูกรางวัล (ดึงอัตโนมัติจากหน้าบิล)</h3>
+            <p class="text-[11px] text-slate-400">แสดงลำดับบิลเฉพาะของลูกค้าคนนั้น พร้อมคำนวณเรทให้อัตโนมัติ</p>
           </div>
-          <button @click="addPrizeRow" class="px-3.5 py-1.5 rounded-xl bg-gold-500 text-white text-xs font-bold">+ เพิ่มรางวัล</button>
+          <button @click="addManualPrizeRow" class="px-3 py-1.5 rounded-xl bg-champagne-500 text-white text-xs font-bold">+ เพิ่มรางวัลเอง</button>
         </div>
         <div class="overflow-x-auto max-h-[30rem] hide-scrollbar">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="bg-[#FAFAFA] dark:bg-slate-900 text-slate-400 border-b border-slate-100 dark:border-slate-800">
               <tr>
-                <th class="py-3 px-4">ลูกค้า</th>
-                <th class="py-3 px-4">ประเภท</th>
-                <th class="py-3 px-4 text-center">อั้น (1/2)</th>
-                <th class="py-3 px-4 text-right">จำนวนถูก (บาท)</th>
-                <th class="py-3 px-4 text-right">เรทลูกค้า</th>
-                <th class="py-3 px-4 text-right">จ่ายลูกค้า</th>
-                <th class="py-3 px-4 text-right">เรทเจ้านาย</th>
-                <th class="py-3 px-4 text-right">เบิกเจ้านาย</th>
-                <th class="py-3 px-4 text-right text-gold-600 font-bold">โบนัสเรา</th>
-                <th class="py-3 px-4 text-center">ลบ</th>
+                <th class="py-3 px-3">ลูกค้า</th>
+                <th class="py-3 px-3">บิลที่ถูก (ลำดับของลูกค้า)</th>
+                <th class="py-3 px-3 text-center">หักรับค่าหวย?</th>
+                <th class="py-3 px-3">ประเภท</th>
+                <th class="py-3 px-3 text-center">อั้น (1/2)</th>
+                <th class="py-3 px-3 text-right">จำนวนถูก (บาท)</th>
+                <th class="py-3 px-3 text-right">เรทลูกค้า</th>
+                <th class="py-3 px-3 text-right font-bold text-slate-700 dark:text-white">จ่ายลูกค้า</th>
+                <th class="py-3 px-3 text-right">เรทเจ้านาย</th>
+                <th class="py-3 px-3 text-right">เบิกเจ้านาย</th>
+                <th class="py-3 px-3 text-right text-champagne-600 font-bold">โบนัสเรา</th>
+                <th class="py-3 px-3 text-center">ลบ</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-for="(pz, idx) in currentPeriod.prizes" :key="idx" class="hover:bg-slate-50/50">
-                <td class="py-2.5 px-4"><input list="cust-list" v-model="pz.customerName" @input="updatePrizeRates(pz)" placeholder="ชื่อลูกค้า" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-semibold outline-none"></td>
-                <td class="py-2.5 px-4">
-                  <select v-model="pz.type" @change="onPrizeTypeChange(pz)" class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none">
+                <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-100">{{ pz.customerName }}</td>
+                
+                <!-- แสดงลำดับบิลของลูกค้าคนนั้น -->
+                <td class="py-2.5 px-3">
+                  <span class="px-2 py-0.5 rounded-md bg-champagne-50 dark:bg-slate-900 text-champagne-700 dark:text-champagne-400 font-semibold border border-champagne-200/50">
+                    {{ pz.billOrderText || 'บิลทั่วไป' }}
+                  </span>
+                </td>
+
+                <!-- สถานะหักรับค่าหวย -->
+                <td class="py-2.5 px-3 text-center">
+                  <span v-if="pz.isDeduct" class="px-2 py-0.5 rounded-md bg-purple-50 text-purple-600 font-bold">✓ หักค่าหวย</span>
+                  <span v-else class="text-slate-400">ไม่หัก</span>
+                </td>
+
+                <td class="py-2.5 px-3">
+                  <select v-model="pz.type" @change="onPrizeTypeChange(pz)" class="p-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none">
                     <option value="3_DIRECT">3 ตรง</option>
                     <option value="3_TOD">3 โต๊ด</option>
                     <option value="3_BOTTOM">3 ล่าง</option>
@@ -518,17 +541,20 @@
                     <option value="RUN_BOTTOM">วิ่งล่าง (4)</option>
                   </select>
                 </td>
-                <td class="py-2.5 px-4 text-center">
+                <td class="py-2.5 px-3 text-center">
                   <input v-if="!isRunType(pz.type)" type="checkbox" v-model="pz.isHalf" @change="updatePrizeRates(pz)" class="w-4 h-4 rounded text-rose-500">
                   <span v-else class="text-slate-300">-</span>
                 </td>
-                <td class="py-2.5 px-4"><input v-model.number="pz.amount" type="number" class="w-20 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right font-bold outline-none"></td>
-                <td class="py-2.5 px-4"><input v-model.number="pz.customerRate" type="number" class="w-16 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right outline-none"></td>
-                <td class="py-2.5 px-4 text-right font-bold text-slate-700 dark:text-slate-200">฿{{ formatNum((pz.amount || 0) * (pz.customerRate || 0)) }}</td>
-                <td class="py-2.5 px-4"><input v-model.number="pz.bossRate" type="number" class="w-16 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-right outline-none"></td>
-                <td class="py-2.5 px-4 text-right font-bold text-rose-500">฿{{ formatNum((pz.amount || 0) * (pz.bossRate || 0)) }}</td>
-                <td class="py-2.5 px-4 text-right font-black text-gold-600 dark:text-gold-400">+฿{{ formatNum(((pz.amount || 0) * (pz.bossRate || 0)) - ((pz.amount || 0) * (pz.customerRate || 0))) }}</td>
-                <td class="py-2.5 px-4 text-center"><button @click="removePrizeRow(idx)" class="text-rose-400 hover:text-rose-600"><i class="fa-solid fa-trash"></i></button></td>
+                <td class="py-2.5 px-3"><input v-model.number="pz.amount" type="number" class="w-20 p-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right font-bold outline-none"></td>
+                <td class="py-2.5 px-3"><input v-model.number="pz.customerRate" type="number" class="w-16 p-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right outline-none"></td>
+                <td class="py-2.5 px-3 text-right font-bold text-slate-800 dark:text-slate-200">฿{{ formatNum((pz.amount || 0) * (pz.customerRate || 0)) }}</td>
+                <td class="py-2.5 px-3"><input v-model.number="pz.bossRate" type="number" class="w-16 p-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-right outline-none"></td>
+                <td class="py-2.5 px-3 text-right font-bold text-rose-500">฿{{ formatNum((pz.amount || 0) * (pz.bossRate || 0)) }}</td>
+                <td class="py-2.5 px-3 text-right font-black text-champagne-600 dark:text-champagne-400">+฿{{ formatNum(((pz.amount || 0) * (pz.bossRate || 0)) - ((pz.amount || 0) * (pz.customerRate || 0))) }}</td>
+                <td class="py-2.5 px-3 text-center"><button @click="removePrizeRow(idx)" class="text-rose-400 hover:text-rose-600"><i class="fa-solid fa-trash"></i></button></td>
+              </tr>
+              <tr v-if="!currentPeriod.prizes || currentPeriod.prizes.length === 0">
+                <td colspan="12" class="text-center py-8 text-slate-400">ยังไม่มีรายการบิลที่ติ๊กถูกรางวัล</td>
               </tr>
             </tbody>
           </table>
@@ -536,29 +562,29 @@
       </div>
     </section>
 
-    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (Payout & Share Card) -->
-    <section v-if="currentTab === 'payout'" class="space-y-6">
-      <div class="bg-white dark:bg-luxury-darkCard p-5 rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card flex flex-wrap items-center justify-between gap-4 no-print">
-        <div class="flex items-center gap-3">
+    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (Payout & Share Card ตามเงื่อนไขหักรับ/ไม่หักรับ) -->
+    <section v-if="currentTab === 'payout'" class="space-y-5">
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-3 no-print">
+        <div class="flex items-center gap-2">
           <label class="text-xs font-semibold text-slate-400 uppercase">เลือกลูกค้าที่ถูกรางวัล:</label>
-          <select v-model="selectedPrizeCustomer" class="px-4 py-2 rounded-xl border border-gold-200 dark:border-gold-800 bg-gold-50/40 dark:bg-slate-800 text-xs font-bold outline-none">
+          <select v-model="selectedPrizeCustomer" class="px-3.5 py-1.5 rounded-xl border border-champagne-300 dark:border-slate-700 bg-champagne-50/40 dark:bg-slate-900 text-xs font-bold outline-none">
             <option v-for="c in winningCustomers" :key="c" :value="c">🎉 {{ c }} (ถูกรางวัล)</option>
           </select>
         </div>
 
         <div class="flex items-center gap-2">
-          <button @click="copyCustomerBank" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-gold-400 text-xs font-semibold flex items-center gap-1.5 transition">
-            <i class="fa-solid fa-copy text-gold-500"></i> ก๊อปเลขบัญชีลูกค้า
+          <button @click="copyCustomerBank" class="px-3.5 py-1.5 rounded-xl border border-champagne-200 dark:border-slate-700 hover:border-champagne-400 text-xs font-semibold flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-copy text-champagne-500"></i> ก๊อปเลขบัญชีลูกค้า
           </button>
-          <button @click="saveClientReceiptImage" :disabled="isSavingImg" class="px-5 py-2 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white text-xs font-bold shadow-luxury-gold flex items-center gap-1.5 transition disabled:opacity-50">
+          <button @click="saveClientReceiptImage" :disabled="isSavingImg" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-champagne-500 to-champagne-600 hover:from-champagne-600 hover:to-champagne-700 text-white text-xs font-bold shadow-md shadow-champagne-500/20 flex items-center gap-1.5 transition disabled:opacity-50">
             <i class="fa-solid fa-image"></i> {{ isSavingImg ? 'กำลังบันทึก...' : 'บันทึกรูปส่งลูกค้า' }}
           </button>
         </div>
       </div>
 
-      <!-- ส่วนแจกแจงแอดมิน (Admin View) -->
-      <div v-if="selectedPrizeCustomer" class="bg-white dark:bg-luxury-darkCard p-5 rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card space-y-3 no-print">
-        <div class="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800">
+      <!-- ส่วนแจกแจงแอดมิน (Admin Detailed View) -->
+      <div v-if="selectedPrizeCustomer" class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm space-y-3 no-print">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-700">
           <span class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">รายละเอียดเงินรางวัล (เฉพาะเราเห็น)</span>
           <span class="text-xs text-slate-400">บัญชีลูกค้า: <b class="text-slate-800 dark:text-white">{{ getCustomerBankAccount(selectedPrizeCustomer) || '-' }}</b></span>
         </div>
@@ -571,11 +597,11 @@
             <span class="text-slate-400 text-[11px] block">2. จ่ายรางวัลลูกค้า</span>
             <span class="font-bold text-slate-700 dark:text-slate-200 text-sm">฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).totalCustomerPrize) }}</span>
           </div>
-          <div class="p-3 rounded-2xl bg-gold-50/50 dark:bg-gold-950/20 border border-gold-200/50 dark:border-gold-900/50">
-            <span class="text-gold-600 dark:text-gold-400 text-[11px] block font-bold">3. โบนัสส่วนต่างเรา</span>
-            <span class="font-black text-gold-600 dark:text-gold-400 text-sm">+฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).prizeBonus) }}</span>
+          <div class="p-3 rounded-2xl bg-champagne-50/50 dark:bg-champagne-950/20 border border-champagne-200/50 dark:border-slate-800">
+            <span class="text-champagne-600 dark:text-champagne-400 text-[11px] block font-bold">3. โบนัสส่วนต่างเรา</span>
+            <span class="font-black text-champagne-600 dark:text-champagne-400 text-sm">+฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).prizeBonus) }}</span>
           </div>
-          <div class="p-3 rounded-2xl bg-slate-900 dark:bg-gold-500 text-white dark:text-slate-950">
+          <div class="p-3 rounded-2xl bg-slate-900 dark:bg-champagne-500 text-white dark:text-slate-950">
             <span class="text-slate-300 dark:text-slate-800 text-[11px] block font-medium">4. ยอดสุทธิโอนให้ลูกค้า</span>
             <span class="font-black text-sm">฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).netPayoutToCustomer) }}</span>
           </div>
@@ -583,36 +609,45 @@
       </div>
 
       <!-- การ์ดรูปภาพส่งลูกค้า (Luxury Clean Gold Card) -->
-      <div v-if="selectedPrizeCustomer" id="client-share-card" class="bg-white border border-[#EAE6DF] p-8 rounded-3xl max-w-md mx-auto shadow-xl text-slate-800 relative overflow-hidden">
-        <div class="text-center pb-5 border-b border-gold-100 mb-5">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-gold-400 to-gold-600 text-white flex items-center justify-center text-xl mx-auto mb-2.5 shadow-luxury-gold">
+      <div v-if="selectedPrizeCustomer" id="client-share-card" class="bg-white border border-[#EAE6DF] p-8 rounded-3xl max-w-md mx-auto shadow-lg text-slate-800 relative overflow-hidden">
+        <div class="text-center pb-5 border-b border-champagne-100 mb-5">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-champagne-500 to-champagne-400 text-white flex items-center justify-center text-xl mx-auto mb-2 shadow-sm">
             <i class="fa-solid fa-crown"></i>
           </div>
-          <span class="text-[11px] font-serif font-bold text-gold-600 uppercase tracking-widest">CONGRATULATIONS</span>
+          <span class="text-[11px] font-serif font-bold text-champagne-600 uppercase tracking-widest">CONGRATULATIONS</span>
           <h2 class="text-2xl font-bold mt-1 text-slate-900">{{ selectedPrizeCustomer }}</h2>
           <p class="text-xs text-slate-400 mt-0.5">งวดประจำวันที่ {{ currentPeriod.name }}</p>
         </div>
 
-        <div class="space-y-3 text-xs">
-          <div class="flex justify-between items-center p-3 rounded-2xl bg-gold-50/60 border border-gold-200/50">
-            <span class="font-semibold text-slate-700">ยอดเงินรางวัลที่ได้รับ:</span>
-            <span class="text-sm font-black text-gold-700">+฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).totalCustomerPrize) }}</span>
-          </div>
-          <div class="flex justify-between items-center p-2.5 px-3 text-slate-500">
-            <span>หัก ค่าหวยงวดปัจจุบัน ({{ currentPeriod.name }}):</span>
-            <span class="font-medium text-rose-500">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).currentPeriodCost) }}</span>
-          </div>
-          <div v-if="getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost > 0" class="flex justify-between items-center p-2.5 px-3 text-slate-500">
-            <span>หัก ค่าหวยงวดเก่า ({{ getCustomerPrizeCalculation(selectedPrizeCustomer).overduePeriodName }}):</span>
-            <span class="font-medium text-rose-500">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost) }}</span>
+        <div class="space-y-2.5 text-xs">
+          <!-- ยอดเงินรางวัล -->
+          <div class="flex justify-between items-center p-3 rounded-2xl bg-champagne-50/70 border border-champagne-200/60">
+            <span class="font-bold text-slate-700">ยอดเงินรางวัลที่ได้รับ:</span>
+            <span class="text-sm font-black text-champagne-700">+฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).totalCustomerPrize) }}</span>
           </div>
 
-          <div class="mt-4 p-5 rounded-3xl bg-gradient-to-r from-gold-500 to-gold-600 text-white text-center shadow-luxury-gold">
-            <span class="text-[11px] font-medium text-gold-100 uppercase tracking-wider">ยอดเงินโอนสุทธิเข้าบัญชี</span>
+          <!-- หักค่าหวยงวดปัจจุบัน (กรณีติ๊กหักรับ) -->
+          <div v-if="getCustomerPrizeCalculation(selectedPrizeCustomer).isDeductCurrent" class="flex justify-between items-center p-2.5 px-3 rounded-xl bg-slate-50 text-slate-600">
+            <span>หัก ค่าหวยงวดปัจจุบัน ({{ currentPeriod.name }}):</span>
+            <span class="font-bold text-rose-500">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).currentPeriodCost) }}</span>
+          </div>
+          <div v-else class="flex justify-between items-center p-2 px-3 text-slate-400 italic">
+            <span>*บิลนี้ไม่หักค่าหวยงวดปัจจุบัน (รับเงินรางวัลเต็ม)</span>
+          </div>
+
+          <!-- หักค้างเก่างวดก่อน (หักเสมอถ้ามี) -->
+          <div v-if="getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost > 0" class="flex justify-between items-center p-2.5 px-3 rounded-xl bg-amber-50/70 border border-amber-200/50 text-amber-900">
+            <span>หัก ยอดค้างเก่างวดก่อน ({{ getCustomerPrizeCalculation(selectedPrizeCustomer).overduePeriodName }}):</span>
+            <span class="font-bold text-rose-600">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost) }}</span>
+          </div>
+
+          <!-- ยอดโอนสุทธิ -->
+          <div class="mt-4 p-4 rounded-2xl bg-gradient-to-r from-champagne-500 to-champagne-600 text-white text-center shadow-md">
+            <span class="text-[11px] font-medium text-champagne-100 uppercase tracking-wider">ยอดเงินโอนสุทธิเข้าบัญชี</span>
             <div class="text-3xl font-extrabold mt-1">
               ฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).netPayoutToCustomer) }}
             </div>
-            <p class="text-[11px] text-gold-100 mt-1">บัญชี: {{ getCustomerBankAccount(selectedPrizeCustomer) || 'ตามที่ระบุ' }}</p>
+            <p class="text-[11px] text-champagne-100 mt-1">โอนเข้า: {{ getCustomerBankAccount(selectedPrizeCustomer) || 'บัญชีตามที่ระบุ' }}</p>
           </div>
         </div>
 
@@ -624,9 +659,9 @@
 
     <!-- 7. ตั้งค่า (Settings) -->
     <section v-if="currentTab === 'settings'" class="max-w-xl mx-auto space-y-4">
-      <div class="bg-white dark:bg-luxury-darkCard p-6 rounded-3xl border border-luxury-border dark:border-luxury-darkBorder shadow-luxury-card space-y-4">
+      <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm space-y-3">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white flex items-center gap-2">
-          <i class="fa-solid fa-gear text-gold-500"></i> ตั้งค่าระบบ & กฎการชำระเงิน
+          <i class="fa-solid fa-gear text-champagne-500"></i> ตั้งค่าระบบ & กฎการชำระเงิน
         </h3>
         
         <div>
@@ -634,12 +669,12 @@
           <input v-model.number="settings.dueDays" type="number" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none">
         </div>
 
-        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-[#FAFAFA] dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-[#FAFAFA] dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
           <div>
             <div class="text-xs font-semibold">เปิดใช้กฎตัดสิทธิ์ส่วนลดเมื่อเลยกำหนด</div>
             <div class="text-[11px] text-slate-400">หากเกินกำหนดวันชำระ ส่วนลดงวดค้างจะกลายเป็น 0% ทันที</div>
           </div>
-          <input type="checkbox" v-model="settings.autoCutDiscount" class="w-4 h-4 rounded text-gold-500">
+          <input type="checkbox" v-model="settings.autoCutDiscount" class="w-4 h-4 rounded text-champagne-500">
         </div>
 
         <div>
@@ -647,7 +682,7 @@
           <textarea v-model="bankInfo" rows="3" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none"></textarea>
         </div>
 
-        <button @click="saveToStorage" class="w-full py-2.5 rounded-xl bg-slate-900 dark:bg-gold-500 text-white dark:text-slate-950 font-bold text-xs hover:opacity-90 transition">
+        <button @click="saveToStorage" class="w-full py-2.5 rounded-xl bg-slate-900 dark:bg-champagne-500 text-white dark:text-slate-950 font-bold text-xs hover:opacity-90 transition">
           บันทึกการตั้งค่าขึ้น Cloud
         </button>
       </div>
@@ -656,9 +691,9 @@
   </main>
 
   <!-- Mobile Bottom Navigation Bar -->
-  <nav class="no-print md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-t border-luxury-border dark:border-luxury-darkBorder px-2 py-2 flex justify-around">
+  <nav class="no-print md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-t border-champagne-200 dark:border-slate-800 px-2 py-2 flex justify-around">
     <button v-for="tab in tabs" :key="tab.id" @click="currentTab = tab.id"
-            :class="currentTab === tab.id ? 'text-gold-600 dark:text-gold-400 font-bold' : 'text-slate-400'"
+            :class="currentTab === tab.id ? 'text-champagne-600 dark:text-champagne-400 font-bold' : 'text-slate-400'"
             class="flex flex-col items-center gap-0.5 text-[10px] p-1 transition">
       <i :class="tab.icon" class="text-sm"></i>
       <span>{{ tab.shortName }}</span>
@@ -802,17 +837,30 @@
         navigator.clipboard.writeText(acc);
         this.showToast(`คัดลอกเลขบัญชีคุณ ${this.selectedPrizeCustomer} แล้ว`);
       },
-      
+
+      // คำนวณลำดับบิลของลูกค้าคนนั้น (นับเฉพาะบิลของคนนั้นคนเดียว)
+      getCustomerSpecificBillOrder(bill) {
+        if (!bill || !bill.customerName) return 'บิลทั่วไป';
+        const customerBills = (this.currentPeriod.bills || []).filter(b => b.customerName && b.customerName.trim() === bill.customerName.trim());
+        const order = customerBills.findIndex(b => b.id === bill.id) + 1;
+        return `บิลที่ ${order} ของคุณ${bill.customerName}`;
+      },
+
+      // เชื่อมบิลขายสู่หน้าถูกรางวัล + ระบุลำดับบิลของคนนั้น
       onToggleBillWon(bill) {
         if (!this.currentPeriod) return;
         if (!this.currentPeriod.prizes) this.currentPeriod.prizes = [];
 
         if (bill.isWonPrize) {
+          bill.isDeduct = true; // ค่าเริ่มต้นติ๊กหักรับค่าหวย
+          const orderText = this.getCustomerSpecificBillOrder(bill);
           const exists = this.currentPeriod.prizes.find(p => p.billId === bill.id);
           if (!exists) {
             const pz = {
               billId: bill.id,
               customerName: bill.customerName,
+              billOrderText: orderText,
+              isDeduct: true,
               type: '2_DIGIT',
               isHalf: false,
               amount: bill.normalAmount || 0,
@@ -824,26 +872,48 @@
             this.currentPeriod.prizes.push(pz);
           }
         } else {
+          bill.isDeduct = false;
           this.currentPeriod.prizes = this.currentPeriod.prizes.filter(p => p.billId !== bill.id);
         }
       },
 
+      onDeductChange(bill) {
+        const pz = (this.currentPeriod.prizes || []).find(p => p.billId === bill.id);
+        if (pz) {
+          pz.isDeduct = bill.isDeduct;
+        }
+      },
+
+      addManualPrizeRow() {
+        if (!this.currentPeriod) return;
+        if (!this.currentPeriod.prizes) this.currentPeriod.prizes = [];
+        const pz = { billId: '', customerName: '', billOrderText: 'บิลเพิ่มเติม', isDeduct: true, type: '2_DIGIT', isHalf: false, amount: 0, customerRate: 60, bossRate: 70, isPaidOut: false };
+        this.currentPeriod.prizes.push(pz);
+      },
+
+      // คำนวณสรุปโอนรางวัล: หักค่าหวยปัจจุบัน (ถ้าหักรับ) + หักค้างเก่าเสมอ
       getCustomerPrizeCalculation(name) {
-        if (!this.currentPeriod || !name) return { totalBossPrize: 0, totalCustomerPrize: 0, prizeBonus: 0, currentPeriodCost: 0, overdueCost: 0, overduePeriodName: '', netPayoutToCustomer: 0 };
+        if (!this.currentPeriod || !name) return { totalBossPrize: 0, totalCustomerPrize: 0, prizeBonus: 0, isDeductCurrent: false, currentPeriodCost: 0, overdueCost: 0, overduePeriodName: '', netPayoutToCustomer: 0 };
         
         let totalBoss = 0, totalCust = 0;
+        let isDeductCurrent = false;
+
         (this.currentPeriod.prizes || []).forEach(p => {
           if (p.customerName && p.customerName.trim() === name.trim()) {
             const amt = Number(p.amount) || 0;
             totalBoss += amt * (Number(p.bossRate) || 0);
             totalCust += amt * (Number(p.customerRate) || 0);
+            if (p.isDeduct) isDeductCurrent = true;
           }
         });
 
         const prizeBonus = Math.max(0, totalBoss - totalCust);
         const summary = this.getCustomerSummary(name);
-        const currentPeriodCost = summary.normalNet + summary.runNet;
 
+        // ค่าหวยงวดปัจจุบัน: จะหักก็ต่อเมื่อติ๊ก "หักรับ"
+        const currentPeriodCost = isDeductCurrent ? (summary.normalNet + summary.runNet) : 0;
+
+        // ยอดค้างเก่า: นำมาหักลบเสมอโดยอัตโนมัติ
         const overdueUnpaid = summary.overdueUnpaid;
         const overdueObj = (this.currentPeriod.overdues || []).find(o => o && o.customerName && o.customerName.trim() === name.trim() && !o.isPaid);
         const overduePeriodName = overdueObj ? overdueObj.fromPeriodName : 'งวดก่อนหน้า';
@@ -854,6 +924,7 @@
           totalBossPrize: totalBoss,
           totalCustomerPrize: totalCust,
           prizeBonus,
+          isDeductCurrent,
           currentPeriodCost,
           overdueCost: overdueUnpaid,
           overduePeriodName,
@@ -888,7 +959,11 @@
             if (!p.overdues) p.overdues = [];
             else p.overdues = p.overdues.map(o => ({ ...o, isPaid: o.isPaid === true || o.isPaid === 'true' }));
             if (!p.prizes) p.prizes = [];
-            else p.prizes = p.prizes.map(z => ({ ...z, isHalf: (z.isHalf === true || z.isHalf === 'true') && !this.isRunType(z.type) }));
+            else p.prizes = p.prizes.map(z => ({ 
+              ...z, 
+              isHalf: (z.isHalf === true || z.isHalf === 'true') && !this.isRunType(z.type),
+              isDeduct: z.isDeduct !== undefined ? (z.isDeduct === true || z.isDeduct === 'true') : true
+            }));
             return p;
           });
           if (this.periods.length > 0 && !this.selectedPeriodId) {
@@ -971,7 +1046,7 @@
 
       addEmptyBillRow() {
         if (!this.currentPeriod.bills) this.currentPeriod.bills = [];
-        this.currentPeriod.bills.push({ id: 'b_' + Date.now(), customerName: '', normalAmount: 0, runAmount: 0, isPaid: false, isWonPrize: false });
+        this.currentPeriod.bills.push({ id: 'b_' + Date.now(), customerName: '', normalAmount: 0, runAmount: 0, isPaid: false, isWonPrize: false, isDeduct: false });
       },
       removeBillRow(idx) {
         const bill = this.currentPeriod.bills[idx];
@@ -996,11 +1071,6 @@
       },
       removeOverdueRow(idx) { this.currentPeriod.overdues.splice(idx, 1); },
 
-      addPrizeRow() {
-        if (!this.currentPeriod.prizes) this.currentPeriod.prizes = [];
-        const pz = { billId: '', customerName: '', type: '2_DIGIT', isHalf: false, amount: 0, customerRate: 60, bossRate: 70, isPaidOut: false };
-        this.currentPeriod.prizes.push(pz);
-      },
       removePrizeRow(idx) { this.currentPeriod.prizes.splice(idx, 1); },
 
       onPrizeTypeChange(pz) {
@@ -1029,7 +1099,7 @@
         rows.forEach(r => {
           const raw = r.trim().replace(/,/g, '');
           if (!isNaN(Number(raw)) && raw !== '') {
-            this.currentPeriod.bills.push({ id: 'b_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4), customerName: '', normalAmount: Number(raw), runAmount: 0, isPaid: false, isWonPrize: false });
+            this.currentPeriod.bills.push({ id: 'b_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4), customerName: '', normalAmount: Number(raw), runAmount: 0, isPaid: false, isWonPrize: false, isDeduct: false });
             added++;
           }
         });
