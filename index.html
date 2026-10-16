@@ -3,18 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sales & Lottery Management - Neo 3D Clay</title>
+  <title>NeoSales 3D Pro - ระบบบริหารยอดขายและสรุปโอนรางวัล</title>
   
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Vue 3 -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  <!-- html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Prompt Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -24,10 +19,10 @@
           fontFamily: { prompt: ['Prompt', 'sans-serif'] },
           colors: {
             clay: {
-              bg: '#EBF1F6',
-              bgDark: '#1E232A',
-              card: '#F3F7FA',
-              cardDark: '#262D36',
+              bg: '#EEF2F6',
+              bgDark: '#1A1E24',
+              card: '#F6F9FC',
+              cardDark: '#232931',
               primary: '#6C5CE7',
               accent: '#FD79A8',
               teal: '#00CEC9',
@@ -36,13 +31,11 @@
             }
           },
           boxShadow: {
-            'clay-card': '8px 8px 16px #cfd6dc, -8px -8px 16px #ffffff, inset 1px 1px 2px rgba(255,255,255,0.8)',
-            'clay-card-dark': '8px 8px 16px #15191e, -8px -8px 16px #2d3540, inset 1px 1px 2px rgba(255,255,255,0.05)',
-            'clay-btn': '5px 5px 10px #c5ccd3, -5px -5px 10px #ffffff, inset 2px 2px 2px rgba(255,255,255,0.7)',
-            'clay-btn-active': 'inset 4px 4px 8px #c5ccd3, inset -4px -4px 8px #ffffff',
-            'clay-pill': '6px 6px 12px #cad2d9, -6px -6px 12px #ffffff',
-            'clay-inset': 'inset 3px 3px 6px #cad2d9, inset -3px -3px 6px #ffffff',
-            'clay-inset-dark': 'inset 3px 3px 6px #191e24, inset -3px -3px 6px #2b333e'
+            'clay-card': '9px 9px 18px #d1d8df, -9px -9px 18px #ffffff, inset 1px 1px 2px rgba(255,255,255,0.8)',
+            'clay-card-dark': '9px 9px 18px #13171c, -9px -9px 18px #2b333e, inset 1px 1px 2px rgba(255,255,255,0.06)',
+            'clay-btn': '5px 5px 10px #c6ced5, -5px -5px 10px #ffffff, inset 2px 2px 2px rgba(255,255,255,0.6)',
+            'clay-inset': 'inset 3px 3px 6px #cbd3da, inset -3px -3px 6px #ffffff',
+            'clay-inset-dark': 'inset 3px 3px 6px #161a20, inset -3px -3px 6px #29303a'
           }
         }
       }
@@ -51,23 +44,15 @@
 
   <style>
     body { font-family: 'Prompt', sans-serif; }
-    .clay-card {
-      border-radius: 1.75rem;
-      transition: all 0.25s ease-in-out;
-    }
-    .clay-btn {
-      border-radius: 1.25rem;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .clay-btn:active {
-      transform: scale(0.97);
-    }
+    .clay-card { border-radius: 1.75rem; }
+    .clay-btn { border-radius: 1.25rem; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .clay-btn:active { transform: scale(0.97); }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     @media print {
       body * { visibility: hidden; }
-      #printable-bill, #printable-bill * { visibility: visible; }
-      #printable-bill { position: absolute; left: 0; top: 0; width: 100%; }
+      #printable-receipt-card, #printable-receipt-card * { visibility: visible; }
+      #printable-receipt-card { position: absolute; left: 0; top: 0; width: 100%; }
       .no-print { display: none !important; }
     }
   </style>
@@ -80,25 +65,25 @@
     <div class="w-16 h-16 rounded-3xl bg-white/20 p-3 shadow-clay-card flex items-center justify-center animate-bounce">
       <i class="fa-solid fa-cloud-arrow-up text-3xl text-amber-300"></i>
     </div>
-    <h3 class="text-lg font-bold mt-4">กำลังซิงค์ข้อมูล Cloud...</h3>
-    <p class="text-xs text-slate-300">ระบบกำลังอัปเดต Google Sheets</p>
+    <h3 class="text-base font-bold mt-4">กำลังบันทึกข้อมูลและตรวจสอบความปลอดภัย...</h3>
+    <p class="text-xs text-slate-300">ระบบ Lock ป้องกันการเขียนทับทำงานอยู่</p>
   </div>
 
   <!-- Header บนคอมพิวเตอร์ -->
   <header class="no-print hidden md:block sticky top-0 z-40 bg-clay-bg/85 dark:bg-clay-bgDark/85 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-clay-primary to-clay-accent flex items-center justify-center text-white text-xl shadow-clay-btn">
-          <i class="fa-solid fa-shapes"></i>
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-clay-primary to-clay-accent flex items-center justify-center text-white text-lg shadow-clay-btn">
+          <i class="fa-solid fa-shield-halved"></i>
         </div>
         <div>
-          <h1 class="text-xl font-black bg-gradient-to-r from-clay-primary to-clay-accent bg-clip-text text-transparent">NeoSales 3D</h1>
-          <p class="text-[11px] text-slate-400 font-semibold tracking-wider">MANAGEMENT CLOUD PLATFORM</p>
+          <h1 class="text-lg font-black bg-gradient-to-r from-clay-primary to-clay-accent bg-clip-text text-transparent">NeoSales 3D Pro</h1>
+          <p class="text-[10px] text-slate-400 font-bold tracking-wider">AUTO-DEBT & PRIZE PAYOUT ENGINE</p>
         </div>
       </div>
 
-      <!-- Navigation Bar (Desktop) -->
-      <nav class="flex items-center gap-2 bg-clay-card dark:bg-clay-cardDark p-2 rounded-2xl shadow-clay-card dark:shadow-clay-card-dark">
+      <!-- Navigation Tabs (Desktop) -->
+      <nav class="flex items-center gap-1.5 bg-clay-card dark:bg-clay-cardDark p-1.5 rounded-2xl shadow-clay-card dark:shadow-clay-card-dark">
         <button v-for="tab in tabs" :key="tab.id" @click="currentTab = tab.id"
                 :class="currentTab === tab.id ? 'bg-clay-primary text-white shadow-clay-btn' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'"
                 class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
@@ -107,13 +92,12 @@
         </button>
       </nav>
 
-      <!-- โหมดมืด & บันทึก -->
-      <div class="flex items-center gap-3">
-        <button @click="toggleTheme" class="w-10 h-10 rounded-2xl bg-clay-card dark:bg-clay-cardDark shadow-clay-btn flex items-center justify-center text-slate-600 dark:text-amber-300 text-sm">
-          <i :class="isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon'"></i>
+      <div class="flex items-center gap-2.5">
+        <button @click="toggleTheme" class="w-9 h-9 rounded-xl bg-clay-card dark:bg-clay-cardDark shadow-clay-btn flex items-center justify-center text-xs">
+          <i :class="isDark ? 'fa-solid fa-sun text-amber-300' : 'fa-solid fa-moon text-slate-600'"></i>
         </button>
         <button @click="saveToStorage" class="clay-btn px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold shadow-clay-btn flex items-center gap-1.5">
-          <i class="fa-solid fa-floppy-disk"></i> ซิงค์ชีท
+          <i class="fa-solid fa-cloud-check"></i> บันทึกระบบ
         </button>
       </div>
     </div>
@@ -122,13 +106,13 @@
   <!-- Mobile Top Bar -->
   <div class="no-print md:hidden flex items-center justify-between px-5 pt-4 pb-2">
     <div class="flex items-center gap-2.5">
-      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-clay-primary to-clay-accent flex items-center justify-center text-white text-lg shadow-clay-btn">
-        <i class="fa-solid fa-shapes"></i>
+      <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-clay-primary to-clay-accent flex items-center justify-center text-white text-base shadow-clay-btn">
+        <i class="fa-solid fa-shield-halved"></i>
       </div>
-      <h1 class="text-lg font-black bg-gradient-to-r from-clay-primary to-clay-accent bg-clip-text text-transparent">NeoSales</h1>
+      <h1 class="text-base font-black bg-gradient-to-r from-clay-primary to-clay-accent bg-clip-text text-transparent">NeoSales Pro</h1>
     </div>
     <div class="flex items-center gap-2">
-      <button @click="toggleTheme" class="w-9 h-9 rounded-xl bg-clay-card dark:bg-clay-cardDark shadow-clay-btn flex items-center justify-center text-xs">
+      <button @click="toggleTheme" class="w-8 h-8 rounded-xl bg-clay-card dark:bg-clay-cardDark shadow-clay-btn flex items-center justify-center text-xs">
         <i :class="isDark ? 'fa-solid fa-sun text-amber-300' : 'fa-solid fa-moon text-slate-600'"></i>
       </button>
       <button @click="saveToStorage" class="px-3 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-bold shadow-clay-btn flex items-center gap-1">
@@ -137,68 +121,50 @@
     </div>
   </div>
 
-  <!-- เนื้อหาหลัก 7 หมวด -->
   <main class="max-w-7xl mx-auto px-4 md:px-6 py-4">
 
-    <!-- 1. แดชบอร์ด (Dashboard) -->
+    <!-- TAB 1: แดชบอร์ด (Dashboard) -->
     <section v-if="currentTab === 'dashboard'" class="space-y-6">
-      <!-- การ์ดตัวเลข 4 ช่อง Neo 3D -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- ยอดขายรวม -->
         <div class="clay-card p-5 bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-400">ยอดขายรวม</span>
-            <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-500 flex items-center justify-center text-xs shadow-clay-btn"><i class="fa-solid fa-wallet"></i></div>
-          </div>
-          <div class="my-3 text-2xl lg:text-3xl font-black text-slate-800 dark:text-white">฿{{ formatNum(overallStats.totalGross) }}</div>
-          <div class="text-[11px] text-slate-400 font-semibold border-t border-slate-200/60 dark:border-slate-700/60 pt-2 flex justify-between">
-            <span>หลังหักส่วนลด:</span>
+          <span class="text-xs font-bold text-slate-400">ยอดขายรวม</span>
+          <div class="my-2.5 text-2xl lg:text-3xl font-black text-slate-800 dark:text-white">฿{{ formatNum(overallStats.totalGross) }}</div>
+          <div class="text-[11px] text-slate-400 border-t border-slate-200/60 dark:border-slate-700/60 pt-2 flex justify-between font-semibold">
+            <span>สุทธิหลังลด:</span>
             <span class="text-indigo-600 dark:text-indigo-400 font-bold">฿{{ formatNum(overallStats.totalCustomerNetAll) }}</span>
           </div>
         </div>
 
-        <!-- รอยอดลูกค้า -->
         <div class="clay-card p-5 bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-blue-500">รอยอดลูกค้า</span>
-            <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-500 flex items-center justify-center text-xs shadow-clay-btn"><i class="fa-solid fa-hourglass-half"></i></div>
-          </div>
-          <div class="my-3 text-2xl lg:text-3xl font-black text-blue-600 dark:text-blue-400">฿{{ formatNum(overallStats.totalRemainingToCollect) }}</div>
-          <div class="text-[11px] text-slate-400 font-semibold border-t border-slate-200/60 dark:border-slate-700/60 pt-2 flex justify-between">
+          <span class="text-xs font-bold text-blue-500">รอยอดลูกค้า</span>
+          <div class="my-2.5 text-2xl lg:text-3xl font-black text-blue-600 dark:text-blue-400">฿{{ formatNum(overallStats.totalRemainingToCollect) }}</div>
+          <div class="text-[11px] text-slate-400 border-t border-slate-200/60 dark:border-slate-700/60 pt-2 flex justify-between font-semibold">
             <span>รับชำระแล้ว:</span>
             <span class="text-emerald-500 font-bold">฿{{ formatNum(overallStats.totalPaidNet) }}</span>
           </div>
         </div>
 
-        <!-- ยอดจ่ายเจ้านาย -->
         <div class="clay-card p-5 bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-rose-500">ยอดจ่ายเจ้านาย</span>
-            <div class="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-500 flex items-center justify-center text-xs shadow-clay-btn"><i class="fa-solid fa-user-tie"></i></div>
-          </div>
-          <div class="my-3 text-2xl lg:text-3xl font-black text-rose-600 dark:text-rose-400">฿{{ formatNum(overallStats.totalToBoss) }}</div>
-          <div class="text-[11px] text-slate-400 font-semibold border-t border-slate-200/60 dark:border-slate-700/60 pt-2">
-            หักส่ง: ปกติ 30% | วิ่ง 10%
+          <span class="text-xs font-bold text-rose-500">ยอดส่งเจ้านาย</span>
+          <div class="my-2.5 text-2xl lg:text-3xl font-black text-rose-600 dark:text-rose-400">฿{{ formatNum(overallStats.totalToBoss) }}</div>
+          <div class="text-[11px] text-slate-400 border-t border-slate-200/60 dark:border-slate-700/60 pt-2 font-semibold">
+            ปกติหัก 30% | วิ่งหัก 10%
           </div>
         </div>
 
-        <!-- กำไรสุทธิ -->
-        <div class="clay-card p-5 bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-clay-card dark:shadow-clay-card-dark flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-emerald-100">กำไรสุทธิงวดนี้</span>
-            <div class="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center text-xs shadow-clay-btn"><i class="fa-solid fa-coins"></i></div>
-          </div>
-          <div class="my-3 text-2xl lg:text-3xl font-black text-amber-300">฿{{ formatNum(overallStats.netProfit) }}</div>
-          <div class="text-[11px] text-emerald-100 font-semibold border-t border-emerald-400/40 pt-2 flex justify-between">
+        <div class="clay-card p-5 bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-clay-card flex flex-col justify-between">
+          <span class="text-xs font-bold text-emerald-100">กำไรสุทธิงวดนี้</span>
+          <div class="my-2.5 text-2xl lg:text-3xl font-black text-amber-300">฿{{ formatNum(overallStats.netProfit) }}</div>
+          <div class="text-[11px] text-emerald-100 border-t border-emerald-400/40 pt-2 flex justify-between font-semibold">
             <span>กำไรบิล: ฿{{ formatNum(overallStats.salesProfit) }}</span>
-            <span v-if="overallStats.totalPrizeBonus > 0" class="text-amber-200 font-bold">+โบนัส: ฿{{ formatNum(overallStats.totalPrizeBonus) }}</span>
+            <span v-if="overallStats.totalPrizeBonus > 0" class="text-amber-200 font-bold">+โบนัส ฿{{ formatNum(overallStats.totalPrizeBonus) }}</span>
           </div>
         </div>
       </div>
 
-      <!-- สรุปเคลียร์ยอดเงินรางวัล 3D Card -->
-      <div class="clay-card p-6 bg-gradient-to-r from-purple-800 to-indigo-900 text-white shadow-clay-card">
-        <div class="flex items-center justify-between mb-4 pb-3 border-b border-purple-700/60">
+      <!-- สรุปเคลียร์เงินรางวัล 3D Card -->
+      <div class="clay-card p-6 bg-gradient-to-r from-purple-900 to-indigo-900 text-white shadow-clay-card">
+        <div class="flex items-center justify-between pb-3 border-b border-purple-700/60 mb-4">
           <div class="flex items-center gap-2.5">
             <div class="w-10 h-10 rounded-2xl bg-amber-400 text-indigo-950 flex items-center justify-center font-bold text-lg shadow-clay-btn"><i class="fa-solid fa-trophy"></i></div>
             <div>
@@ -209,22 +175,22 @@
           <span class="text-xs px-3 py-1 bg-white/10 rounded-full font-bold">ถูก {{ (currentPeriod.prizes || []).length }} รายการ</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10">
+          <div class="p-4 rounded-2xl bg-white/10 border border-white/10">
             <span class="text-xs text-purple-200 font-semibold">1. ยอดเบิกเจ้านาย</span>
             <div class="text-2xl font-black text-rose-300 mt-1">฿{{ formatNum(overallStats.totalPrizeFromBoss) }}</div>
           </div>
-          <div class="p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10">
+          <div class="p-4 rounded-2xl bg-white/10 border border-white/10">
             <span class="text-xs text-purple-200 font-semibold">2. ยอดโอนจ่ายลูกค้า</span>
             <div class="text-2xl font-black text-amber-300 mt-1">฿{{ formatNum(overallStats.totalPrizeToCustomer) }}</div>
           </div>
-          <div class="p-4 rounded-2xl bg-emerald-500/20 backdrop-blur-sm border border-emerald-400/30">
+          <div class="p-4 rounded-2xl bg-emerald-500/20 border border-emerald-400/30">
             <span class="text-xs text-emerald-200 font-bold">3. กำไรส่วนต่าง/โบนัสเรา</span>
             <div class="text-2xl font-black text-emerald-300 mt-1">+฿{{ formatNum(overallStats.totalPrizeBonus) }}</div>
           </div>
         </div>
       </div>
 
-      <!-- ตารางรายชื่อลูกค้า & สถานะชำระ -->
+      <!-- ตารางรายชื่อลูกค้า & สถานะงวดนี้ -->
       <div class="clay-card p-6 bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark">
         <h3 class="font-bold text-base mb-4 flex items-center gap-2">
           <i class="fa-solid fa-users text-clay-primary"></i> รายชื่อลูกค้าและสถานะงวดนี้
@@ -280,35 +246,38 @@
       </div>
     </section>
 
-    <!-- 2. บันทึกบิล (Bills Entry) -->
+    <!-- TAB 2: บันทึกบิล (Bills Entry with Prize Marking) -->
     <section v-if="currentTab === 'entry'" class="space-y-6">
       <div class="clay-card p-5 bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <label class="text-xs font-bold text-slate-400">งวด:</label>
-          <select v-model="selectedPeriodId" class="px-4 py-2 rounded-2xl bg-white dark:bg-slate-800 shadow-clay-inset dark:shadow-clay-inset-dark text-xs font-bold outline-none">
+          <label class="text-xs font-bold text-slate-400">เลือกงวด:</label>
+          <select v-model="selectedPeriodId" class="px-4 py-2 rounded-2xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs font-bold outline-none">
             <option v-for="p in periods" :key="p.id" :value="p.id">{{ p.name }}</option>
           </select>
         </div>
         <div class="flex gap-2">
-          <input v-model="newPeriodName" placeholder="ชื่องวดใหม่ เช่น 1 พ.ย. 69" class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-xs shadow-clay-inset dark:shadow-clay-inset-dark outline-none">
-          <button @click="createNewPeriod" class="clay-btn px-4 py-1.5 bg-clay-primary text-white text-xs font-bold shadow-clay-btn">+ สร้างงวด</button>
+          <input v-model="newPeriodName" placeholder="ชื่องวดใหม่ เช่น 16 ต.ค. 69" class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-xs shadow-clay-inset outline-none">
+          <button @click="createNewPeriod" class="clay-btn px-4 py-1.5 bg-clay-primary text-white text-xs font-bold shadow-clay-btn">+ สร้างงวดใหม่</button>
         </div>
       </div>
 
       <!-- Quick Paste Box -->
-      <div class="clay-card p-5 bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 shadow-clay-card dark:shadow-clay-card-dark">
+      <div class="clay-card p-5 bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 shadow-clay-card">
         <h3 class="text-xs font-extrabold text-indigo-900 dark:text-indigo-300 mb-1 flex items-center gap-1.5">
           <i class="fa-solid fa-paste"></i> วางข้อมูลยอดด่วน (Paste ตัวเลข)
         </h3>
         <textarea v-model="pasteText" rows="3" placeholder="วางตัวเลขยอดเงินแถวละยอด หรือคัดลอกมาทั้งตารางได้เลย..."
-                  class="w-full p-3 rounded-2xl bg-white dark:bg-slate-900 shadow-clay-inset dark:shadow-clay-inset-dark text-xs font-mono outline-none"></textarea>
+                  class="w-full p-3 rounded-2xl bg-white dark:bg-slate-900 shadow-clay-inset text-xs font-mono outline-none"></textarea>
         <button @click="processPaste" class="clay-btn mt-2 px-5 py-2 bg-indigo-600 text-white text-xs font-bold shadow-clay-btn">แปลงข้อมูลลงตาราง</button>
       </div>
 
-      <!-- รายการบิล -->
+      <!-- ตารางบิลขาย & ติ๊กเชื่อมถูกรางวัล -->
       <div class="clay-card p-5 bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="font-bold text-sm">รายการบิลในงวด ({{ (currentPeriod.bills || []).length }} บิล)</h3>
+          <div>
+            <h3 class="font-bold text-sm">รายการบิลในงวด ({{ (currentPeriod.bills || []).length }} บิล)</h3>
+            <p class="text-[11px] text-slate-400">ติ๊กช่อง "ถูกรางวัล" เพื่อส่งข้อมูลเข้าหน้าคำนวณเงินรางวัลให้อัตโนมัติ</p>
+          </div>
           <button @click="addEmptyBillRow" class="clay-btn px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-bold">+ เพิ่มแถว</button>
         </div>
         <div class="overflow-x-auto max-h-[32rem] hide-scrollbar">
@@ -320,16 +289,20 @@
                 <th class="p-2">ชื่อลูกค้า</th>
                 <th class="p-2">ยอดวิ่ง/ลอย</th>
                 <th class="p-2 text-center">จ่ายแล้ว</th>
+                <th class="p-2 text-center text-purple-600 font-bold">ถูกรางวัล?</th>
                 <th class="p-2 text-center">ลบ</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-              <tr v-for="(b, idx) in currentPeriod.bills" :key="idx" :class="{'bg-emerald-500/10': b.isPaid}">
+              <tr v-for="(b, idx) in currentPeriod.bills" :key="b.id || idx" :class="{'bg-emerald-500/10': b.isPaid}">
                 <td class="p-2 text-center text-xs text-slate-400">{{ idx + 1 }}</td>
-                <td class="p-2"><input v-model.number="b.normalAmount" type="number" class="w-28 p-1.5 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset dark:shadow-clay-inset-dark text-right font-bold text-xs outline-none"></td>
-                <td class="p-2"><input list="cust-list" v-model="b.customerName" placeholder="พิมพ์ชื่อลูกค้า" class="w-36 p-1.5 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset dark:shadow-clay-inset-dark font-semibold text-xs outline-none"></td>
-                <td class="p-2"><input v-model.number="b.runAmount" type="number" class="w-28 p-1.5 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset dark:shadow-clay-inset-dark text-right text-indigo-500 font-bold text-xs outline-none"></td>
+                <td class="p-2"><input v-model.number="b.normalAmount" type="number" class="w-28 p-1.5 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-right font-bold text-xs outline-none"></td>
+                <td class="p-2"><input list="cust-list" v-model="b.customerName" placeholder="พิมพ์ชื่อลูกค้า" class="w-36 p-1.5 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset font-semibold text-xs outline-none"></td>
+                <td class="p-2"><input v-model.number="b.runAmount" type="number" class="w-28 p-1.5 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-right text-indigo-500 font-bold text-xs outline-none"></td>
                 <td class="p-2 text-center"><input type="checkbox" v-model="b.isPaid" class="w-4 h-4 cursor-pointer text-emerald-500 rounded"></td>
+                <td class="p-2 text-center">
+                  <input type="checkbox" v-model="b.isWonPrize" @change="onToggleBillWon(b)" class="w-4 h-4 cursor-pointer text-purple-600 rounded">
+                </td>
                 <td class="p-2 text-center"><button @click="removeBillRow(idx)" class="text-rose-400 hover:text-rose-600 text-xs"><i class="fa-solid fa-trash"></i></button></td>
               </tr>
             </tbody>
@@ -338,51 +311,66 @@
       </div>
     </section>
 
-    <!-- 3. ลูกค้า (Customers) -->
+    <!-- TAB 3: ลูกค้า & เรท & บัญชีธนาคาร (Customers) -->
     <section v-if="currentTab === 'customers'" class="space-y-6">
       <div class="clay-card p-6 bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark">
         <h3 class="font-bold text-base mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-user-plus text-clay-primary"></i> ข้อมูลลูกค้า & เรทจ่ายรางวัล
+          <i class="fa-solid fa-user-plus text-clay-primary"></i> ข้อมูลลูกค้า & เรทจ่ายรางวัล & บัญชีรับเงิน
         </h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 items-end">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-3 items-end">
           <div class="col-span-2">
             <label class="text-[11px] font-bold text-slate-400">ชื่อลูกค้า</label>
-            <input v-model="customerForm.name" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset dark:shadow-clay-inset-dark text-xs font-bold outline-none">
+            <input v-model="customerForm.name" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs font-bold outline-none">
           </div>
           <div>
             <label class="text-[11px] font-bold text-emerald-500">ลดปกติ (%)</label>
-            <input v-model.number="customerForm.normalDiscount" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset dark:shadow-clay-inset-dark text-xs outline-none">
+            <input v-model.number="customerForm.normalDiscount" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs outline-none">
           </div>
           <div>
             <label class="text-[11px] font-bold text-indigo-500">ลดวิ่ง (%)</label>
-            <input v-model.number="customerForm.runDiscount" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset dark:shadow-clay-inset-dark text-xs outline-none">
+            <input v-model.number="customerForm.runDiscount" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs outline-none">
           </div>
           <div>
             <label class="text-[11px] font-bold text-purple-500">จ่าย 2 ตัว</label>
-            <input v-model.number="customerForm.rate2Digit" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset dark:shadow-clay-inset-dark text-xs font-bold outline-none">
+            <input v-model.number="customerForm.rate2Digit" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs font-bold outline-none">
           </div>
           <div>
             <label class="text-[11px] font-bold text-purple-500">จ่าย 3 ตรง</label>
-            <input v-model.number="customerForm.rate3Direct" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset dark:shadow-clay-inset-dark text-xs outline-none">
+            <input v-model.number="customerForm.rate3Direct" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs outline-none">
           </div>
           <div>
             <label class="text-[11px] font-bold text-purple-500">จ่าย 3 โต๊ด</label>
-            <input v-model.number="customerForm.rate3Tod" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset dark:shadow-clay-inset-dark text-xs outline-none">
+            <input v-model.number="customerForm.rate3Tod" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs outline-none">
           </div>
           <div>
             <label class="text-[11px] font-bold text-purple-500">จ่าย 3 ล่าง</label>
-            <input v-model.number="customerForm.rate3Bottom" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset dark:shadow-clay-inset-dark text-xs outline-none">
+            <input v-model.number="customerForm.rate3Bottom" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs outline-none">
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-purple-500">จ่าย วิ่งบน</label>
+            <input v-model.number="customerForm.rateRunTop" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs outline-none">
           </div>
         </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 items-end">
+          <div>
+            <label class="text-[11px] font-bold text-purple-500">จ่าย วิ่งล่าง</label>
+            <input v-model.number="customerForm.rateRunBottom" type="number" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs outline-none">
+          </div>
+          <div class="md:col-span-2">
+            <label class="text-[11px] font-bold text-slate-500">เลขบัญชี / พร้อมเพย์ลูกค้า (สำหรับโอนรางวัล)</label>
+            <input v-model="customerForm.bankAccount" placeholder="เช่น กสิกร 123-4-56789-0 หรือ 0812345678" class="w-full p-2 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs font-semibold outline-none">
+          </div>
+        </div>
+
         <div class="mt-4 flex gap-2">
           <button @click="saveCustomer" class="clay-btn px-6 py-2 bg-clay-primary text-white text-xs font-bold shadow-clay-btn">
-            {{ editingCustomerIndex === -1 ? '+ เพิ่มลูกค้า' : 'อัปเดตข้อมูล' }}
+            {{ editingCustomerIndex === -1 ? '+ เพิ่มลูกค้า' : 'อัปเดตข้อมูลลูกค้า' }}
           </button>
           <button v-if="editingCustomerIndex !== -1" @click="resetCustomerForm" class="clay-btn px-4 py-2 bg-slate-300 dark:bg-slate-700 text-xs font-semibold">ยกเลิก</button>
         </div>
       </div>
 
-      <!-- Customer List -->
       <div class="clay-card p-5 bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark overflow-x-auto hide-scrollbar">
         <table class="w-full text-left text-sm whitespace-nowrap">
           <thead class="border-b text-xs text-slate-400">
@@ -394,6 +382,7 @@
               <th class="pb-3 text-right">3 ตรง</th>
               <th class="pb-3 text-right">3 โต๊ด</th>
               <th class="pb-3 text-right">3 ล่าง</th>
+              <th class="pb-3">บัญชีธนาคารลูกค้า</th>
               <th class="pb-3 text-center">จัดการ</th>
             </tr>
           </thead>
@@ -406,6 +395,7 @@
               <td class="py-3 text-right">{{ c.rate3Direct || 500 }}</td>
               <td class="py-3 text-right">{{ c.rate3Tod || 90 }}</td>
               <td class="py-3 text-right">{{ c.rate3Bottom || 100 }}</td>
+              <td class="py-3 text-xs font-semibold text-slate-600 dark:text-slate-300">{{ c.bankAccount || '-' }}</td>
               <td class="py-3 text-center">
                 <button @click="editCustomer(idx)" class="text-blue-500 mr-2 text-xs font-bold">แก้ไข</button>
                 <button @click="deleteCustomer(idx)" class="text-rose-500 text-xs font-bold">ลบ</button>
@@ -416,60 +406,82 @@
       </div>
     </section>
 
-    <!-- 4. ยอดค้างชำระ (Overdues) -->
+    <!-- TAB 4: ยอดค้างชำระอัตโนมัติ (Overdues Lifecycle) -->
     <section v-if="currentTab === 'overdue'" class="space-y-6">
       <div class="clay-card p-6 bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark">
         <div class="flex justify-between items-center mb-4">
           <div>
             <h3 class="font-bold text-base text-amber-600 flex items-center gap-2">
-              <i class="fa-solid fa-clock-rotate-left"></i> ยอดค้างเก่ามาเก็บรอบนี้
+              <i class="fa-solid fa-clock-rotate-left"></i> ยอดค้างเก่า & วันครบกำหนดชำระ
             </h3>
-            <p class="text-xs text-slate-400 mt-0.5">ระบบจะตัดสิทธิ์ส่วนลดอัตโนมัติหากเลยกำหนดวันชำระ</p>
+            <p class="text-xs text-slate-400 mt-0.5">ระบบเชื่อมต่อยอดค้างข้ามงวดอัตโนมัติ และตัดส่วนลด 0% หากเกินกำหนด</p>
           </div>
-          <button @click="addOverdueRow" class="clay-btn px-4 py-1.5 bg-amber-400 text-amber-950 font-bold text-xs shadow-clay-btn">+ เพิ่มยอดค้าง</button>
+          <button @click="addOverdueRow" class="clay-btn px-4 py-1.5 bg-amber-400 text-amber-950 font-bold text-xs shadow-clay-btn">+ เพิ่มรายการค้าง</button>
         </div>
+
         <div class="space-y-3">
-          <div v-for="(od, idx) in currentPeriod.overdues" :key="idx" class="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-clay-inset dark:shadow-clay-inset-dark flex flex-wrap items-center gap-3">
-            <input list="cust-list" v-model="od.customerName" placeholder="ชื่อลูกค้า" class="flex-1 min-w-[120px] bg-transparent text-xs font-bold outline-none">
-            <input v-model.number="od.amount" type="number" placeholder="ยอดเงิน" class="w-32 bg-transparent text-right text-xs font-black text-rose-500 outline-none">
-            <label class="flex items-center gap-1.5 text-xs font-bold cursor-pointer">
-              <input type="checkbox" v-model="od.isPaid" class="w-4 h-4 rounded text-emerald-500">
-              <span :class="od.isPaid ? 'text-emerald-500' : 'text-slate-400'">จ่ายแล้ว</span>
-            </label>
-            <button @click="removeOverdueRow(idx)" class="text-rose-400 text-xs px-2"><i class="fa-solid fa-trash"></i></button>
+          <div v-for="(od, idx) in currentPeriod.overdues" :key="od.id || idx"
+               class="p-4 rounded-2xl bg-white dark:bg-slate-800 shadow-clay-inset flex flex-wrap items-center justify-between gap-3"
+               :class="{'border-l-4 border-rose-500': isOverdueCut(od)}">
+            <div class="flex items-center gap-3">
+              <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 font-bold text-slate-500">{{ od.fromPeriodName }}</span>
+              <input list="cust-list" v-model="od.customerName" placeholder="ชื่อลูกค้า" class="bg-transparent font-bold text-sm outline-none w-32">
+            </div>
+
+            <div class="flex items-center gap-4">
+              <div>
+                <label class="text-[10px] text-slate-400 block">วันครบกำหนด</label>
+                <input v-model="od.dueDate" type="date" class="bg-transparent text-xs font-semibold outline-none">
+              </div>
+
+              <div class="text-right">
+                <label class="text-[10px] text-slate-400 block">ยอดค้างชำระ</label>
+                <input v-model.number="od.amount" type="number" class="w-28 text-right bg-transparent text-sm font-black text-rose-500 outline-none">
+              </div>
+
+              <div class="flex items-center gap-2">
+                <label class="flex items-center gap-1.5 text-xs font-bold cursor-pointer">
+                  <input type="checkbox" v-model="od.isPaid" class="w-4 h-4 rounded text-emerald-500">
+                  <span :class="od.isPaid ? 'text-emerald-500' : 'text-slate-400'">จ่ายแล้ว</span>
+                </label>
+                <button @click="removeOverdueRow(idx)" class="text-rose-400 text-xs px-2"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
           </div>
-          <div v-if="!currentPeriod.overdues || currentPeriod.overdues.length === 0" class="text-center py-6 text-xs text-slate-400">
+
+          <div v-if="!currentPeriod.overdues || currentPeriod.overdues.length === 0" class="text-center py-8 text-xs text-slate-400">
             ไม่มีรายการค้างเก่าในงวดนี้
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 5. ถูกรางวัล (Prizes) -->
+    <!-- TAB 5: ถูกรางวัล & คำนวณเบิกเจ้านาย (Prizes) -->
     <section v-if="currentTab === 'prizes'" class="space-y-6">
       <div class="clay-card p-6 bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark">
         <div class="flex justify-between items-center mb-4">
           <div>
             <h3 class="font-bold text-base text-purple-600 flex items-center gap-2">
-              <i class="fa-solid fa-award"></i> บันทึกยอดถูกรางวัล
+              <i class="fa-solid fa-award"></i> รายการบิลถูกรางวัล
             </h3>
-            <p class="text-xs text-slate-400 mt-0.5">คำนวณยอดเบิกเจ้านาย & โบนัสส่วนต่างอัตโนมัติ</p>
+            <p class="text-xs text-slate-400 mt-0.5">ดึงข้อมูลอัตโนมัติจากบิลที่ติ๊กถูก และคำนวณกำไรส่วนต่างโบนัสให้ทันที</p>
           </div>
-          <button @click="addPrizeRow" class="clay-btn px-4 py-1.5 bg-purple-600 text-white font-bold text-xs shadow-clay-btn">+ เพิ่มรายการถูก</button>
+          <button @click="addPrizeRow" class="clay-btn px-4 py-1.5 bg-purple-600 text-white font-bold text-xs shadow-clay-btn">+ เพิ่มรายการถูกรางวัล</button>
         </div>
+
         <div class="overflow-x-auto max-h-[30rem] hide-scrollbar">
           <table class="w-full text-left text-sm whitespace-nowrap">
             <thead class="border-b text-xs text-slate-400">
               <tr>
                 <th class="p-2">ลูกค้า</th>
-                <th class="p-2">ประเภท</th>
-                <th class="p-2 text-center">อั้น (1/2)</th>
-                <th class="p-2 text-right">จำนวนถูก</th>
+                <th class="p-2">ประเภทรางวัล</th>
+                <th class="p-2 text-center">อั้น (ครึ่ง)</th>
+                <th class="p-2 text-right">จำนวนถูก (บาท)</th>
                 <th class="p-2 text-right">เรทลูกค้า</th>
                 <th class="p-2 text-right">ยอดจ่ายลูกค้า</th>
                 <th class="p-2 text-right">เรทเจ้านาย</th>
                 <th class="p-2 text-right">ยอดเบิกเจ้า</th>
-                <th class="p-2 text-right text-emerald-500 font-bold">โบนัสเรา</th>
+                <th class="p-2 text-right text-emerald-500 font-bold">โบนัสส่วนต่างเรา</th>
                 <th class="p-2 text-center">ลบ</th>
               </tr>
             </thead>
@@ -504,75 +516,117 @@
       </div>
     </section>
 
-    <!-- 6. สรุปยอดโอน & บิลเดี่ยว (Transfer Summary) -->
-    <section v-if="currentTab === 'receipt'" class="space-y-6">
-      <div class="flex items-center justify-between no-print">
-        <select v-model="selectedCustomerReceipt" class="px-4 py-2 rounded-2xl bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark text-sm font-bold outline-none">
-          <option v-for="c in allDisplayCustomers" :key="c" :value="c">👤 ใบเสร็จคุณ: {{ c }}</option>
-        </select>
-        <div class="flex gap-2">
-          <button @click="copyBankInfo" class="clay-btn px-4 py-2 bg-clay-card dark:bg-clay-cardDark text-xs font-bold shadow-clay-btn flex items-center gap-1.5">
-            <i class="fa-solid fa-copy text-clay-primary"></i> ก๊อปบัญชี
+    <!-- TAB 6: สรุปยอดโอนรางวัล & บันทึกรูป (Admin Details vs Client Card) -->
+    <section v-if="currentTab === 'payout'" class="space-y-6">
+      <div class="clay-card p-5 bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark flex flex-wrap items-center justify-between gap-4 no-print">
+        <div class="flex items-center gap-3">
+          <label class="text-xs font-bold text-slate-400">เลือกลูกค้าที่ถูกรางวัล:</label>
+          <select v-model="selectedPrizeCustomer" class="px-4 py-2 rounded-2xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs font-bold outline-none">
+            <option v-for="c in winningCustomers" :key="c" :value="c">🎉 {{ c }} (ถูกรางวัล)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button @click="copyCustomerBank" class="clay-btn px-4 py-2 bg-clay-card dark:bg-clay-cardDark text-xs font-bold shadow-clay-btn flex items-center gap-1.5">
+            <i class="fa-solid fa-copy text-clay-primary"></i> ก๊อปเลขบัญชีลูกค้า
           </button>
-          <button @click="saveAsImage" :disabled="isSavingImg" class="clay-btn px-4 py-2 bg-emerald-500 text-white text-xs font-bold shadow-clay-btn flex items-center gap-1.5">
-            <i class="fa-solid fa-image"></i> {{ isSavingImg ? 'กำลังสร้างรูป...' : 'บันทึกรูป PNG' }}
+          <button @click="saveClientReceiptImage" :disabled="isSavingImg" class="clay-btn px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold shadow-clay-btn flex items-center gap-1.5">
+            <i class="fa-solid fa-file-image"></i> {{ isSavingImg ? 'กำลังสร้างรูป...' : 'บันทึกรูปสรุปรางวัลส่งลูกค้า' }}
           </button>
         </div>
       </div>
 
-      <!-- Printable Bill Card -->
-      <div id="printable-bill" class="clay-card p-8 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 max-w-3xl mx-auto shadow-clay-card">
-        <div class="flex justify-between items-start pb-4 border-b border-slate-200 dark:border-slate-800 mb-6">
+      <!-- 1. ส่วนแสดงผลเฉพาะแอดมิน (Admin Detailed View) -->
+      <div v-if="selectedPrizeCustomer" class="clay-card p-6 bg-clay-card dark:bg-clay-cardDark shadow-clay-card space-y-4 no-print">
+        <div class="flex items-center justify-between border-b pb-3 border-slate-200 dark:border-slate-700">
           <div>
-            <span class="text-xs font-black uppercase text-clay-primary">ใบแจ้งสรุปยอดชำระ</span>
-            <h2 class="text-3xl font-black mt-1 text-slate-800 dark:text-white">{{ selectedCustomerReceipt }}</h2>
-            <p class="text-xs text-slate-400 mt-0.5">งวดประจำวันที่: {{ currentPeriod.name }}</p>
+            <span class="text-xs font-bold text-purple-600 uppercase">รายละเอียดโอนเงิน (เฉพาะเราเห็น)</span>
+            <h3 class="text-xl font-black mt-0.5">{{ selectedPrizeCustomer }}</h3>
           </div>
           <div class="text-right">
-            <span class="text-xs px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 font-semibold">
-              ลดปกติ: {{ getCustomerDiscount(selectedCustomerReceipt).normal }}% | วิ่ง: {{ getCustomerDiscount(selectedCustomerReceipt).run }}%
+            <span class="text-xs text-slate-400 block">บัญชีลูกค้า:</span>
+            <span class="text-sm font-bold text-slate-800 dark:text-white">{{ getCustomerBankAccount(selectedPrizeCustomer) || 'ยังไม่ได้ระบุบัญชี' }}</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800">
+            <span class="text-slate-400 block">1. เบิกเจ้านาย</span>
+            <span class="font-bold text-sm text-rose-500">฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).totalBossPrize) }}</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800">
+            <span class="text-slate-400 block">2. จ่ายรางวัลลูกค้า</span>
+            <span class="font-bold text-sm text-purple-600">฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).totalCustomerPrize) }}</span>
+          </div>
+          <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40">
+            <span class="text-emerald-600 font-bold block">3. กำไรโบนัสส่วนต่างเรา</span>
+            <span class="font-black text-sm text-emerald-500">+฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).prizeBonus) }}</span>
+          </div>
+          <div class="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40">
+            <span class="text-indigo-600 font-bold block">4. ยอดสุทธิที่ต้องโอนให้ลูกค้า</span>
+            <span class="font-black text-base text-clay-primary">฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).netPayoutToCustomer) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. การ์ดสรุปยอดส่งลูกค้า (Client Share Image Card) ออกแบบสไตล์ Neo 3D ยินดีด้วย -->
+      <div v-if="selectedPrizeCustomer" id="client-share-card" class="clay-card p-8 bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 text-white max-w-xl mx-auto shadow-2xl relative overflow-hidden">
+        <!-- ลูกเล่นแสง 3D -->
+        <div class="absolute -top-12 -right-12 w-40 h-40 bg-amber-400/20 rounded-full blur-2xl"></div>
+        <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-purple-500/20 rounded-full blur-2xl"></div>
+
+        <div class="relative z-10 text-center border-b border-white/10 pb-5 mb-5">
+          <div class="w-14 h-14 rounded-2xl bg-amber-400 text-indigo-950 flex items-center justify-center font-extrabold text-2xl mx-auto mb-2 shadow-lg">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <span class="text-xs font-bold text-amber-300 tracking-wider uppercase">CONGRATULATIONS • ขอแสดงความยินดีด้วยนะคะ</span>
+          <h2 class="text-3xl font-black mt-1 text-white">{{ selectedPrizeCustomer }}</h2>
+          <p class="text-[11px] text-purple-200 mt-0.5">งวดประจำวันที่: {{ currentPeriod.name }}</p>
+        </div>
+
+        <div class="relative z-10 space-y-3 text-sm">
+          <!-- ยอดถูกรางวัล -->
+          <div class="flex justify-between items-center p-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10">
+            <span class="font-bold text-purple-200 flex items-center gap-2">
+              <i class="fa-solid fa-award text-amber-300"></i> ยอดเงินรางวัลที่ได้รับ:
             </span>
+            <span class="text-lg font-black text-amber-300">+฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).totalCustomerPrize) }}</span>
           </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- บิลย่อย -->
-          <div>
-            <h4 class="text-xs font-bold text-slate-400 mb-2 uppercase">รายการซื้อในงวด</h4>
-            <div class="max-h-64 overflow-y-auto hide-scrollbar space-y-1.5">
-              <div v-for="(b, idx) in getCustomerBills(selectedCustomerReceipt)" :key="idx" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 flex justify-between text-xs">
-                <span class="text-slate-400">บิล {{ idx + 1 }}</span>
-                <div class="space-x-2">
-                  <span class="font-bold">ปกติ: ฿{{ formatNum(b.normalAmount) }}</span>
-                  <span v-if="b.runAmount" class="font-bold text-indigo-500">วิ่ง: ฿{{ formatNum(b.runAmount) }}</span>
-                </div>
-              </div>
-              <div v-if="getCustomerBills(selectedCustomerReceipt).length === 0" class="text-xs text-slate-400 text-center py-4">ไม่มีรายการซื้อ</div>
+          <!-- หักค่าหวยปัจจุบัน -->
+          <div class="flex justify-between items-center p-3 rounded-2xl bg-white/5 border border-white/5 text-slate-300">
+            <span>หัก ค่าหวยงวดปัจจุบัน ({{ currentPeriod.name }}):</span>
+            <span class="font-bold text-rose-300">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).currentPeriodCost) }}</span>
+          </div>
+
+          <!-- หักค้างเก่างวดก่อนหน้า -->
+          <div v-if="getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost > 0" class="flex justify-between items-center p-3 rounded-2xl bg-white/5 border border-white/5 text-slate-300">
+            <span>หัก ค่าหวยค้างชำระ ({{ getCustomerPrizeCalculation(selectedPrizeCustomer).overduePeriodName }}):</span>
+            <span class="font-bold text-rose-300">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost) }}</span>
+          </div>
+
+          <!-- ยอดโอนสุทธิ -->
+          <div class="mt-4 p-5 rounded-3xl bg-gradient-to-r from-emerald-500 to-teal-500 text-center shadow-xl">
+            <span class="text-xs font-bold text-emerald-100 uppercase tracking-wider">🎉 ยอดเงินโอนสุทธิเข้าบัญชี 🎉</span>
+            <div class="text-3xl lg:text-4xl font-black mt-1 text-white">
+              ฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).netPayoutToCustomer) }}
             </div>
-          </div>
-
-          <!-- สรุปตัวเลข -->
-          <div class="space-y-3 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl">
-            <div class="flex justify-between text-xs"><span>ยอดก่อนหักส่วนลด:</span><span class="font-bold">฿{{ formatNum(getCustomerSummary(selectedCustomerReceipt).normalGrossUnpaid) }}</span></div>
-            <div class="flex justify-between text-xs text-emerald-600"><span>ส่วนลดปกติ:</span><span class="font-bold">-฿{{ formatNum(getCustomerSummary(selectedCustomerReceipt).normalDiscountAmount) }}</span></div>
-            <div class="flex justify-between text-xs text-indigo-600"><span>ยอดวิ่งสุทธิ:</span><span class="font-bold">฿{{ formatNum(getCustomerSummary(selectedCustomerReceipt).runNet) }}</span></div>
-            <div class="flex justify-between text-xs text-amber-600"><span>ยอดค้างเก่า:</span><span class="font-bold">฿{{ formatNum(getCustomerSummary(selectedCustomerReceipt).overdueUnpaid) }}</span></div>
-            <div class="pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
-              <span class="font-extrabold text-sm">ยอดชำระทั้งสิ้น:</span>
-              <span class="text-2xl font-black text-clay-primary">฿{{ formatNum(getCustomerSummary(selectedCustomerReceipt).totalPayable) }}</span>
-            </div>
+            <p class="text-[11px] text-emerald-100 mt-1">โอนเข้าบัญชี: {{ getCustomerBankAccount(selectedPrizeCustomer) || 'ตามที่ระบุ' }}</p>
           </div>
         </div>
 
-        <!-- บัญชีรับโอน -->
-        <div class="mt-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-center">
-          <div class="text-[11px] font-bold text-amber-800 dark:text-amber-300 uppercase"><i class="fa-solid fa-building-columns"></i> บัญชีรับชำระเงิน</div>
-          <div class="text-base font-black mt-1 text-slate-800 dark:text-white">{{ bankInfo }}</div>
+        <div class="relative z-10 mt-6 pt-4 border-t border-white/10 text-center">
+          <p class="text-[11px] text-purple-200 font-semibold">ขอบพระคุณที่อุดหนุนและไว้วางใจค่ะ 🙏✨</p>
         </div>
+      </div>
+
+      <div v-if="winningCustomers.length === 0" class="clay-card p-12 text-center text-slate-400 bg-clay-card dark:bg-clay-cardDark shadow-clay-card">
+        <i class="fa-solid fa-trophy text-4xl mb-3 text-slate-300"></i>
+        <p class="text-sm">ยังไม่มีรายการลูกค้าที่ถูกรางวัลในงวดนี้</p>
       </div>
     </section>
 
-    <!-- 7. ตั้งค่า (Settings) -->
+    <!-- TAB 7: ตั้งค่าระบบ & กฎการชำระเงิน (Settings) -->
     <section v-if="currentTab === 'settings'" class="max-w-2xl mx-auto space-y-6">
       <div class="clay-card p-6 bg-clay-card dark:bg-clay-cardDark shadow-clay-card dark:shadow-clay-card-dark space-y-4">
         <h3 class="font-bold text-base flex items-center gap-2">
@@ -580,24 +634,26 @@
         </h3>
         
         <div>
-          <label class="block text-xs font-bold mb-1">จำนวนวันครบกำหนดชำระ (วัน)</label>
+          <label class="block text-xs font-bold mb-1">จำนวนวันครบกำหนดชำระบิล (วัน)</label>
           <input v-model.number="settings.dueDays" type="number" class="w-full p-2.5 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs outline-none">
         </div>
 
         <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset">
           <div>
-            <div class="text-xs font-bold">กฎตัดสิทธิ์ส่วนลดเมื่อเลยกำหนด</div>
-            <div class="text-[11px] text-slate-400">หากเกินกำหนดชำระ ส่วนลดลูกค้าจะกลายเป็น 0% ทันที</div>
+            <div class="text-xs font-bold">เปิดใช้งานกฎตัดสิทธิ์ส่วนลดเมื่อเลยกำหนด</div>
+            <div class="text-[11px] text-slate-400">หากเกินกำหนดวันชำระ ส่วนลดงวดค้างจะกลายเป็น 0% ทันที</div>
           </div>
-          <input type="checkbox" v-model="settings.autoCutDiscount" class="w-5 h-5 rounded text-clay-primary">
+          <input type="checkbox" v-model="settings.autoCutDiscount" class="w-5 h-5 rounded text-clay-primary cursor-pointer">
         </div>
 
         <div>
-          <label class="block text-xs font-bold mb-1">ข้อความช่องทางรับเงิน (แสดงบนใบเสร็จ)</label>
+          <label class="block text-xs font-bold mb-1">ข้อมูลบัญชีรับเงินของร้าน (แสดงบนใบเสร็จบิลยอดค้าง)</label>
           <textarea v-model="bankInfo" rows="3" class="w-full p-3 rounded-xl bg-white dark:bg-slate-800 shadow-clay-inset text-xs outline-none"></textarea>
         </div>
 
-        <button @click="saveToStorage" class="clay-btn w-full py-2.5 bg-clay-primary text-white font-bold text-xs shadow-clay-btn">บันทึกการตั้งค่าขึ้น Cloud</button>
+        <button @click="saveToStorage" class="clay-btn w-full py-2.5 bg-clay-primary text-white font-bold text-xs shadow-clay-btn">
+          บันทึกการตั้งค่าขึ้น Cloud
+        </button>
       </div>
     </section>
 
@@ -627,18 +683,18 @@
         isSavingImg: false,
         isDark: false,
         currentTab: 'dashboard',
-        selectedCustomerReceipt: '',
+        selectedPrizeCustomer: '',
         tabs: [
           { id: 'dashboard', name: 'แดชบอร์ด', shortName: 'ภาพรวม', icon: 'fa-solid fa-chart-pie' },
           { id: 'entry', name: 'บันทึกบิล', shortName: 'ลงบิล', icon: 'fa-solid fa-file-invoice' },
           { id: 'customers', name: 'ลูกค้า & เรท', shortName: 'ลูกค้า', icon: 'fa-solid fa-user-group' },
           { id: 'overdue', name: 'ยอดค้าง', shortName: 'ค้างเก่า', icon: 'fa-solid fa-clock-rotate-left' },
           { id: 'prizes', name: 'ถูกรางวัล', shortName: 'รางวัล', icon: 'fa-solid fa-trophy' },
-          { id: 'receipt', name: 'สรุปยอดโอน', shortName: 'ใบเสร็จ', icon: 'fa-solid fa-receipt' },
+          { id: 'payout', name: 'สรุปโอนรางวัล', shortName: 'โอนรางวัล', icon: 'fa-solid fa-money-bill-transfer' },
           { id: 'settings', name: 'ตั้งค่า', shortName: 'ตั้งค่า', icon: 'fa-solid fa-gear' }
         ],
         customers: [],
-        customerForm: { name: '', normalDiscount: 0, runDiscount: 0, rate2Digit: 60, rate3Direct: 500, rate3Tod: 90, rate3Bottom: 100, rateRunTop: 3, rateRunBottom: 4 },
+        customerForm: { name: '', normalDiscount: 0, runDiscount: 0, rate2Digit: 60, rate3Direct: 500, rate3Tod: 90, rate3Bottom: 100, rateRunTop: 3, rateRunBottom: 4, bankAccount: '' },
         editingCustomerIndex: -1,
         bankInfo: '— ธ.กรุงศรี 0594166287 * ♡ Ⓜ️📖 𝐍𝐀𝐌𝐄 : พรพิมล เพิ่มไธสง 👓',
         periods: [],
@@ -668,8 +724,14 @@
           (this.currentPeriod.overdues || []).forEach(o => { if (o && o.customerName) names.add(o.customerName.trim()); });
           (this.currentPeriod.prizes || []).forEach(z => { if (z && z.customerName) names.add(z.customerName.trim()); });
         }
-        const arr = Array.from(names);
-        if (arr.length > 0 && !this.selectedCustomerReceipt) this.selectedCustomerReceipt = arr[0];
+        return Array.from(names);
+      },
+      winningCustomers() {
+        if (!this.currentPeriod || !this.currentPeriod.prizes) return [];
+        const set = new Set();
+        this.currentPeriod.prizes.forEach(p => { if (p.customerName) set.add(p.customerName.trim()); });
+        const arr = Array.from(set);
+        if (arr.length > 0 && !this.selectedPrizeCustomer) this.selectedPrizeCustomer = arr[0];
         return arr;
       },
       overallStats() {
@@ -727,10 +789,89 @@
       },
       formatNum(val) { return Number(val || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); },
       isRunType(type) { return type === 'RUN_TOP' || type === 'RUN_BOTTOM'; },
-      openReceipt(name) {
-        this.selectedCustomerReceipt = name;
-        this.currentTab = 'receipt';
+      
+      getCustomerBankAccount(name) {
+        if (!name) return '';
+        const c = this.customers.find(x => x && x.name && x.name.trim() === name.trim());
+        return c ? (c.bankAccount || '') : '';
       },
+      copyCustomerBank() {
+        const acc = this.getCustomerBankAccount(this.selectedPrizeCustomer);
+        if (!acc) return alert('ลูกค้ารายนี้ยังไม่ได้บันทึกเลขบัญชี');
+        navigator.clipboard.writeText(acc);
+        alert(`คัดลอกเลขบัญชีคุณ ${this.selectedPrizeCustomer}: ${acc} เรียบร้อยแล้ว`);
+      },
+      
+      isOverdueCut(od) {
+        if (!this.settings.autoCutDiscount || !od.dueDate) return false;
+        const due = new Date(od.dueDate);
+        const now = new Date();
+        return now > due && !od.isPaid;
+      },
+
+      // เชื่อมบิลขายสู่บิลถูกรางวัลอัตโนมัติ
+      onToggleBillWon(bill) {
+        if (!this.currentPeriod) return;
+        if (!this.currentPeriod.prizes) this.currentPeriod.prizes = [];
+
+        if (bill.isWonPrize) {
+          const exists = this.currentPeriod.prizes.find(p => p.billId === bill.id);
+          if (!exists) {
+            const pz = {
+              billId: bill.id,
+              customerName: bill.customerName,
+              type: '2_DIGIT',
+              isHalf: false,
+              amount: bill.normalAmount || 0,
+              customerRate: 60,
+              bossRate: 70,
+              isPaidOut: false
+            };
+            this.updatePrizeRates(pz);
+            this.currentPeriod.prizes.push(pz);
+          }
+        } else {
+          this.currentPeriod.prizes = this.currentPeriod.prizes.filter(p => p.billId !== bill.id);
+        }
+      },
+
+      // คำนวณยอดรางวัล หักค่าหวยปัจจุบัน และหักค้างเก่า
+      getCustomerPrizeCalculation(name) {
+        if (!this.currentPeriod || !name) return { totalBossPrize: 0, totalCustomerPrize: 0, prizeBonus: 0, currentPeriodCost: 0, overdueCost: 0, overduePeriodName: '', netPayoutToCustomer: 0 };
+        
+        let totalBoss = 0, totalCust = 0;
+        (this.currentPeriod.prizes || []).forEach(p => {
+          if (p.customerName && p.customerName.trim() === name.trim()) {
+            const amt = Number(p.amount) || 0;
+            totalBoss += amt * (Number(p.bossRate) || 0);
+            totalCust += amt * (Number(p.customerRate) || 0);
+          }
+        });
+
+        const prizeBonus = Math.max(0, totalBoss - totalCust);
+
+        // ค่าหวยงวดปัจจุบัน (เฉพาะบิลที่ยังไม่จ่าย)
+        const summary = this.getCustomerSummary(name);
+        const currentPeriodCost = summary.normalNet + summary.runNet;
+
+        // ค่ายอดค้างเก่า
+        const overdueUnpaid = summary.overdueUnpaid;
+        const overdueObj = (this.currentPeriod.overdues || []).find(o => o && o.customerName && o.customerName.trim() === name.trim() && !o.isPaid);
+        const overduePeriodName = overdueObj ? overdueObj.fromPeriodName : 'งวดก่อนหน้า';
+
+        const netPayoutToCustomer = Math.max(0, totalCust - currentPeriodCost - overdueUnpaid);
+
+        return {
+          totalBossPrize: totalBoss,
+          totalCustomerPrize: totalCust,
+          prizeBonus,
+          currentPeriodCost,
+          overdueCost: overdueUnpaid,
+          overduePeriodName,
+          netPayoutToCustomer
+        };
+      },
+
       isCustomerFullyPaid(name) {
         if (!this.currentPeriod || !name) return false;
         const bills = (this.currentPeriod.bills || []).filter(b => b && b.customerName && b.customerName.trim() === name.trim());
@@ -738,16 +879,14 @@
         if (bills.length === 0 && overdues.length === 0) return false;
         return bills.every(b => b.isPaid) && overdues.every(o => o.isPaid);
       },
+
       async toggleCustomerPayment(name, status) {
         if (!this.currentPeriod || !name) return;
         (this.currentPeriod.bills || []).forEach(b => { if (b && b.customerName && b.customerName.trim() === name.trim()) b.isPaid = status; });
         (this.currentPeriod.overdues || []).forEach(o => { if (o && o.customerName && o.customerName.trim() === name.trim()) o.isPaid = status; });
         await this.saveToStorage();
       },
-      copyBankInfo() {
-        navigator.clipboard.writeText(this.bankInfo);
-        alert('คัดลอกข้อมูลบัญชีรับเงินเรียบร้อยแล้ว');
-      },
+
       async fetchData() {
         this.isLoading = true;
         try {
@@ -755,6 +894,7 @@
           const data = await res.json();
           this.customers = data.customers || [];
           this.bankInfo = data.bankInfo || this.bankInfo;
+          this.settings = data.settings || this.settings;
           this.periods = (data.periods || []).map(p => {
             if (!p.bills) p.bills = [];
             if (!p.overdues) p.overdues = [];
@@ -767,13 +907,21 @@
         } catch(e) { alert('เชื่อมต่อฐานข้อมูลล้มเหลว กรุณารีเฟรช'); }
         this.isLoading = false;
       },
+
       async saveToStorage() {
         this.isLoading = true;
         try {
-          await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'save', payload: { customers: this.customers, bankInfo: this.bankInfo, periods: this.periods } }) });
-        } catch(e) { alert('บันทึกล้มเหลว'); }
+          const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'save', payload: { customers: this.customers, bankInfo: this.bankInfo, settings: this.settings, periods: this.periods } })
+          });
+          const result = await res.json();
+          if (result.status !== 'success') alert('บันทึกล้มเหลว: ' + (result.error || 'ระบบขัดข้อง'));
+        } catch(e) { alert('ระบบคลาวด์ขัดข้อง กรุณาลองใหม่อีกครั้ง'); }
         this.isLoading = false;
       },
+
       async saveCustomer() {
         if (!this.customerForm.name.trim()) return alert('ระบุชื่อลูกค้า');
         if (this.editingCustomerIndex === -1) this.customers.push({ ...this.customerForm });
@@ -791,30 +939,74 @@
         if (confirm('ยืนยันลบลูกค้า?')) { this.customers.splice(idx, 1); await this.saveToStorage(); }
       },
       resetCustomerForm() {
-        this.customerForm = { name: '', normalDiscount: 0, runDiscount: 0, rate2Digit: 60, rate3Direct: 500, rate3Tod: 90, rate3Bottom: 100, rateRunTop: 3, rateRunBottom: 4 };
+        this.customerForm = { name: '', normalDiscount: 0, runDiscount: 0, rate2Digit: 60, rate3Direct: 500, rate3Tod: 90, rate3Bottom: 100, rateRunTop: 3, rateRunBottom: 4, bankAccount: '' };
         this.editingCustomerIndex = -1;
       },
       async createNewPeriod() {
         if (!this.newPeriodName.trim()) return alert('ระบุชื่องวด');
-        const newP = { id: 'p_' + Date.now(), name: this.newPeriodName.trim(), bills: [], overdues: [], prizes: [] };
-        this.periods.unshift(newP); this.selectedPeriodId = newP.id; this.newPeriodName = '';
+        
+        // ส่งต่อยอดค้างที่ยังไม่จ่ายจากงวดปัจจุบันไปงวดใหม่อัตโนมัติ (ไม่สร้างหนี้ซ้ำ)
+        const rolloverOverdues = [];
+        if (this.currentPeriod) {
+          this.allDisplayCustomers.forEach(cName => {
+            const summary = this.getCustomerSummary(cName);
+            if (summary.totalPayable > 0) {
+              const due = new Date();
+              due.setDate(due.getDate() + (this.settings.dueDays || 3));
+              rolloverOverdues.push({
+                id: 'od_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                fromPeriodName: this.currentPeriod.name,
+                customerName: cName,
+                amount: summary.totalPayable,
+                isPaid: false,
+                dueDate: due.toISOString().split('T')[0]
+              });
+            }
+          });
+        }
+
+        const newP = { id: 'p_' + Date.now(), name: this.newPeriodName.trim(), createdDate: new Date().toISOString(), bills: [], overdues: rolloverOverdues, prizes: [] };
+        this.periods.unshift(newP);
+        this.selectedPeriodId = newP.id;
+        this.newPeriodName = '';
         await this.saveToStorage();
+        alert(`สร้างงวดใหม่สำเร็จ! ดึงยอดค้างยกยอดมาให้อัตโนมัติ ${rolloverOverdues.length} รายการ`);
       },
+
       addEmptyBillRow() {
         if (!this.currentPeriod.bills) this.currentPeriod.bills = [];
-        this.currentPeriod.bills.push({ customerName: '', normalAmount: 0, runAmount: 0, isPaid: false });
+        this.currentPeriod.bills.push({ id: 'b_' + Date.now(), customerName: '', normalAmount: 0, runAmount: 0, isPaid: false, isWonPrize: false });
       },
-      removeBillRow(idx) { this.currentPeriod.bills.splice(idx, 1); },
+      removeBillRow(idx) {
+        const bill = this.currentPeriod.bills[idx];
+        if (bill && bill.id) {
+          this.currentPeriod.prizes = (this.currentPeriod.prizes || []).filter(p => p.billId !== bill.id);
+        }
+        this.currentPeriod.bills.splice(idx, 1);
+      },
+
       addOverdueRow() {
         if (!this.currentPeriod.overdues) this.currentPeriod.overdues = [];
-        this.currentPeriod.overdues.push({ customerName: '', amount: 0, isPaid: false });
+        const due = new Date();
+        due.setDate(due.getDate() + (this.settings.dueDays || 3));
+        this.currentPeriod.overdues.push({
+          id: 'od_' + Date.now(),
+          fromPeriodName: 'งวดก่อนหน้า',
+          customerName: '',
+          amount: 0,
+          isPaid: false,
+          dueDate: due.toISOString().split('T')[0]
+        });
       },
       removeOverdueRow(idx) { this.currentPeriod.overdues.splice(idx, 1); },
+
       addPrizeRow() {
         if (!this.currentPeriod.prizes) this.currentPeriod.prizes = [];
-        this.currentPeriod.prizes.push({ customerName: '', type: '2_DIGIT', isHalf: false, amount: 0, customerRate: 60, bossRate: 70 });
+        const pz = { billId: '', customerName: '', type: '2_DIGIT', isHalf: false, amount: 0, customerRate: 60, bossRate: 70, isPaidOut: false };
+        this.currentPeriod.prizes.push(pz);
       },
       removePrizeRow(idx) { this.currentPeriod.prizes.splice(idx, 1); },
+
       onPrizeTypeChange(pz) {
         if (this.isRunType(pz.type)) pz.isHalf = false;
         this.updatePrizeRates(pz);
@@ -832,6 +1024,7 @@
         if (pz.isHalf && !this.isRunType(pz.type)) { bRate /= 2; cRate /= 2; }
         pz.bossRate = bRate; pz.customerRate = cRate;
       },
+
       processPaste() {
         if (!this.pasteText.trim()) return;
         const rows = this.pasteText.trim().split('\n');
@@ -840,13 +1033,14 @@
         rows.forEach(r => {
           const raw = r.trim().replace(/,/g, '');
           if (!isNaN(Number(raw)) && raw !== '') {
-            this.currentPeriod.bills.push({ customerName: '', normalAmount: Number(raw), runAmount: 0, isPaid: false });
+            this.currentPeriod.bills.push({ id: 'b_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4), customerName: '', normalAmount: Number(raw), runAmount: 0, isPaid: false, isWonPrize: false });
             added++;
           }
         });
         this.pasteText = '';
         if (added > 0) alert(`เพิ่มบิลเรียบร้อย ${added} รายการ`);
       },
+
       getCustomerDiscount(name) {
         if (!name) return { normal: 0, run: 0 };
         const c = this.customers.find(x => x && x.name && x.name.trim() === name.trim());
@@ -859,7 +1053,7 @@
       getCustomerSummary(name) {
         if (!this.currentPeriod || !name) return { hasActivity: false, normalGrossUnpaid: 0, normalDiscountAmount: 0, normalNet: 0, runGrossUnpaid: 0, runNet: 0, overdueUnpaid: 0, totalPayable: 0 };
         const bills = this.getCustomerBills(name);
-        const disc = this.getCustomerDiscount(name);
+        let disc = this.getCustomerDiscount(name);
         const overdues = (this.currentPeriod.overdues || []).filter(o => o && o.customerName && o.customerName.trim() === name.trim());
         const prizes = (this.currentPeriod.prizes || []).filter(z => z && z.customerName && z.customerName.trim() === name.trim());
         const hasActivity = bills.length > 0 || overdues.length > 0 || prizes.length > 0;
@@ -882,14 +1076,15 @@
           totalPayable: nNet + rNet + odUnpaid
         };
       },
-      async saveAsImage() {
-        const el = document.getElementById('printable-bill');
+
+      async saveClientReceiptImage() {
+        const el = document.getElementById('client-share-card');
         if (!el) return;
         this.isSavingImg = true;
         try {
-          const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: this.isDark ? '#0f172a' : '#ffffff' });
+          const canvas = await html2canvas(el, { scale: 2.5, useCORS: true, backgroundColor: '#1e1b4b' });
           const link = document.createElement('a');
-          link.download = `บิล_${this.selectedCustomerReceipt}_${this.currentPeriod.name}.png`;
+          link.download = `สรุปรางวัล_${this.selectedPrizeCustomer}_${this.currentPeriod.name}.png`;
           link.href = canvas.toDataURL('image/png');
           link.click();
         } catch(e) { alert('สร้างรูปภาพไม่สำเร็จ'); }
