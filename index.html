@@ -60,13 +60,16 @@
 <body class="bg-clay-bg dark:bg-clay-bgDark text-slate-700 dark:text-slate-200 min-h-screen antialiased select-none pb-24 md:pb-12 transition-colors duration-300">
 <div id="app">
 
-  <!-- Loader คลาวด์ -->
-  <div v-if="isLoading" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex flex-col items-center justify-center text-white">
+  <!-- Loader คลาวด์ พร้อมปุ่มกดปิดเองหากรอนาน -->
+  <div v-if="isLoading" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center text-white">
     <div class="w-16 h-16 rounded-3xl bg-white/20 p-3 shadow-clay-card flex items-center justify-center animate-bounce">
       <i class="fa-solid fa-cloud-arrow-up text-3xl text-amber-300"></i>
     </div>
-    <h3 class="text-base font-bold mt-4">กำลังบันทึกข้อมูลและตรวจสอบความปลอดภัย...</h3>
-    <p class="text-xs text-slate-300">ระบบ Lock ป้องกันการเขียนทับทำงานอยู่</p>
+    <h3 class="text-base font-bold mt-4">กำลังซิงค์ข้อมูล Cloud...</h3>
+    <p class="text-xs text-slate-300 mt-1">กำลังเชื่อมโยงข้อมูลกับ Google Sheets</p>
+    <button @click="forceCloseLoader" class="mt-4 px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold text-slate-200 transition">
+      ปิดหน้าจอโหลดทันที
+    </button>
   </div>
 
   <!-- Header บนคอมพิวเตอร์ -->
@@ -571,7 +574,6 @@
 
       <!-- 2. การ์ดสรุปยอดส่งลูกค้า (Client Share Image Card) ออกแบบสไตล์ Neo 3D ยินดีด้วย -->
       <div v-if="selectedPrizeCustomer" id="client-share-card" class="clay-card p-8 bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 text-white max-w-xl mx-auto shadow-2xl relative overflow-hidden">
-        <!-- ลูกเล่นแสง 3D -->
         <div class="absolute -top-12 -right-12 w-40 h-40 bg-amber-400/20 rounded-full blur-2xl"></div>
         <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-purple-500/20 rounded-full blur-2xl"></div>
 
@@ -783,6 +785,9 @@
       }
     },
     methods: {
+      forceCloseLoader() {
+        this.isLoading = false;
+      },
       toggleTheme() {
         this.isDark = !this.isDark;
         document.documentElement.classList.toggle('dark', this.isDark);
@@ -809,7 +814,6 @@
         return now > due && !od.isPaid;
       },
 
-      // เชื่อมบิลขายสู่บิลถูกรางวัลอัตโนมัติ
       onToggleBillWon(bill) {
         if (!this.currentPeriod) return;
         if (!this.currentPeriod.prizes) this.currentPeriod.prizes = [];
@@ -835,7 +839,6 @@
         }
       },
 
-      // คำนวณยอดรางวัล หักค่าหวยปัจจุบัน และหักค้างเก่า
       getCustomerPrizeCalculation(name) {
         if (!this.currentPeriod || !name) return { totalBossPrize: 0, totalCustomerPrize: 0, prizeBonus: 0, currentPeriodCost: 0, overdueCost: 0, overduePeriodName: '', netPayoutToCustomer: 0 };
         
@@ -849,12 +852,9 @@
         });
 
         const prizeBonus = Math.max(0, totalBoss - totalCust);
-
-        // ค่าหวยงวดปัจจุบัน (เฉพาะบิลที่ยังไม่จ่าย)
         const summary = this.getCustomerSummary(name);
         const currentPeriodCost = summary.normalNet + summary.runNet;
 
-        // ค่ายอดค้างเก่า
         const overdueUnpaid = summary.overdueUnpaid;
         const overdueObj = (this.currentPeriod.overdues || []).find(o => o && o.customerName && o.customerName.trim() === name.trim() && !o.isPaid);
         const overduePeriodName = overdueObj ? overdueObj.fromPeriodName : 'งวดก่อนหน้า';
@@ -887,8 +887,16 @@
         await this.saveToStorage();
       },
 
+      // ระบบ FetchData พร้อม Safety Timeout 3.5 วินาที ปลดหน้าจอหมุนค้างอัตโนมัติ
       async fetchData() {
         this.isLoading = true;
+        const safetyTimer = setTimeout(() => {
+          if (this.isLoading) {
+            this.isLoading = false;
+            console.warn('Sync Timeout: ปลดหน้าจอโหลดอัตโนมัติเนื่องจากเครือข่ายใช้เวลานาน');
+          }
+        }, 3500);
+
         try {
           const res = await fetch(SCRIPT_URL);
           const data = await res.json();
@@ -904,12 +912,20 @@
             return p;
           });
           if (this.periods.length > 0) this.selectedPeriodId = this.periods[0].id;
-        } catch(e) { alert('เชื่อมต่อฐานข้อมูลล้มเหลว กรุณารีเฟรช'); }
-        this.isLoading = false;
+        } catch(e) {
+          console.error('Fetch error:', e);
+        } finally {
+          clearTimeout(safetyTimer);
+          this.isLoading = false; // ปิดสถานะหมุนโหลดเสมอ
+        }
       },
 
       async saveToStorage() {
         this.isLoading = true;
+        const safetyTimer = setTimeout(() => {
+          if (this.isLoading) this.isLoading = false;
+        }, 5000);
+
         try {
           const res = await fetch(SCRIPT_URL, {
             method: 'POST',
@@ -917,9 +933,17 @@
             body: JSON.stringify({ action: 'save', payload: { customers: this.customers, bankInfo: this.bankInfo, settings: this.settings, periods: this.periods } })
           });
           const result = await res.json();
-          if (result.status !== 'success') alert('บันทึกล้มเหลว: ' + (result.error || 'ระบบขัดข้อง'));
-        } catch(e) { alert('ระบบคลาวด์ขัดข้อง กรุณาลองใหม่อีกครั้ง'); }
-        this.isLoading = false;
+          if (result.status === 'success') {
+            alert('✓ บันทึกข้อมูลและซิงค์ Cloud เรียบร้อยแล้ว');
+          } else {
+            alert('บันทึกล้มเหลว: ' + (result.error || 'ระบบขัดข้อง'));
+          }
+        } catch(e) {
+          alert('ระบบคลาวด์ขัดข้อง กรุณาลองใหม่อีกครั้ง');
+        } finally {
+          clearTimeout(safetyTimer);
+          this.isLoading = false;
+        }
       },
 
       async saveCustomer() {
@@ -945,7 +969,6 @@
       async createNewPeriod() {
         if (!this.newPeriodName.trim()) return alert('ระบุชื่องวด');
         
-        // ส่งต่อยอดค้างที่ยังไม่จ่ายจากงวดปัจจุบันไปงวดใหม่อัตโนมัติ (ไม่สร้างหนี้ซ้ำ)
         const rolloverOverdues = [];
         if (this.currentPeriod) {
           this.allDisplayCustomers.forEach(cName => {
