@@ -127,11 +127,12 @@
           </div>
         </div>
 
+        <!-- กล่องรอยอดชำระ และ ยอดค่าหวยงวดปัจจุบันที่ได้รับจริง -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between">
-          <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider">รอยอดชำระ</span>
+          <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider">รอยอดชำระ (งวดนี้)</span>
           <div class="my-2 text-2xl lg:text-3xl font-extrabold text-blue-600 dark:text-blue-400">฿{{ formatNum(overallStats.totalRemainingToCollect) }}</div>
           <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700 flex justify-between font-medium">
-            <span>ชำระแล้ว/หักรับ:</span>
+            <span>ชำระแล้ว/หักรับ (งวดนี้):</span>
             <span class="font-bold text-emerald-500">฿{{ formatNum(overallStats.totalPaidNet) }}</span>
           </div>
         </div>
@@ -644,7 +645,7 @@
       </div>
     </section>
 
-    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (ดึงจากแท็บยอดค้างตลอดเวลา) -->
+    <!-- 6. สรุปโอนรางวัล & บันทึกรูป -->
     <section v-if="currentTab === 'payout'" class="space-y-5">
       <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-3 no-print">
         <div class="flex items-center gap-2">
@@ -895,8 +896,11 @@
       },
       overallStats() {
         if (!this.currentPeriod) return { totalGross: 0, totalRemainingToCollect: 0, totalPaidNet: 0, totalCustomerNetAll: 0, totalToBoss: 0, netProfit: 0, totalPrizeFromBoss: 0, totalPrizeToCustomer: 0, totalPrizeBonus: 0, salesProfit: 0 };
-        let normalGross = 0, runGross = 0, totalCustomerNet = 0, totalPaid = 0;
+        let normalGross = 0, runGross = 0, totalCustomerNet = 0;
+        let totalPaidCurrentNet = 0;
+        let totalUnpaidCurrentNet = 0;
 
+        // คำนวณเฉพาะบิลค่าหวยของงวดปัจจุบันเท่านั้น ไม่เอายอดค้างเก่ามาบวกปน
         (this.currentPeriod.bills || []).forEach(b => {
           const n = Number(b.normalAmount) || 0;
           const r = Number(b.runAmount) || 0;
@@ -904,19 +908,15 @@
           const disc = this.getCustomerDiscount(b.customerName);
           const net = (n * (1 - (disc.normal / 100))) + (r * (1 - (disc.run / 100)));
           totalCustomerNet += net;
-          if (b.isPaid || (b.isWonPrize && b.isDeduct)) totalPaid += net;
-        });
-
-        (this.currentPeriod.overdues || []).forEach(o => {
-          const amt = Number(o.amount) || 0;
-          if (o.isPaid || o.settledNote) totalPaid += amt;
+          
+          if (b.isPaid || (b.isWonPrize && b.isDeduct)) {
+            totalPaidCurrentNet += net;
+          } else {
+            totalUnpaidCurrentNet += net;
+          }
         });
 
         const totalToBoss = (normalGross * 0.70) + (runGross * 0.90);
-        let totalRemainingToCollect = 0;
-        this.allDisplayCustomers.forEach(cName => {
-          totalRemainingToCollect += this.getCustomerSummary(cName).totalPayable;
-        });
 
         let prizeBoss = 0, prizeCust = 0;
         (this.currentPeriod.prizes || []).forEach(z => {
@@ -927,10 +927,11 @@
 
         const prizeBonus = Math.max(0, prizeBoss - prizeCust);
         const salesProfit = totalCustomerNet - totalToBoss;
+
         return {
           totalGross: normalGross + runGross,
-          totalRemainingToCollect,
-          totalPaidNet: totalPaid,
+          totalRemainingToCollect: totalUnpaidCurrentNet, // ยอดรอชำระเฉพาะงวดปัจจุบัน
+          totalPaidNet: totalPaidCurrentNet,             // ยอดค่าหวยงวดปัจจุบันที่ได้รับจริง
           totalCustomerNetAll: totalCustomerNet,
           totalToBoss,
           salesProfit,
@@ -1095,7 +1096,6 @@
         return now > due;
       },
 
-      // ระบบยกยอดค้างจากงวดก่อนหน้าอัตโนมัติ
       async autoRolloverFromPreviousPeriod() {
         const curIdx = this.periods.findIndex(p => p.id === this.selectedPeriodId);
         if (curIdx === -1 || curIdx + 1 >= this.periods.length) {
@@ -1148,7 +1148,7 @@
         }
       },
 
-      // คำนวณสรุปโอนรางวัล: ดึงจากแท็บ "ยอดค้าง" ของงวดปัจจุบันเพียงที่เดียวตลอดเวลา (ไม่หายแม้จะกดลิงก์)
+      // คำนวณสรุปโอนรางวัล: ดึงจากแท็บ "ยอดค้าง" ตลอดเวลา ไม่หายแม้จะกดลิงก์หรือรีเฟรช
       getCustomerPrizeCalculation(name) {
         if (!this.currentPeriod || !name) return { totalBossPrize: 0, totalCustomerPrize: 0, prizeBonus: 0, deductCurrentCost: 0, overdueCost: 0, overduePeriodName: '', isOverdueCutDiscount: false, netPayoutToCustomer: 0, detailedItems: [] };
         
@@ -1225,7 +1225,7 @@
         };
       },
 
-      // ฟังก์ชันกดลิงก์ตัดชำระงวดเก่า: ทำเครื่องหมายว่าหักจากรางวัลแล้วในทั้งสองงวด
+      // ฟังก์ชันกดลิงก์ตัดชำระงวดเก่า: มาร์กเป็นจ่ายแล้วเพื่อตัดออกจากหน้าแดชบอร์ดงวดปัจจุบัน
       async settleAndLinkPreviousPeriod(name) {
         if (!name) return;
         const curIdx = this.periods.findIndex(p => p.id === this.selectedPeriodId);
@@ -1245,11 +1245,11 @@
           }
         });
 
-        // 2. มาร์กในแท็บ "ยอดค้าง" ของงวดปัจจุบันว่าหักจากเงินรางวัลแล้ว (ไม่ต้องมีช่องติ๊กจ่าย)
+        // 2. มาร์กในแท็บ "ยอดค้าง" ของงวดปัจจุบันว่าหักจากเงินรางวัลแล้ว (และตัดยอดหนี้ออกจากแดชบอร์ดงวดนี้)
         if (this.currentPeriod.overdues) {
           this.currentPeriod.overdues.forEach(o => {
             if ((o.customerName || '').trim() === cleanName) {
-              o.isPaid = true; // มาร์กเป็นจ่ายแล้วเพื่อตัดออกจากหน้าแดชบอร์ด
+              o.isPaid = true;
               o.settledNote = `หักจากเงินรางวัลแล้ว`;
             }
           });
@@ -1296,7 +1296,7 @@
         let isOverdueCutDiscount = false;
 
         overdues.forEach(o => {
-          // ถ้ายอดค้างถูกมาร์กว่าหักจากรางวัลแล้ว ไม่ถือว่าเป็นหนี้รอชำระในแดชบอร์ด
+          // ถ้ายอดค้างถูกมาร์กว่าหักจากรางวัลแล้ว (settledNote) หรือจ่ายแล้ว จะไม่นำมาคิดเป็นยอดค้างรอชำระในแดชบอร์ด
           if (!o.isPaid && !o.settledNote) {
             allOverduesPaid = false;
             if (this.isOverduePastDueDays(o) && this.settings.autoCutDiscount && o.rawGrossAmount) {
@@ -1362,7 +1362,8 @@
                 ...b,
                 isPaid: b.isPaid === true || b.isPaid === 'true',
                 isWonPrize: b.isWonPrize === true || b.isWonPrize === 'true',
-                isDeduct: b.isDeduct !== undefined ? (b.isDeduct === true || b.isDeduct === 'true') : true
+                isDeduct: b.isDeduct !== undefined ? (b.isDeduct === true || b.isDeduct === 'true') : true,
+                settledNote: b.settledNote || ''
               }));
             }
             if (!p.overdues) p.overdues = [];
