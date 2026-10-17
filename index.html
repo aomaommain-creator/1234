@@ -501,13 +501,13 @@
       </div>
     </section>
 
-    <!-- 4. ยอดค้าง (Overdues) -->
+    <!-- 4. ยอดค้าง (Overdues - ปรับตามความต้องการ: คนที่หักจากรางวัลแล้วล็อกสถานะ ไม่ต้องมี Checkbox ติ๊กจ่าย) -->
     <section v-if="currentTab === 'overdue'" class="space-y-4">
       <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm space-y-3">
         <div class="flex flex-wrap justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-700 gap-2">
           <div>
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">รายการยอดค้างชำระ (งวดประจำวันที่ {{ currentPeriod.name }})</h3>
-            <p class="text-[11px] text-slate-400">ระบบจะดึงยอดค้างจากงวดก่อนหน้าที่ยังไม่ได้ชำระมาให้อัตโนมัติ (เกิน 3 วัน = ตัดสิทธิ์ส่วนลด)</p>
+            <p class="text-[11px] text-slate-400">รายการที่หักจากรางวัลแล้วจะล็อกไว้ถาวร ส่วนคนที่ยังค้างสามารถติ๊กจ่ายเงินสดได้</p>
           </div>
           <div class="flex gap-2">
             <button @click="autoRolloverFromPreviousPeriod" class="px-3.5 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 transition flex items-center gap-1.5 shadow-sm">
@@ -523,13 +523,16 @@
             <div class="flex items-center gap-2">
               <span class="text-[10px] bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg font-bold">{{ od.fromPeriodName }}</span>
               <input list="cust-list" v-model="od.customerName" placeholder="ชื่อลูกค้า" class="bg-transparent font-bold text-xs outline-none w-28">
-              <span v-if="od.settledNote" class="text-[10px] bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-md">
-                {{ od.settledNote }}
+              
+              <!-- ป้ายกำกับสถานะ -->
+              <span v-if="od.settledNote" class="text-[10px] bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                <i class="fa-solid fa-award"></i> {{ od.settledNote }}
               </span>
               <span v-else-if="isOverduePastDueDays(od)" class="text-[10px] bg-rose-100 text-rose-600 font-bold px-2 py-0.5 rounded-md">
                 เกินกำหนด 3 วัน (ไม่ได้รับส่วนลด)
               </span>
             </div>
+            
             <div class="flex items-center gap-4 text-xs">
               <div class="flex items-center gap-1.5">
                 <span class="text-slate-400 text-[11px]">ครบกำหนด:</span>
@@ -539,15 +542,22 @@
                 <span class="text-slate-400 text-[11px]">ยอด:</span>
                 <input v-model.number="od.amount" type="number" class="w-24 text-right font-bold text-rose-500 bg-transparent outline-none">
               </div>
-              <label class="flex items-center gap-1.5 font-bold cursor-pointer">
+              
+              <!-- ควบคุมการติ๊กจ่าย: ถ้าหักจากรางวัลแล้วจะแสดงเป็นป้ายล็อกไว้ ไม่ต้องมี Checkbox ให้กดสับสน -->
+              <div v-if="od.settledNote" class="text-purple-600 font-bold text-xs flex items-center gap-1">
+                <i class="fa-solid fa-circle-check"></i> เคลียร์แล้ว
+              </div>
+              <!-- ถ้าเป็นคนที่ค้างอยู่ทั่วไป มี Checkbox ให้ติ๊กจ่ายเงินสดตามปกติ -->
+              <label v-else class="flex items-center gap-1.5 font-bold cursor-pointer">
                 <input type="checkbox" v-model="od.isPaid" class="w-4 h-4 rounded text-champagne-500">
                 <span :class="od.isPaid ? 'text-emerald-500' : 'text-slate-400'">{{ od.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย' }}</span>
               </label>
+
               <button @click="removeOverdueRow(idx)" class="text-rose-400 hover:text-rose-600"><i class="fa-solid fa-trash"></i></button>
             </div>
           </div>
           <div v-if="!currentPeriod.overdues || currentPeriod.overdues.length === 0" class="text-center py-6 text-xs text-slate-400">
-            ไม่มีรายการค้างในงวดนี้ (สามารถกดปุ่มสีม่วงด้านบนเพื่อดึงยอดค้างจากงวดก่อนหน้าอัตโนมัติ)
+            ไม่มีรายการค้างในงวดนี้
           </div>
         </div>
       </div>
@@ -634,7 +644,7 @@
       </div>
     </section>
 
-    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (ดึงจากแท็บยอดค้างที่เดียวเท่านั้น) -->
+    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (ดึงยอดค้างจากหน้ายอดค้างตลอดเวลา ไม่หายเด็ดขาด) -->
     <section v-if="currentTab === 'payout'" class="space-y-5">
       <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-3 no-print">
         <div class="flex items-center gap-2">
@@ -645,6 +655,7 @@
         </div>
 
         <div class="flex items-center gap-2">
+          <!-- ปุ่มลิงก์ตัดชำระงวดเก่า -->
           <button @click="settleAndLinkPreviousPeriod(selectedPrizeCustomer)" class="px-3.5 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-100 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
             <i class="fa-solid fa-link"></i> ลิงก์ตัดชำระงวดเก่า
           </button>
@@ -744,7 +755,7 @@
             <span>*บิลที่ถูกไม่หักค่าหวยงวดปัจจุบัน (รับเงินรางวัลเต็ม)</span>
           </div>
 
-          <!-- หักยอดค้างเก่างวดก่อนหน้า -->
+          <!-- หักยอดค้างเก่างวดก่อนหน้า (ดึงจากแท็บยอดค้างเสมอ แม้จะตัดชำระไปแล้ว) -->
           <div v-if="getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost > 0" class="flex justify-between items-center p-2 rounded-xl bg-amber-50/70 border border-amber-200/50 text-amber-900">
             <span>หัก ยอดค้างเก่างวด{{ getCustomerPrizeCalculation(selectedPrizeCustomer).overduePeriodName }} <span v-if="getCustomerPrizeCalculation(selectedPrizeCustomer).isOverdueCutDiscount" class="text-rose-600 font-bold">(ไม่ได้รับส่วนลด)</span><span v-else>(หักส่วนลดแล้ว)</span>:</span>
             <span class="font-bold text-rose-600">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost) }}</span>
@@ -1085,6 +1096,7 @@
         return now > due;
       },
 
+      // ระบบยกยอดค้างจากงวดก่อนหน้าอัตโนมัติ
       async autoRolloverFromPreviousPeriod() {
         const curIdx = this.periods.findIndex(p => p.id === this.selectedPeriodId);
         if (curIdx === -1 || curIdx + 1 >= this.periods.length) {
@@ -1137,7 +1149,7 @@
         }
       },
 
-      // คำนวณสรุปโอนรางวัล: ยึดจากแท็บ "ยอดค้าง" ของงวดปัจจุบันเพียงที่เดียวเท่านั้น (ไม่แอบค้นจากที่อื่น)
+      // คำนวณสรุปโอนรางวัล: ดึงจากแท็บ "ยอดค้าง" ของงวดปัจจุบันเพียงที่เดียวเท่านั้น (ไม่แอบดึงจากที่อื่น)
       getCustomerPrizeCalculation(name) {
         if (!this.currentPeriod || !name) return { totalBossPrize: 0, totalCustomerPrize: 0, prizeBonus: 0, deductCurrentCost: 0, overdueCost: 0, overduePeriodName: '', isOverdueCutDiscount: false, netPayoutToCustomer: 0, detailedItems: [] };
         
@@ -1188,9 +1200,10 @@
 
         if (this.currentPeriod && this.currentPeriod.overdues) {
           const overdueObj = this.currentPeriod.overdues.find(o => (o.customerName || '').trim() === cleanName);
-          // หากมีรายการในหน้างวดค้าง และยังไม่ถูกติ๊กจ่าย
-          if (overdueObj && !overdueObj.isPaid) {
+          // หากมีรายการในหน้างวดค้าง (ดึงมาคำนวณตลอดเวลา แม้จะมาร์กเป็นหักจากรางวัลแล้ว)
+          if (overdueObj) {
             overduePeriodName = overdueObj.fromPeriodName || 'งวดก่อนหน้า';
+            // ถ้าเกิน 3 วันและไม่ได้รับส่วนลด
             if (this.isOverduePastDueDays(overdueObj) && this.settings.autoCutDiscount && overdueObj.rawGrossAmount) {
               overdueCost = Number(overdueObj.rawGrossAmount);
               isOverdueCutDiscount = true;
@@ -1215,6 +1228,7 @@
         };
       },
 
+      // ฟังก์ชันกดลิงก์ตัดชำระงวดเก่า
       async settleAndLinkPreviousPeriod(name) {
         if (!name) return;
         const curIdx = this.periods.findIndex(p => p.id === this.selectedPeriodId);
@@ -1234,11 +1248,11 @@
           }
         });
 
-        // 2. มาร์กในแท็บ "ยอดค้าง" ของงวดปัจจุบันว่าหักจากเงินรางวัลแล้ว (ไม่ลบทิ้ง)
+        // 2. มาร์กในแท็บ "ยอดค้าง" ของงวดปัจจุบันว่าหักจากเงินรางวัลแล้ว (ไม่ต้องมีช่องติ๊กจ่าย)
         if (this.currentPeriod.overdues) {
           this.currentPeriod.overdues.forEach(o => {
             if ((o.customerName || '').trim() === cleanName) {
-              o.isPaid = true;
+              o.isPaid = false; // คงสถานะไว้ไม่ให้ระบบตัดยอดออก
               o.settledNote = `หักจากเงินรางวัลแล้ว`;
             }
           });
@@ -1285,7 +1299,8 @@
         let isOverdueCutDiscount = false;
 
         overdues.forEach(o => {
-          if (!o.isPaid) {
+          // ถ้ายอดค้างถูกมาร์กว่าหักจากรางวัลแล้ว ไม่ถือว่าเป็นหนี้รอชำระในแดชบอร์ด
+          if (!o.isPaid && !o.settledNote) {
             allOverduesPaid = false;
             if (this.isOverduePastDueDays(o) && this.settings.autoCutDiscount && o.rawGrossAmount) {
               odUnpaid += Number(o.rawGrossAmount);
@@ -1327,7 +1342,7 @@
         });
 
         (this.currentPeriod.overdues || []).forEach(o => {
-          if (o && (o.customerName || '').trim() === cleanName) {
+          if (o && (o.customerName || '').trim() === cleanName && !o.settledNote) {
             o.isPaid = status;
           }
         });
@@ -1519,6 +1534,7 @@
         return this.currentPeriod.bills.filter(b => b && b.customerName && b.customerName.trim() === name.trim());
       },
 
+      // บันทึกรูปบิลแจ้งยอดจากหน้าแดชบอร์ด
       async saveDashboardBillImage() {
         const el = document.getElementById('dashboard-client-bill');
         if (!el) return;
@@ -1541,6 +1557,7 @@
         this.isSavingImg = false;
       },
 
+      // บันทึกรูปการ์ดสรุปรางวัล
       async saveClientReceiptImage() {
         const el = document.getElementById('client-share-card');
         if (!el) return;
