@@ -88,7 +88,7 @@
       <nav class="hidden md:flex items-center gap-1 bg-champagne-50 dark:bg-slate-800 p-1.5 rounded-2xl border border-champagne-200/60 dark:border-slate-700">
         <button v-for="tab in tabs" :key="tab.id" @click="currentTab = tab.id"
                 :class="currentTab === tab.id ? 'bg-white dark:bg-slate-700 text-champagne-600 dark:text-champagne-400 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white font-medium'"
-                class="px-3 py-1.5 rounded-xl text-xs transition-all flex items-center gap-1.5">
+                class="px-3.5 py-1.5 rounded-xl text-xs transition-all flex items-center gap-1.5">
           <i :class="tab.icon"></i>
           <span>{{ tab.name }}</span>
         </button>
@@ -350,7 +350,7 @@
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-for="(b, idx) in currentPeriod.bills" :key="b.id || idx" :class="{'bg-emerald-50/40 dark:bg-emerald-950/20': b.isPaid}">
                 <td class="py-2 px-3 text-center text-slate-400">{{ idx + 1 }}</td>
-                <td class="py-2 px-3"><input v-model.number="b.normalAmount" @input="onBillAmountChange(b)" type="number" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right font-bold outline-none"></td>
+                <td class="py-2 px-3"><input v-model.number="b.normalAmount" type="number" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right font-bold outline-none"></td>
                 <td class="py-2 px-3"><input list="cust-list" v-model="b.customerName" placeholder="ชื่อลูกค้า" class="w-32 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-medium outline-none"></td>
                 
                 <td class="py-2 px-3">
@@ -360,7 +360,7 @@
                   <span v-else class="text-slate-300">-</span>
                 </td>
 
-                <td class="py-2 px-3"><input v-model.number="b.runAmount" @input="onBillAmountChange(b)" type="number" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right text-indigo-500 font-bold outline-none"></td>
+                <td class="py-2 px-3"><input v-model.number="b.runAmount" type="number" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right text-indigo-500 font-bold outline-none"></td>
                 <td class="py-2 px-3 text-center"><input type="checkbox" v-model="b.isPaid" class="w-4 h-4 rounded text-champagne-500 cursor-pointer"></td>
                 
                 <td class="py-2 px-3 text-center">
@@ -388,7 +388,7 @@
                 </td>
 
                 <td class="py-2 px-3 text-right">
-                  <input v-if="b.isWonPrize" type="number" :value="getPrizeOfBill(b.id).amount" @input="updateBillPrizeField(b.id, 'amount', Number($event.target.value))" placeholder="0" class="w-20 p-1.5 rounded-lg border border-champagne-300 dark:border-slate-700 bg-champagne-50/50 dark:bg-slate-900 text-right font-bold text-champagne-700 dark:text-champagne-300 outline-none">
+                  <input v-if="b.isWonPrize" type="number" :value="getPrizeOfBill(b.id).amount" @input="updateBillPrizeField(b.id, 'amount', Number($event.target.value))" placeholder="0" class="w-20 p-1 rounded-lg border border-champagne-300 dark:border-slate-700 bg-champagne-50/50 dark:bg-slate-900 text-right font-bold text-champagne-700 dark:text-champagne-300 outline-none">
                   <span v-else class="text-slate-300">-</span>
                 </td>
 
@@ -617,7 +617,7 @@
       </div>
     </section>
 
-    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (ล็อกยอดค้างเก่าไว้ตลอดเวลา ไม่หายเด็ดขาด) -->
+    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (ยอดคำนวณนิ่งสนิท ไม่หายเมื่อกดลิงก์) -->
     <section v-if="currentTab === 'payout'" class="space-y-5">
       <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-3 no-print">
         <div class="flex items-center gap-2">
@@ -628,8 +628,8 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <!-- ปุ่มลิงก์ตัดชำระงวดเก่า (เปลี่ยนเป็นแจ้งเตือนอย่างเดียว ไม่ลบตัวเลขในบิล) -->
-          <button @click="notifyLinkedOldPeriod(selectedPrizeCustomer)" class="px-3.5 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-100 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+          <!-- ปุ่มลิงก์ตัดชำระงวดเก่า (กดแล้วแจ้งเตือนว่าตัดสำเร็จ โดยตัวเลขในหน้านี้ไม่เปลี่ยน) -->
+          <button @click="settleAndLinkPreviousPeriod(selectedPrizeCustomer)" class="px-3.5 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-100 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
             <i class="fa-solid fa-link"></i> ลิงก์ตัดชำระงวดเก่า
           </button>
           <button @click="copyCustomerBank" class="px-4 py-2 rounded-xl bg-champagne-50 dark:bg-slate-800 border border-champagne-300 dark:border-slate-600 hover:bg-champagne-100 text-xs font-bold text-champagne-800 dark:text-champagne-200 flex items-center gap-2 transition shadow-sm">
@@ -641,7 +641,7 @@
         </div>
       </div>
 
-      <!-- กล่องแจ้งเตือนกรณีเงินรางวัลไม่พอจ่าย (ลูกค้าต้องโอนเพิ่ม) -->
+      <!-- กล่องแจ้งเตือนกรณีเงินรางวัลไม่พอจ่าย (ต้องจ่ายเพิ่ม) -->
       <div v-if="selectedPrizeCustomer && getCustomerPrizeCalculation(selectedPrizeCustomer).netPayoutToCustomer < 0"
            class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -685,7 +685,7 @@
         </div>
       </div>
 
-      <!-- การ์ดรูปภาพส่งลูกค้า (ล็อกยอดหักค้างเก่าไว้เสมอ ไม่หายเด็ดขาด) -->
+      <!-- การ์ดรูปภาพส่งลูกค้า -->
       <div v-if="selectedPrizeCustomer" id="client-share-card" class="bg-white border border-[#EAE6DF] p-7 md:p-8 rounded-3xl max-w-lg mx-auto shadow-lg text-slate-800 relative overflow-hidden">
         <div class="text-center pb-4 border-b border-champagne-100 mb-4">
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-champagne-500 to-champagne-400 text-white flex items-center justify-center text-xl mx-auto mb-2 shadow-sm">
@@ -724,8 +724,11 @@
             <span>หัก ค่าหวยงวดปัจจุบัน (หักส่วนลดแล้ว):</span>
             <span class="font-bold text-rose-500">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).deductCurrentCost) }}</span>
           </div>
+          <div v-else class="flex justify-between items-center text-[11px] text-slate-400 italic px-1">
+            <span>*บิลที่ถูกไม่หักค่าหวยงวดปัจจุบัน (รับเงินรางวัลเต็ม)</span>
+          </div>
 
-          <!-- หักยอดค้างเก่างวดก่อนหน้า (ล็อกตัวเลขไว้เสมอ) -->
+          <!-- หักยอดค้างเก่างวดก่อนหน้า (ยกเฉพาะยอดที่ต้องชำระจริงหลังหักลด) -->
           <div v-if="getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost > 0" class="flex justify-between items-center p-2 rounded-xl bg-amber-50/70 border border-amber-200/50 text-amber-900">
             <span>หัก ยอดค้างเก่างวด{{ getCustomerPrizeCalculation(selectedPrizeCustomer).overduePeriodName }} (หักส่วนลดแล้ว):</span>
             <span class="font-bold text-rose-600">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost) }}</span>
@@ -1056,7 +1059,7 @@
         this.currentPeriod.prizes.push(pz);
       },
 
-      // คำนวณสรุปโอนรางวัล: ล็อกยอดค้างเก่าไว้ตลอดเวลา ไม่ให้ตัวเลขหาย
+      // คำนวณสรุปโอนรางวัล: หักเฉพาะยอดที่ต้องชำระจริงของงวดก่อนหน้า และล็อกค่าไว้ไม่ให้หายเมื่อกดลิงก์
       getCustomerPrizeCalculation(name) {
         if (!this.currentPeriod || !name) return { totalBossPrize: 0, totalCustomerPrize: 0, prizeBonus: 0, deductCurrentCost: 0, overdueCost: 0, overduePeriodName: '', netPayoutToCustomer: 0, detailedItems: [] };
         
@@ -1099,7 +1102,7 @@
 
         const prizeBonus = Math.max(0, totalBoss - totalCust);
 
-        // ดึงยอดเรียกเก็บจริงจากงวดก่อนหน้า: ล็อกยอดไว้ตลอดเวลา แม้จะถูกตัดชำระผ่านเงินรางวัลแล้ว
+        // ดึงเฉพาะ "ยอดที่ต้องชำระจริง (หลังหักส่วนลด)" ของงวดก่อนหน้ามาหัก และล็อกค่าไว้ไม่ให้หาย
         let overdueCost = 0;
         let overduePeriodName = '';
 
@@ -1107,13 +1110,16 @@
         if (curIdx !== -1 && curIdx + 1 < this.periods.length) {
           const prevPeriod = this.periods[curIdx + 1];
           overduePeriodName = prevPeriod.name;
-          
-          // ดึงบิลของงวดก่อนหน้า (ทั้งบิลที่ยังไม่จ่าย หรือบิลที่จ่ายด้วยการหักเคลียร์รางวัล)
+
+          // ดึงเฉพาะบิลที่ค้างชำระจริง หรือบิลที่เพิ่งถูกลิงก์เคลียร์ด้วยงวดนี้
           const prevBills = (prevPeriod.bills || []).filter(b => b.customerName && b.customerName.trim() === name.trim() && (!b.isPaid || b.settledByPrizePeriod === this.currentPeriod.name));
           let prevGrossNormal = 0, prevGrossRun = 0;
           prevBills.forEach(b => {
-            prevGrossNormal += Number(b.normalAmount) || 0;
-            prevGrossRun += Number(b.runAmount) || 0;
+            // ไม่นำบิลที่ถูกหักรับรางวัลของงวดนั้นไปแล้วมาคิดซ้ำ
+            if (!(b.isWonPrize && b.isDeduct)) {
+              prevGrossNormal += Number(b.normalAmount) || 0;
+              prevGrossRun += Number(b.runAmount) || 0;
+            }
           });
           const prevDisc = this.getCustomerDiscount(name);
           overdueCost = (prevGrossNormal * (1 - (prevDisc.normal / 100))) + (prevGrossRun * (1 - (prevDisc.run / 100)));
@@ -1141,8 +1147,8 @@
         };
       },
 
-      // แจ้งเตือนและบันทึกตัดชำระไปยังงวดเก่า (ไม่ลบยอดในหน้าสรุปรางวัล)
-      async notifyLinkedOldPeriod(name) {
+      // ฟังก์ชันกดลิงก์ตัดชำระงวดเก่า: ไปปรับสถานะงวดเก่าเงียบๆ แต่หน้าสรุปโอนรางวัลนี้ตัวเลขจะไม่เปลี่ยนเด็ดขาด
+      async settleAndLinkPreviousPeriod(name) {
         if (!name) return;
         const curIdx = this.periods.findIndex(p => p.id === this.selectedPeriodId);
         if (curIdx === -1 || curIdx + 1 >= this.periods.length) {
@@ -1154,12 +1160,19 @@
         (prevPeriod.bills || []).forEach(b => {
           if (b.customerName && b.customerName.trim() === name.trim() && !b.isPaid) {
             b.isPaid = true;
-            b.settledByPrizePeriod = this.currentPeriod.name; // มาร์กไว้ว่าจ่ายด้วยการหักรางวัล
+            b.settledByPrizePeriod = this.currentPeriod.name; // จำไว้ว่างวดนี้เป็นคนหักจ่ายให้
             count++;
           }
         });
 
-        this.showToast(`บันทึกเรียบร้อย: นำเงินรางวัลงวด ${this.currentPeriod.name} ไปหักตัดชำระบิลงวด ${prevPeriod.name} แล้ว`);
+        // เคลียร์ยอด Overdue ของงวดปัจจุบันถ้ามี
+        (this.currentPeriod.overdues || []).forEach(o => {
+          if (o.customerName && o.customerName.trim() === name.trim()) {
+            o.isPaid = true;
+          }
+        });
+
+        this.showToast(`บันทึกเรียบร้อย: นำเงินรางวัลงวด ${this.currentPeriod.name} ไปหักตัดชำระบิลงวด ${prevPeriod.name} แล้ว (หน้านี้คงตัวเลขเดิมไว้)`);
         await this.saveToStorage();
       },
 
@@ -1415,6 +1428,7 @@
         return this.currentPeriod.bills.filter(b => b && b.customerName && b.customerName.trim() === name.trim());
       },
 
+      // บันทึกรูปบิลแจ้งยอดจากหน้าแดชบอร์ดแบบเต็มความสูง (เห็นครบทุกบิล)
       async saveDashboardBillImage() {
         const el = document.getElementById('dashboard-client-bill');
         if (!el) return;
@@ -1437,6 +1451,7 @@
         this.isSavingImg = false;
       },
 
+      // บันทึกรูปการ์ดสรุปรางวัลจากหน้าสรุปโอนรางวัล
       async saveClientReceiptImage() {
         const el = document.getElementById('client-share-card');
         if (!el) return;
