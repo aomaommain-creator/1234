@@ -74,7 +74,7 @@
         </div>
       </div>
 
-      <!-- ช่องเลือกงวดบนแถบ Header จุดเดียว -->
+      <!-- ช่องเลือกงวดบนแถบ Header -->
       <div class="flex items-center gap-2 bg-champagne-50/80 dark:bg-slate-800 px-3 py-1.5 rounded-2xl border border-champagne-300 dark:border-slate-700 shadow-inner">
         <span class="text-xs font-bold text-champagne-700 dark:text-champagne-300 flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-calendar-days text-sm"></i> งวด:
@@ -159,7 +159,7 @@
         <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
           <div>
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">ตารางสรุปยอดขายรายบุคคล (งวดประจำวันที่ {{ currentPeriod.name }})</h3>
-            <p class="text-[11px] text-slate-400">แสดงยอดบิลซื้อทั้งหมดและสถานะการชำระเงินที่ชัดเจน</p>
+            <p class="text-[11px] text-slate-400">หากค้างเกินกำหนด 3 วัน ระบบจะตัดสิทธิ์ส่วนลดและคิดยอดเต็มอัตโนมัติ</p>
           </div>
           <span class="text-xs text-slate-400">ทั้งหมด {{ allDisplayCustomers.length }} คน</span>
         </div>
@@ -168,7 +168,7 @@
             <thead class="bg-[#FAFAFA] dark:bg-slate-900 text-slate-400 border-b border-slate-100 dark:border-slate-800">
               <tr>
                 <th class="py-3 px-4">ลูกค้า</th>
-                <th class="py-3 px-4 text-right">ยอดสุทธิรอชำระ (งวดนี้)</th>
+                <th class="py-3 px-4 text-right">ยอดสุทธิ (งวดนี้)</th>
                 <th class="py-3 px-4 text-right">ค้างเก่างวดก่อน</th>
                 <th class="py-3 px-4 text-right">ยอดต้องชำระรวม</th>
                 <th class="py-3 px-4 text-center">สถานะชำระเงิน</th>
@@ -189,8 +189,12 @@
                   <td class="py-3.5 px-4 text-right font-medium text-slate-600 dark:text-slate-300">
                     ฿{{ formatNum(getCustomerSummary(cName).normalNet + getCustomerSummary(cName).runNet) }}
                   </td>
-                  <td class="py-3.5 px-4 text-right text-amber-500 font-semibold">
-                    {{ getCustomerSummary(cName).overdueUnpaid > 0 ? '฿' + formatNum(getCustomerSummary(cName).overdueUnpaid) : '-' }}
+                  <td class="py-3.5 px-4 text-right font-semibold" :class="getCustomerSummary(cName).isOverdueCutDiscount ? 'text-rose-600' : 'text-amber-500'">
+                    <span v-if="getCustomerSummary(cName).overdueUnpaid > 0">
+                      ฿{{ formatNum(getCustomerSummary(cName).overdueUnpaid) }}
+                      <span v-if="getCustomerSummary(cName).isOverdueCutDiscount" class="text-[10px] block font-normal text-rose-500">(ไม่ได้รับส่วนลด)</span>
+                    </span>
+                    <span v-else class="text-slate-300">-</span>
                   </td>
                   <td class="py-3.5 px-4 text-right">
                     <span v-if="getCustomerSummary(cName).isFullyPaid" class="text-[11px] font-bold px-2.5 py-1 rounded-lg"
@@ -282,14 +286,17 @@
               <div class="flex justify-between text-slate-600"><span>ยอดรอชำระ (ก่อนลด):</span><span class="font-bold">฿{{ formatNum(getCustomerSummary(selectedCustomerBill).normalGrossUnpaid) }}</span></div>
               <div class="flex justify-between text-emerald-600"><span>ส่วนลดปกติ:</span><span class="font-bold">-฿{{ formatNum(getCustomerSummary(selectedCustomerBill).normalDiscountAmount) }}</span></div>
               <div class="flex justify-between text-indigo-600"><span>ยอดวิ่งรอชำระ:</span><span class="font-bold">฿{{ formatNum(getCustomerSummary(selectedCustomerBill).runNet) }}</span></div>
-              <div class="flex justify-between text-amber-600"><span>ยอดค้างเก่า:</span><span class="font-bold">฿{{ formatNum(getCustomerSummary(selectedCustomerBill).overdueUnpaid) }}</span></div>
+              <div class="flex justify-between" :class="getCustomerSummary(selectedCustomerBill).isOverdueCutDiscount ? 'text-rose-600' : 'text-amber-600'">
+                <span>ยอดค้างเก่า:</span>
+                <span class="font-bold">฿{{ formatNum(getCustomerSummary(selectedCustomerBill).overdueUnpaid) }}</span>
+              </div>
               
               <div class="pt-3 border-t border-slate-200 flex justify-between items-center">
                 <span class="font-extrabold text-sm text-slate-800">ยอดชำระทั้งสิ้น:</span>
                 <span class="text-2xl font-black text-champagne-600">฿{{ formatNum(getCustomerSummary(selectedCustomerBill).totalPayable) }}</span>
               </div>
-              <p v-if="getCustomerSummary(selectedCustomerBill).hasDeductWon" class="text-[10px] text-purple-600 text-right mt-1 font-semibold">
-                *ไม่รวมบิลที่หักลบกับเงินรางวัลแล้ว
+              <p v-if="getCustomerSummary(selectedCustomerBill).isOverdueCutDiscount" class="text-[10px] text-rose-600 text-right mt-1 font-semibold">
+                *ยอดค้างเก่าเกินกำหนด 3 วัน (ถูกตัดสิทธิ์ส่วนลด)
               </p>
             </div>
           </div>
@@ -349,7 +356,7 @@
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-for="(b, idx) in currentPeriod.bills" :key="b.id || idx" :class="{'bg-emerald-50/40 dark:bg-emerald-950/20': b.isPaid}">
                 <td class="py-2 px-3 text-center text-slate-400">{{ idx + 1 }}</td>
-                <td class="py-2 px-3"><input v-model.number="b.normalAmount" type="number" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right font-bold outline-none"></td>
+                <td class="py-2 px-3"><input v-model.number="b.normalAmount" @input="onBillAmountChange(b)" type="number" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right font-bold outline-none"></td>
                 <td class="py-2 px-3"><input list="cust-list" v-model="b.customerName" placeholder="ชื่อลูกค้า" class="w-32 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 font-medium outline-none"></td>
                 
                 <td class="py-2 px-3">
@@ -359,7 +366,7 @@
                   <span v-else class="text-slate-300">-</span>
                 </td>
 
-                <td class="py-2 px-3"><input v-model.number="b.runAmount" type="number" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right text-indigo-500 font-bold outline-none"></td>
+                <td class="py-2 px-3"><input v-model.number="b.runAmount" @input="onBillAmountChange(b)" type="number" class="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right text-indigo-500 font-bold outline-none"></td>
                 <td class="py-2 px-3 text-center"><input type="checkbox" v-model="b.isPaid" class="w-4 h-4 rounded text-champagne-500 cursor-pointer"></td>
                 
                 <td class="py-2 px-3 text-center">
@@ -494,15 +501,21 @@
       </div>
     </section>
 
-    <!-- 4. ยอดค้าง (Overdues) -->
+    <!-- 4. ยอดค้าง (Overdues - ปรับระบบดึงยอดค้างอัตโนมัติ + ตัดสิทธิ์ส่วนลดเมื่อเกิน 3 วัน) -->
     <section v-if="currentTab === 'overdue'" class="space-y-4">
       <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm space-y-3">
-        <div class="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-700">
+        <div class="flex flex-wrap justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-700 gap-2">
           <div>
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">รายการยอดค้างชำระ</h3>
-            <p class="text-[11px] text-slate-400">ระบบเชื่อมโยงยอดค้างข้ามงวด และจะถูกนำมาหักลบตอนโอนเงินรางวัลเสมอ</p>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">รายการยอดค้างชำระ (งวดประจำวันที่ {{ currentPeriod.name }})</h3>
+            <p class="text-[11px] text-slate-400">ระบบจะดึงยอดค้างจากงวดก่อนหน้าที่ยังไม่ได้ชำระมาให้อัตโนมัติ (เกิน 3 วัน = ตัดสิทธิ์ส่วนลด)</p>
           </div>
-          <button @click="addOverdueRow" class="px-3.5 py-1.5 rounded-xl bg-amber-500 text-white text-xs font-bold">+ เพิ่มยอดค้าง</button>
+          <div class="flex gap-2">
+            <!-- ปุ่มดึงยอดค้างจากงวดก่อนอัตโนมัติ -->
+            <button @click="autoRolloverFromPreviousPeriod" class="px-3.5 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 transition flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-cloud-arrow-down"></i> ดึงยอดค้างจากงวดก่อนอัตโนมัติ
+            </button>
+            <button @click="addOverdueRow" class="px-3.5 py-1.5 rounded-xl bg-amber-500 text-white text-xs font-bold">+ เพิ่มเอง</button>
+          </div>
         </div>
 
         <div class="space-y-2">
@@ -511,11 +524,18 @@
             <div class="flex items-center gap-2">
               <span class="text-[10px] bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg font-bold">{{ od.fromPeriodName }}</span>
               <input list="cust-list" v-model="od.customerName" placeholder="ชื่อลูกค้า" class="bg-transparent font-bold text-xs outline-none w-28">
+              <!-- แสดงป้ายกำกับตัดสิทธิ์ส่วนลด หรือ หักจากรางวัลแล้ว -->
+              <span v-if="od.settledNote" class="text-[10px] bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-md">
+                {{ od.settledNote }}
+              </span>
+              <span v-else-if="isOverduePastDueDays(od)" class="text-[10px] bg-rose-100 text-rose-600 font-bold px-2 py-0.5 rounded-md">
+                เกินกำหนด 3 วัน (ไม่ได้รับส่วนลด)
+              </span>
             </div>
             <div class="flex items-center gap-4 text-xs">
               <div class="flex items-center gap-1.5">
                 <span class="text-slate-400 text-[11px]">ครบกำหนด:</span>
-                <input v-model="od.dueDate" type="date" class="bg-transparent text-slate-700 dark:text-slate-300 outline-none">
+                <input v-model="od.dueDate" type="date" class="bg-transparent text-slate-700 dark:text-slate-300 outline-none font-medium">
               </div>
               <div class="flex items-center gap-1.5">
                 <span class="text-slate-400 text-[11px]">ยอด:</span>
@@ -523,13 +543,13 @@
               </div>
               <label class="flex items-center gap-1.5 font-bold cursor-pointer">
                 <input type="checkbox" v-model="od.isPaid" class="w-4 h-4 rounded text-champagne-500">
-                <span :class="od.isPaid ? 'text-emerald-500' : 'text-slate-400'">จ่ายแล้ว</span>
+                <span :class="od.isPaid ? 'text-emerald-500' : 'text-slate-400'">{{ od.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย' }}</span>
               </label>
               <button @click="removeOverdueRow(idx)" class="text-rose-400 hover:text-rose-600"><i class="fa-solid fa-trash"></i></button>
             </div>
           </div>
           <div v-if="!currentPeriod.overdues || currentPeriod.overdues.length === 0" class="text-center py-6 text-xs text-slate-400">
-            ไม่มีรายการค้างในงวดนี้
+            ไม่มีรายการค้างในงวดนี้ (สามารถกดปุ่มสีม่วงด้านบนเพื่อดึงยอดค้างจากงวดก่อนหน้าอัตโนมัติ)
           </div>
         </div>
       </div>
@@ -616,7 +636,7 @@
       </div>
     </section>
 
-    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (ระบบล็อกยอดค้างเก่าไว้ถาวร ไม่หายเมื่อออกเข้าใหม่) -->
+    <!-- 6. สรุปโอนรางวัล & บันทึกรูป -->
     <section v-if="currentTab === 'payout'" class="space-y-5">
       <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-3 no-print">
         <div class="flex items-center gap-2">
@@ -627,7 +647,7 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <!-- ปุ่มลิงก์ตัดชำระงวดเก่า (เปลี่ยนสถานะงวดก่อนหน้าเป็น "หักเคลียร์เงินรางวัลงวด 16.10.69") -->
+          <!-- ปุ่มลิงก์ตัดชำระงวดเก่า -->
           <button @click="settleAndLinkPreviousPeriod(selectedPrizeCustomer)" class="px-3.5 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-100 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
             <i class="fa-solid fa-link"></i> ลิงก์ตัดชำระงวดเก่า
           </button>
@@ -684,7 +704,7 @@
         </div>
       </div>
 
-      <!-- การ์ดรูปภาพส่งลูกค้า (ล็อกยอดหักค้างเก่าไว้ถาวร) -->
+      <!-- การ์ดรูปภาพส่งลูกค้า -->
       <div v-if="selectedPrizeCustomer" id="client-share-card" class="bg-white border border-[#EAE6DF] p-7 md:p-8 rounded-3xl max-w-lg mx-auto shadow-lg text-slate-800 relative overflow-hidden">
         <div class="text-center pb-4 border-b border-champagne-100 mb-4">
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-champagne-500 to-champagne-400 text-white flex items-center justify-center text-xl mx-auto mb-2 shadow-sm">
@@ -723,13 +743,10 @@
             <span>หัก ค่าหวยงวดปัจจุบัน (หักส่วนลดแล้ว):</span>
             <span class="font-bold text-rose-500">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).deductCurrentCost) }}</span>
           </div>
-          <div v-else class="flex justify-between items-center text-[11px] text-slate-400 italic px-1">
-            <span>*บิลที่ถูกไม่หักค่าหวยงวดปัจจุบัน (รับเงินรางวัลเต็ม)</span>
-          </div>
 
-          <!-- หักยอดค้างเก่างวดก่อนหน้า (ล็อกตัวเลขไว้ถาวร) -->
+          <!-- หักยอดค้างเก่างวดก่อนหน้า -->
           <div v-if="getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost > 0" class="flex justify-between items-center p-2 rounded-xl bg-amber-50/70 border border-amber-200/50 text-amber-900">
-            <span>หัก ยอดค้างเก่างวด{{ getCustomerPrizeCalculation(selectedPrizeCustomer).overduePeriodName }} (หักส่วนลดแล้ว):</span>
+            <span>หัก ยอดค้างเก่างวด{{ getCustomerPrizeCalculation(selectedPrizeCustomer).overduePeriodName }} <span v-if="getCustomerPrizeCalculation(selectedPrizeCustomer).isOverdueCutDiscount" class="text-rose-600 font-bold">(ไม่ได้รับส่วนลด)</span><span v-else>(หักส่วนลดแล้ว)</span>:</span>
             <span class="font-bold text-rose-600">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost) }}</span>
           </div>
 
@@ -768,8 +785,8 @@
 
         <div class="flex items-center justify-between p-3.5 rounded-2xl bg-[#FAFAFA] dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
           <div>
-            <div class="text-xs font-semibold">เปิดใช้กฎตัดสิทธิ์ส่วนลดเมื่อเลยกำหนด</div>
-            <div class="text-[11px] text-slate-400">หากเกินกำหนดวันชำระ ส่วนลดงวดค้างจะกลายเป็น 0% ทันที</div>
+            <div class="text-xs font-semibold">เปิดใช้กฎตัดสิทธิ์ส่วนลดเมื่อเลยกำหนด (3 วัน)</div>
+            <div class="text-[11px] text-slate-400">หากเกินกำหนดวันชำระ ยอดค้างจะถูกคิดเป็นยอดเต็มไม่ได้รับส่วนลดทันที</div>
           </div>
           <input type="checkbox" v-model="settings.autoCutDiscount" class="w-4 h-4 rounded text-champagne-500">
         </div>
@@ -831,7 +848,7 @@
         selectedPeriodId: '',
         newPeriodName: '',
         pasteText: '',
-        settings: { dueDays: 3, autoCutDiscount: false }
+        settings: { dueDays: 3, autoCutDiscount: true }
       }
     },
     mounted() {
@@ -917,13 +934,12 @@
     methods: {
       showToast(msg) {
         this.toastMessage = msg;
-        setTimeout(() => { this.toastMessage = ''; }, 3000);
+        setTimeout(() => { this.toastMessage = ''; }, 3500);
       },
       toggleTheme() {
         this.isDark = !this.isDark;
         document.documentElement.classList.toggle('dark', this.isDark);
       },
-      // แสดงเป็นจำนวนเต็ม ปัดเศษขึ้นเสมอ ไม่มีเศษสตางค์
       formatNum(val) { 
         return Math.ceil(Number(val || 0)).toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); 
       },
@@ -1061,9 +1077,73 @@
         this.currentPeriod.prizes.push(pz);
       },
 
-      // คำนวณสรุปโอนรางวัล: ล็อกยอดค้างเก่าไว้ถาวร ไม่หายแม้จะรีเฟรชหรือเข้าแอปใหม่
+      // ฟังก์ชันเช็กว่ายอดค้างเกินกำหนด 3 วันหรือไม่
+      isOverduePastDueDays(od) {
+        if (!od || !od.dueDate || od.isPaid) return false;
+        const due = new Date(od.dueDate);
+        const now = new Date();
+        now.setHours(0,0,0,0);
+        return now > due;
+      },
+
+      // ระบบยกยอดค้างจากงวดก่อนหน้าอัตโนมัติ (Automated Rollover)
+      async autoRolloverFromPreviousPeriod() {
+        const curIdx = this.periods.findIndex(p => p.id === this.selectedPeriodId);
+        if (curIdx === -1 || curIdx + 1 >= this.periods.length) {
+          return alert('ไม่พบข้อมูลของงวดก่อนหน้าที่จะดึงยอด');
+        }
+
+        const prevPeriod = this.periods[curIdx + 1];
+        if (!this.currentPeriod.overdues) this.currentPeriod.overdues = [];
+
+        let addedCount = 0;
+        const custNames = new Set();
+        (prevPeriod.bills || []).forEach(b => { if (b.customerName) custNames.add(b.customerName.trim()); });
+
+        custNames.forEach(cName => {
+          // คำนวณยอดค้างสุทธิของลูกค้าคนนี้ในงวดก่อน
+          const bills = (prevPeriod.bills || []).filter(b => b.customerName && b.customerName.trim() === cName && !b.isPaid && !(b.isWonPrize && b.isDeduct));
+          if (bills.length > 0) {
+            let nGross = 0, rGross = 0;
+            bills.forEach(b => {
+              nGross += Number(b.normalAmount) || 0;
+              rGross += Number(b.runAmount) || 0;
+            });
+
+            const disc = this.getCustomerDiscount(cName);
+            const netAmount = (nGross * (1 - (disc.normal / 100))) + (rGross * (1 - (disc.run / 100)));
+
+            // ตรวจสอบว่าในหน้างวดค้างปัจจุบันมีรายการนี้แล้วหรือยัง
+            const exists = this.currentPeriod.overdues.find(o => o.customerName && o.customerName.trim() === cName && o.fromPeriodName === prevPeriod.name);
+            if (!exists && netAmount > 0) {
+              const due = new Date();
+              due.setDate(due.getDate() + (this.settings.dueDays || 3));
+              this.currentPeriod.overdues.push({
+                id: 'od_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                fromPeriodName: prevPeriod.name,
+                customerName: cName,
+                amount: Math.ceil(netAmount),
+                rawGrossAmount: Math.ceil(nGross + rGross),
+                isPaid: false,
+                dueDate: due.toISOString().split('T')[0],
+                settledNote: ''
+              });
+              addedCount++;
+            }
+          }
+        });
+
+        if (addedCount > 0) {
+          this.showToast(`ดึงยอดค้างจากงวด ${prevPeriod.name} มาตั้งในงวดนี้เรียบร้อย (${addedCount} รายการ)`);
+          await this.saveToStorage();
+        } else {
+          alert(`ไม่มีบิลค้างชำระใหม่ในงวด ${prevPeriod.name} หรือมีรายการค้างในระบบแล้ว`);
+        }
+      },
+
+      // คำนวณสรุปโอนรางวัล: ยึดยอดจากแท็บ "ยอดค้าง" เป็นหลักเสมอ
       getCustomerPrizeCalculation(name) {
-        if (!this.currentPeriod || !name) return { totalBossPrize: 0, totalCustomerPrize: 0, prizeBonus: 0, deductCurrentCost: 0, overdueCost: 0, overduePeriodName: '', netPayoutToCustomer: 0, detailedItems: [] };
+        if (!this.currentPeriod || !name) return { totalBossPrize: 0, totalCustomerPrize: 0, prizeBonus: 0, deductCurrentCost: 0, overdueCost: 0, overduePeriodName: '', isOverdueCutDiscount: false, netPayoutToCustomer: 0, detailedItems: [] };
         
         const cleanName = (name || '').trim();
         let totalBoss = 0, totalCust = 0;
@@ -1105,37 +1185,46 @@
 
         const prizeBonus = Math.max(0, totalBoss - totalCust);
 
-        // ดึงยอดเรียกเก็บจริงจากงวดก่อนหน้า (ล็อกค่าไว้ถาวร ไม่เปลี่ยนแม้จะเข้าแอปใหม่)
+        // ดึงยอดค้างเก่า: ตรวจสอบจากแท็บ "ยอดค้าง" ของงวดปัจจุบันเป็นหลัก
         let overdueCost = 0;
         let overduePeriodName = '';
+        let isOverdueCutDiscount = false;
 
-        const curIdx = this.periods.findIndex(p => p.id === this.selectedPeriodId);
-        if (curIdx !== -1 && curIdx + 1 < this.periods.length) {
-          const prevPeriod = this.periods[curIdx + 1];
-          overduePeriodName = prevPeriod.name;
-
-          // ดึงบิลของงวดก่อนหน้า: บิลที่ยังไม่จ่าย หรือบิลที่จ่ายด้วยการหักรางวัลของงวดนี้
-          const prevBills = (prevPeriod.bills || []).filter(b => 
-            (b.customerName || '').trim() === cleanName && 
-            (!b.isPaid || b.settledByPrizePeriod === this.currentPeriod.name || (b.settledNote && b.settledNote.includes(this.currentPeriod.name)))
-          );
-
-          let prevGrossNormal = 0, prevGrossRun = 0;
-          prevBills.forEach(b => {
-            if (!(b.isWonPrize && b.isDeduct)) {
-              prevGrossNormal += Number(b.normalAmount) || 0;
-              prevGrossRun += Number(b.runAmount) || 0;
-            }
-          });
-          const prevDisc = this.getCustomerDiscount(cleanName);
-          overdueCost = (prevGrossNormal * (1 - (prevDisc.normal / 100))) + (prevGrossRun * (1 - (prevDisc.run / 100)));
-        }
-
-        if (overdueCost === 0 && this.currentPeriod.overdues) {
+        if (this.currentPeriod.overdues) {
           const overdueObj = this.currentPeriod.overdues.find(o => (o.customerName || '').trim() === cleanName);
           if (overdueObj) {
-            overdueCost = Number(overdueObj.amount) || 0;
             overduePeriodName = overdueObj.fromPeriodName;
+            // ถ้าเกินกำหนด 3 วัน และเปิดโหมดตัดสิทธิ์ส่วนลด -> ใช้ยอดเต็ม
+            if (this.isOverduePastDueDays(overdueObj) && this.settings.autoCutDiscount && overdueObj.rawGrossAmount) {
+              overdueCost = Number(overdueObj.rawGrossAmount);
+              isOverdueCutDiscount = true;
+            } else {
+              overdueCost = Number(overdueObj.amount) || 0;
+            }
+          }
+        }
+
+        // กรณีสำรอง: ถ้ายังไม่ได้กดยกยอด ให้ดึงตรงจากงวดก่อนหน้า
+        if (overdueCost === 0) {
+          const curIdx = this.periods.findIndex(p => p.id === this.selectedPeriodId);
+          if (curIdx !== -1 && curIdx + 1 < this.periods.length) {
+            const prevPeriod = this.periods[curIdx + 1];
+            overduePeriodName = prevPeriod.name;
+
+            const prevBills = (prevPeriod.bills || []).filter(b => 
+              (b.customerName || '').trim() === cleanName && 
+              (!b.isPaid || b.settledByPrizePeriod === this.currentPeriod.name || (b.settledNote && b.settledNote.includes(this.currentPeriod.name)))
+            );
+
+            let prevGrossNormal = 0, prevGrossRun = 0;
+            prevBills.forEach(b => {
+              if (!(b.isWonPrize && b.isDeduct)) {
+                prevGrossNormal += Number(b.normalAmount) || 0;
+                prevGrossRun += Number(b.runAmount) || 0;
+              }
+            });
+            const prevDisc = this.getCustomerDiscount(cleanName);
+            overdueCost = (prevGrossNormal * (1 - (prevDisc.normal / 100))) + (prevGrossRun * (1 - (prevDisc.run / 100)));
           }
         }
 
@@ -1147,13 +1236,14 @@
           prizeBonus,
           deductCurrentCost,
           overdueCost,
-          overduePeriodName: overduePeriodName ? overduePeriodName : 'งวดก่อนหน้า',
+          overduePeriodName: overduePeriodName || 'งวดก่อนหน้า',
+          isOverdueCutDiscount,
           netPayoutToCustomer,
           detailedItems
         };
       },
 
-      // ฟังก์ชันกดลิงก์ตัดชำระงวดเก่า: ไปเปลี่ยนสถานะในงวดเก่าเป็น "หักเคลียร์เงินรางวัลงวด [งวดนี้]"
+      // ฟังก์ชันกดลิงก์ตัดชำระงวดเก่า: ทำเครื่องหมายว่าหักจากรางวัลแล้วในทั้งสองงวด
       async settleAndLinkPreviousPeriod(name) {
         if (!name) return;
         const curIdx = this.periods.findIndex(p => p.id === this.selectedPeriodId);
@@ -1163,30 +1253,33 @@
 
         const cleanName = (name || '').trim();
         const prevPeriod = this.periods[curIdx + 1];
-        let count = 0;
-        
+
+        // 1. มาร์กในงวดก่อนหน้า (1.10.69) ว่าจ่ายแล้วด้วยการหักเคลียร์รางวัล
         (prevPeriod.bills || []).forEach(b => {
           if ((b.customerName || '').trim() === cleanName) {
             b.isPaid = true;
             b.settledByPrizePeriod = this.currentPeriod.name;
             b.settledNote = `หักเคลียร์เงินรางวัลงวด ${this.currentPeriod.name}`;
-            count++;
           }
         });
 
-        (this.currentPeriod.overdues || []).forEach(o => {
-          if ((o.customerName || '').trim() === cleanName) {
-            o.isPaid = true;
-          }
-        });
+        // 2. มาร์กในแท็บ "ยอดค้าง" ของงวดปัจจุบันว่าหักจากเงินรางวัลแล้ว (ไม่ลบทิ้ง)
+        if (this.currentPeriod.overdues) {
+          this.currentPeriod.overdues.forEach(o => {
+            if ((o.customerName || '').trim() === cleanName) {
+              o.isPaid = true;
+              o.settledNote = `หักจากเงินรางวัลแล้ว`;
+            }
+          });
+        }
 
-        this.showToast(`บันทึกเรียบร้อย: หน้าแดชบอร์ดงวด ${prevPeriod.name} แสดงสถานะ "หักเคลียร์เงินรางวัลงวด ${this.currentPeriod.name}" แล้ว`);
+        this.showToast(`บันทึกเรียบร้อย: ปรับสถานะเป็น "หักเคลียร์เงินรางวัลงวด ${this.currentPeriod.name}" แล้ว`);
         await this.saveToStorage();
       },
 
       // คำนวณสรุปแดชบอร์ดตามสถานะบิลขายจริง
       getCustomerSummary(name) {
-        if (!this.currentPeriod || !name) return { hasActivity: false, normalGrossUnpaid: 0, normalDiscountAmount: 0, normalNet: 0, runGrossUnpaid: 0, runNet: 0, overdueUnpaid: 0, totalPayable: 0, isFullyPaid: false, hasDeductWon: false, settledNote: '' };
+        if (!this.currentPeriod || !name) return { hasActivity: false, normalGrossUnpaid: 0, normalDiscountAmount: 0, normalNet: 0, runGrossUnpaid: 0, runNet: 0, overdueUnpaid: 0, isOverdueCutDiscount: false, totalPayable: 0, isFullyPaid: false, hasDeductWon: false, settledNote: '' };
         const cleanName = (name || '').trim();
         const bills = this.getCustomerBills(cleanName);
         let disc = this.getCustomerDiscount(cleanName);
@@ -1218,10 +1311,18 @@
 
         let odUnpaid = 0;
         let allOverduesPaid = true;
+        let isOverdueCutDiscount = false;
+
         overdues.forEach(o => {
           if (!o.isPaid) {
             allOverduesPaid = false;
-            odUnpaid += Number(o.amount) || 0;
+            // เช็กเกิน 3 วันหรือไม่
+            if (this.isOverduePastDueDays(o) && this.settings.autoCutDiscount && o.rawGrossAmount) {
+              odUnpaid += Number(o.rawGrossAmount);
+              isOverdueCutDiscount = true;
+            } else {
+              odUnpaid += Number(o.amount) || 0;
+            }
           }
         });
 
@@ -1236,6 +1337,7 @@
           runGrossUnpaid: rGrossUnpaid,
           runNet: rNet,
           overdueUnpaid: odUnpaid,
+          isOverdueCutDiscount,
           totalPayable,
           isFullyPaid,
           hasDeductWon,
@@ -1340,6 +1442,8 @@
         this.customerForm = { name: '', normalDiscount: 0, runDiscount: 0, rate2Digit: 60, rate3Direct: 500, rate3Tod: 90, rate3Bottom: 100, rateRunTop: 3, rateRunBottom: 4, bankAccount: '' };
         this.editingCustomerIndex = -1;
       },
+      
+      // เมื่อสร้างงวดใหม่: ยกยอดค้างจากงวดปัจจุบันไปงวดใหม่อัตโนมัติทันที
       async createNewPeriod() {
         if (!this.newPeriodName.trim()) return alert('ระบุชื่องวด');
         
@@ -1354,9 +1458,11 @@
                 id: 'od_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
                 fromPeriodName: this.currentPeriod.name,
                 customerName: cName,
-                amount: summary.totalPayable,
+                amount: Math.ceil(summary.totalPayable),
+                rawGrossAmount: Math.ceil(summary.normalGrossUnpaid + summary.runGrossUnpaid),
                 isPaid: false,
-                dueDate: due.toISOString().split('T')[0]
+                dueDate: due.toISOString().split('T')[0],
+                settledNote: ''
               });
             }
           });
@@ -1390,8 +1496,10 @@
           fromPeriodName: 'งวดก่อนหน้า',
           customerName: '',
           amount: 0,
+          rawGrossAmount: 0,
           isPaid: false,
-          dueDate: due.toISOString().split('T')[0]
+          dueDate: due.toISOString().split('T')[0],
+          settledNote: ''
         });
       },
       removeOverdueRow(idx) { this.currentPeriod.overdues.splice(idx, 1); },
@@ -1442,6 +1550,7 @@
         return this.currentPeriod.bills.filter(b => b && b.customerName && b.customerName.trim() === name.trim());
       },
 
+      // บันทึกรูปบิลแจ้งยอดจากหน้าแดชบอร์ด
       async saveDashboardBillImage() {
         const el = document.getElementById('dashboard-client-bill');
         if (!el) return;
@@ -1464,6 +1573,7 @@
         this.isSavingImg = false;
       },
 
+      // บันทึกรูปการ์ดสรุปรางวัล
       async saveClientReceiptImage() {
         const el = document.getElementById('client-share-card');
         if (!el) return;
