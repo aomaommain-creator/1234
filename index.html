@@ -146,7 +146,7 @@
 
         <div class="bg-gradient-to-br from-champagne-50 via-white to-champagne-100/50 dark:from-slate-800 dark:via-slate-800 dark:to-slate-800/80 p-5 rounded-3xl border border-champagne-300 dark:border-champagne-800/60 shadow-sm flex flex-col justify-between">
           <span class="text-xs font-bold text-champagne-600 dark:text-champagne-400 uppercase tracking-wider">กำไรสุทธิงวดนี้</span>
-          <div class="my-2 text-2xl lg:text-3xl font-black text-champagne-600 dark:text-champagne-400">฿{{ formatNum(overallStats.netProfit) }}</div>
+          <div class="my-2 text-2xl lg:text-3xl font-black text-champagne-600 dark:text-champagne-300">฿{{ formatNum(overallStats.netProfit) }}</div>
           <div class="text-[11px] text-slate-400 pt-2 border-t border-champagne-200/60 dark:border-slate-700 flex justify-between font-medium">
             <span>กำไรบิล: ฿{{ formatNum(overallStats.salesProfit) }}</span>
             <span v-if="overallStats.totalPrizeBonus > 0" class="font-bold text-champagne-600 dark:text-champagne-400">+โบนัส ฿{{ formatNum(overallStats.totalPrizeBonus) }}</span>
@@ -159,7 +159,7 @@
         <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
           <div>
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">ตารางสรุปยอดขายรายบุคคล (งวดประจำวันที่ {{ currentPeriod.name }})</h3>
-            <p class="text-[11px] text-slate-400">บิลที่ถูกหักรับเงินรางวัลจะขึ้นสถานะ "หักรับรางวัลแล้ว" ส่วนบิลที่รอชำระจะแสดงยอดปกติ</p>
+            <p class="text-[11px] text-slate-400">รายการที่หักเคลียร์ด้วยเงินรางวัลแล้วจะไม่ถูกนำมาคิดเป็นยอดค้างชำระ</p>
           </div>
           <span class="text-xs text-slate-400">ทั้งหมด {{ allDisplayCustomers.length }} คน</span>
         </div>
@@ -543,11 +543,11 @@
                 <input v-model.number="od.amount" type="number" class="w-24 text-right font-bold text-rose-500 bg-transparent outline-none">
               </div>
               
-              <!-- ควบคุมการติ๊กจ่าย: ถ้าหักจากรางวัลแล้วจะแสดงเป็นป้ายล็อกไว้ ไม่ต้องมี Checkbox ให้กดสับสน -->
+              <!-- ถ้าหักจากรางวัลแล้วแสดงเป็นป้ายล็อกไว้ ไม่ต้องมี Checkbox ติ๊กจ่าย -->
               <div v-if="od.settledNote" class="text-purple-600 font-bold text-xs flex items-center gap-1">
                 <i class="fa-solid fa-circle-check"></i> เคลียร์แล้ว
               </div>
-              <!-- ถ้าเป็นคนที่ค้างอยู่ทั่วไป มี Checkbox ให้ติ๊กจ่ายเงินสดตามปกติ -->
+              <!-- ถ้ายังไม่หักรางวัล มี Checkbox ให้ติ๊กจ่ายเงินสด -->
               <label v-else class="flex items-center gap-1.5 font-bold cursor-pointer">
                 <input type="checkbox" v-model="od.isPaid" class="w-4 h-4 rounded text-champagne-500">
                 <span :class="od.isPaid ? 'text-emerald-500' : 'text-slate-400'">{{ od.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย' }}</span>
@@ -644,7 +644,7 @@
       </div>
     </section>
 
-    <!-- 6. สรุปโอนรางวัล & บันทึกรูป -->
+    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (ดึงจากแท็บยอดค้างตลอดเวลา) -->
     <section v-if="currentTab === 'payout'" class="space-y-5">
       <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-3 no-print">
         <div class="flex items-center gap-2">
@@ -909,7 +909,7 @@
 
         (this.currentPeriod.overdues || []).forEach(o => {
           const amt = Number(o.amount) || 0;
-          if (o.isPaid) totalPaid += amt;
+          if (o.isPaid || o.settledNote) totalPaid += amt;
         });
 
         const totalToBoss = (normalGross * 0.70) + (runGross * 0.90);
@@ -1249,7 +1249,7 @@
         if (this.currentPeriod.overdues) {
           this.currentPeriod.overdues.forEach(o => {
             if ((o.customerName || '').trim() === cleanName) {
-              o.isPaid = false; // คงไว้เพื่อให้ยอดในหน้าสรุปรางวัลยังคงอยู่ถาวร
+              o.isPaid = true; // มาร์กเป็นจ่ายแล้วเพื่อตัดออกจากหน้าแดชบอร์ด
               o.settledNote = `หักจากเงินรางวัลแล้ว`;
             }
           });
@@ -1366,7 +1366,11 @@
               }));
             }
             if (!p.overdues) p.overdues = [];
-            else p.overdues = p.overdues.map(o => ({ ...o, isPaid: o.isPaid === true || o.isPaid === 'true' }));
+            else p.overdues = p.overdues.map(o => ({ 
+              ...o, 
+              isPaid: o.isPaid === true || o.isPaid === 'true',
+              settledNote: o.settledNote || '' 
+            }));
             if (!p.prizes) p.prizes = [];
             else p.prizes = p.prizes.map(z => ({ 
               ...z, 
