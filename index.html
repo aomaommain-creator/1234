@@ -924,7 +924,11 @@
         this.isDark = !this.isDark;
         document.documentElement.classList.toggle('dark', this.isDark);
       },
-      formatNum(val) { return Number(val || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); },
+      // โค้ดใหม่: ปัดเศษขึ้นเสมอ (Math.ceil) และไม่แสดงทศนิยม (minimumFractionDigits: 0)
+formatNum(val) { 
+  return Math.ceil(Number(val || 0)).toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); 
+},
+
       isRunType(type) { return type === 'RUN_TOP' || type === 'RUN_BOTTOM'; },
       
       getCustomerBankAccount(name) {
