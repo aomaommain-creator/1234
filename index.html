@@ -159,7 +159,7 @@
         <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
           <div>
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">ตารางสรุปยอดขายรายบุคคล (งวดประจำวันที่ {{ currentPeriod.name }})</h3>
-            <p class="text-[11px] text-slate-400">บิลที่ถูกหักรับเงินรางวัลจะขึ้นสถานะ "หักรับรางวัลแล้ว" ส่วนบิลที่รอชำระจะแสดงยอดปกติ</p>
+            <p class="text-[11px] text-slate-400">แสดงยอดบิลซื้อทั้งหมดและสถานะการชำระเงินที่ชัดเจน</p>
           </div>
           <span class="text-xs text-slate-400">ทั้งหมด {{ allDisplayCustomers.length }} คน</span>
         </div>
@@ -193,9 +193,9 @@
                     {{ getCustomerSummary(cName).overdueUnpaid > 0 ? '฿' + formatNum(getCustomerSummary(cName).overdueUnpaid) : '-' }}
                   </td>
                   <td class="py-3.5 px-4 text-right">
-                    <span v-if="getCustomerSummary(cName).isFullyPaid" class="text-[11px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-bold px-2 py-0.5 rounded-lg">
-                      <span v-if="getCustomerSummary(cName).hasDeductWon">✓ หักรับรางวัลแล้ว</span>
-                      <span v-else>✓ จ่ายครบแล้ว</span>
+                    <span v-if="getCustomerSummary(cName).isFullyPaid" class="text-[11px] font-bold px-2.5 py-1 rounded-lg"
+                          :class="getCustomerSummary(cName).settledNote ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-emerald-50 text-emerald-600'">
+                      {{ getCustomerSummary(cName).settledNote || (getCustomerSummary(cName).hasDeductWon ? '✓ หักรับรางวัลแล้ว' : '✓ จ่ายครบแล้ว') }}
                     </span>
                     <span v-else class="font-extrabold text-slate-900 dark:text-white text-sm">
                       ฿{{ formatNum(getCustomerSummary(cName).totalPayable) }}
@@ -206,7 +206,7 @@
                             :class="getCustomerSummary(cName).isFullyPaid ? 'bg-emerald-500 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-champagne-100 hover:text-champagne-800 border border-slate-200 dark:border-slate-700'"
                             class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 mx-auto">
                       <i class="fa-solid" :class="getCustomerSummary(cName).isFullyPaid ? 'fa-circle-check' : 'fa-circle-dollar-to-slot'"></i>
-                      <span>{{ getCustomerSummary(cName).isFullyPaid ? (getCustomerSummary(cName).hasDeductWon ? 'หักรับ' : 'จ่ายแล้ว') : 'ติ๊กชำระ' }}</span>
+                      <span>{{ getCustomerSummary(cName).isFullyPaid ? 'จ่ายแล้ว' : 'ติ๊กชำระ' }}</span>
                     </button>
                   </td>
                   <td class="py-3.5 px-4 text-center">
@@ -278,7 +278,6 @@
               </div>
             </div>
 
-            <!-- สรุปการคิดเงิน -->
             <div class="space-y-2.5 bg-slate-50/70 p-4 rounded-2xl border border-slate-100 text-xs">
               <div class="flex justify-between text-slate-600"><span>ยอดรอชำระ (ก่อนลด):</span><span class="font-bold">฿{{ formatNum(getCustomerSummary(selectedCustomerBill).normalGrossUnpaid) }}</span></div>
               <div class="flex justify-between text-emerald-600"><span>ส่วนลดปกติ:</span><span class="font-bold">-฿{{ formatNum(getCustomerSummary(selectedCustomerBill).normalDiscountAmount) }}</span></div>
@@ -388,7 +387,7 @@
                 </td>
 
                 <td class="py-2 px-3 text-right">
-                  <input v-if="b.isWonPrize" type="number" :value="getPrizeOfBill(b.id).amount" @input="updateBillPrizeField(b.id, 'amount', Number($event.target.value))" placeholder="0" class="w-20 p-1 rounded-lg border border-champagne-300 dark:border-slate-700 bg-champagne-50/50 dark:bg-slate-900 text-right font-bold text-champagne-700 dark:text-champagne-300 outline-none">
+                  <input v-if="b.isWonPrize" type="number" :value="getPrizeOfBill(b.id).amount" @input="updateBillPrizeField(b.id, 'amount', Number($event.target.value))" placeholder="0" class="w-20 p-1.5 rounded-lg border border-champagne-300 dark:border-slate-700 bg-champagne-50/50 dark:bg-slate-900 text-right font-bold text-champagne-700 dark:text-champagne-300 outline-none">
                   <span v-else class="text-slate-300">-</span>
                 </td>
 
@@ -617,7 +616,7 @@
       </div>
     </section>
 
-    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (ยอดคำนวณนิ่งสนิท ไม่หายเมื่อกดลิงก์) -->
+    <!-- 6. สรุปโอนรางวัล & บันทึกรูป (ระบบล็อกยอดค้างเก่าไว้ถาวร ไม่หายเมื่อออกเข้าใหม่) -->
     <section v-if="currentTab === 'payout'" class="space-y-5">
       <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-champagne-200/80 dark:border-slate-700 shadow-sm flex flex-wrap items-center justify-between gap-3 no-print">
         <div class="flex items-center gap-2">
@@ -628,7 +627,7 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <!-- ปุ่มลิงก์ตัดชำระงวดเก่า (กดแล้วแจ้งเตือนว่าตัดสำเร็จ โดยตัวเลขในหน้านี้ไม่เปลี่ยน) -->
+          <!-- ปุ่มลิงก์ตัดชำระงวดเก่า (เปลี่ยนสถานะงวดก่อนหน้าเป็น "หักเคลียร์เงินรางวัลงวด 16.10.69") -->
           <button @click="settleAndLinkPreviousPeriod(selectedPrizeCustomer)" class="px-3.5 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-100 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
             <i class="fa-solid fa-link"></i> ลิงก์ตัดชำระงวดเก่า
           </button>
@@ -685,7 +684,7 @@
         </div>
       </div>
 
-      <!-- การ์ดรูปภาพส่งลูกค้า -->
+      <!-- การ์ดรูปภาพส่งลูกค้า (ล็อกยอดหักค้างเก่าไว้ถาวร) -->
       <div v-if="selectedPrizeCustomer" id="client-share-card" class="bg-white border border-[#EAE6DF] p-7 md:p-8 rounded-3xl max-w-lg mx-auto shadow-lg text-slate-800 relative overflow-hidden">
         <div class="text-center pb-4 border-b border-champagne-100 mb-4">
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-champagne-500 to-champagne-400 text-white flex items-center justify-center text-xl mx-auto mb-2 shadow-sm">
@@ -728,7 +727,7 @@
             <span>*บิลที่ถูกไม่หักค่าหวยงวดปัจจุบัน (รับเงินรางวัลเต็ม)</span>
           </div>
 
-          <!-- หักยอดค้างเก่างวดก่อนหน้า (ยกเฉพาะยอดที่ต้องชำระจริงหลังหักลด) -->
+          <!-- หักยอดค้างเก่างวดก่อนหน้า (ล็อกตัวเลขไว้ถาวร) -->
           <div v-if="getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost > 0" class="flex justify-between items-center p-2 rounded-xl bg-amber-50/70 border border-amber-200/50 text-amber-900">
             <span>หัก ยอดค้างเก่างวด{{ getCustomerPrizeCalculation(selectedPrizeCustomer).overduePeriodName }} (หักส่วนลดแล้ว):</span>
             <span class="font-bold text-rose-600">-฿{{ formatNum(getCustomerPrizeCalculation(selectedPrizeCustomer).overdueCost) }}</span>
@@ -924,11 +923,10 @@
         this.isDark = !this.isDark;
         document.documentElement.classList.toggle('dark', this.isDark);
       },
-      // โค้ดใหม่: ปัดเศษขึ้นเสมอ (Math.ceil) และไม่แสดงทศนิยม (minimumFractionDigits: 0)
-formatNum(val) { 
-  return Math.ceil(Number(val || 0)).toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); 
-},
-
+      // แสดงเป็นจำนวนเต็ม ปัดเศษขึ้นเสมอ ไม่มีเศษสตางค์
+      formatNum(val) { 
+        return Math.ceil(Number(val || 0)).toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); 
+      },
       isRunType(type) { return type === 'RUN_TOP' || type === 'RUN_BOTTOM'; },
       
       getCustomerBankAccount(name) {
@@ -1063,17 +1061,18 @@ formatNum(val) {
         this.currentPeriod.prizes.push(pz);
       },
 
-      // คำนวณสรุปโอนรางวัล: หักเฉพาะยอดที่ต้องชำระจริงของงวดก่อนหน้า และล็อกค่าไว้ไม่ให้หายเมื่อกดลิงก์
+      // คำนวณสรุปโอนรางวัล: ล็อกยอดค้างเก่าไว้ถาวร ไม่หายแม้จะรีเฟรชหรือเข้าแอปใหม่
       getCustomerPrizeCalculation(name) {
         if (!this.currentPeriod || !name) return { totalBossPrize: 0, totalCustomerPrize: 0, prizeBonus: 0, deductCurrentCost: 0, overdueCost: 0, overduePeriodName: '', netPayoutToCustomer: 0, detailedItems: [] };
         
+        const cleanName = (name || '').trim();
         let totalBoss = 0, totalCust = 0;
         let deductCurrentCost = 0;
         const detailedItems = [];
-        const disc = this.getCustomerDiscount(name);
+        const disc = this.getCustomerDiscount(cleanName);
 
         (this.currentPeriod.prizes || []).forEach(p => {
-          if (p.customerName && p.customerName.trim() === name.trim()) {
+          if ((p.customerName || '').trim() === cleanName) {
             const amt = Number(p.amount) || 0;
             const bRate = Number(p.bossRate) || 0;
             const cRate = Number(p.customerRate) || 0;
@@ -1106,7 +1105,7 @@ formatNum(val) {
 
         const prizeBonus = Math.max(0, totalBoss - totalCust);
 
-        // ดึงเฉพาะ "ยอดที่ต้องชำระจริง (หลังหักส่วนลด)" ของงวดก่อนหน้ามาหัก และล็อกค่าไว้ไม่ให้หาย
+        // ดึงยอดเรียกเก็บจริงจากงวดก่อนหน้า (ล็อกค่าไว้ถาวร ไม่เปลี่ยนแม้จะเข้าแอปใหม่)
         let overdueCost = 0;
         let overduePeriodName = '';
 
@@ -1115,22 +1114,25 @@ formatNum(val) {
           const prevPeriod = this.periods[curIdx + 1];
           overduePeriodName = prevPeriod.name;
 
-          // ดึงเฉพาะบิลที่ค้างชำระจริง หรือบิลที่เพิ่งถูกลิงก์เคลียร์ด้วยงวดนี้
-          const prevBills = (prevPeriod.bills || []).filter(b => b.customerName && b.customerName.trim() === name.trim() && (!b.isPaid || b.settledByPrizePeriod === this.currentPeriod.name));
+          // ดึงบิลของงวดก่อนหน้า: บิลที่ยังไม่จ่าย หรือบิลที่จ่ายด้วยการหักรางวัลของงวดนี้
+          const prevBills = (prevPeriod.bills || []).filter(b => 
+            (b.customerName || '').trim() === cleanName && 
+            (!b.isPaid || b.settledByPrizePeriod === this.currentPeriod.name || (b.settledNote && b.settledNote.includes(this.currentPeriod.name)))
+          );
+
           let prevGrossNormal = 0, prevGrossRun = 0;
           prevBills.forEach(b => {
-            // ไม่นำบิลที่ถูกหักรับรางวัลของงวดนั้นไปแล้วมาคิดซ้ำ
             if (!(b.isWonPrize && b.isDeduct)) {
               prevGrossNormal += Number(b.normalAmount) || 0;
               prevGrossRun += Number(b.runAmount) || 0;
             }
           });
-          const prevDisc = this.getCustomerDiscount(name);
+          const prevDisc = this.getCustomerDiscount(cleanName);
           overdueCost = (prevGrossNormal * (1 - (prevDisc.normal / 100))) + (prevGrossRun * (1 - (prevDisc.run / 100)));
         }
 
-        if (overdueCost === 0) {
-          const overdueObj = (this.currentPeriod.overdues || []).find(o => o && o.customerName && o.customerName.trim() === name.trim());
+        if (overdueCost === 0 && this.currentPeriod.overdues) {
+          const overdueObj = this.currentPeriod.overdues.find(o => (o.customerName || '').trim() === cleanName);
           if (overdueObj) {
             overdueCost = Number(overdueObj.amount) || 0;
             overduePeriodName = overdueObj.fromPeriodName;
@@ -1151,7 +1153,7 @@ formatNum(val) {
         };
       },
 
-      // ฟังก์ชันกดลิงก์ตัดชำระงวดเก่า: ไปปรับสถานะงวดเก่าเงียบๆ แต่หน้าสรุปโอนรางวัลนี้ตัวเลขจะไม่เปลี่ยนเด็ดขาด
+      // ฟังก์ชันกดลิงก์ตัดชำระงวดเก่า: ไปเปลี่ยนสถานะในงวดเก่าเป็น "หักเคลียร์เงินรางวัลงวด [งวดนี้]"
       async settleAndLinkPreviousPeriod(name) {
         if (!name) return;
         const curIdx = this.periods.findIndex(p => p.id === this.selectedPeriodId);
@@ -1159,41 +1161,46 @@ formatNum(val) {
           return alert('ไม่พบข้อมูลของงวดก่อนหน้า');
         }
 
+        const cleanName = (name || '').trim();
         const prevPeriod = this.periods[curIdx + 1];
         let count = 0;
+        
         (prevPeriod.bills || []).forEach(b => {
-          if (b.customerName && b.customerName.trim() === name.trim() && !b.isPaid) {
+          if ((b.customerName || '').trim() === cleanName) {
             b.isPaid = true;
-            b.settledByPrizePeriod = this.currentPeriod.name; // จำไว้ว่างวดนี้เป็นคนหักจ่ายให้
+            b.settledByPrizePeriod = this.currentPeriod.name;
+            b.settledNote = `หักเคลียร์เงินรางวัลงวด ${this.currentPeriod.name}`;
             count++;
           }
         });
 
-        // เคลียร์ยอด Overdue ของงวดปัจจุบันถ้ามี
         (this.currentPeriod.overdues || []).forEach(o => {
-          if (o.customerName && o.customerName.trim() === name.trim()) {
+          if ((o.customerName || '').trim() === cleanName) {
             o.isPaid = true;
           }
         });
 
-        this.showToast(`บันทึกเรียบร้อย: นำเงินรางวัลงวด ${this.currentPeriod.name} ไปหักตัดชำระบิลงวด ${prevPeriod.name} แล้ว (หน้านี้คงตัวเลขเดิมไว้)`);
+        this.showToast(`บันทึกเรียบร้อย: หน้าแดชบอร์ดงวด ${prevPeriod.name} แสดงสถานะ "หักเคลียร์เงินรางวัลงวด ${this.currentPeriod.name}" แล้ว`);
         await this.saveToStorage();
       },
 
       // คำนวณสรุปแดชบอร์ดตามสถานะบิลขายจริง
       getCustomerSummary(name) {
-        if (!this.currentPeriod || !name) return { hasActivity: false, normalGrossUnpaid: 0, normalDiscountAmount: 0, normalNet: 0, runGrossUnpaid: 0, runNet: 0, overdueUnpaid: 0, totalPayable: 0, isFullyPaid: false, hasDeductWon: false };
-        const bills = this.getCustomerBills(name);
-        let disc = this.getCustomerDiscount(name);
-        const overdues = (this.currentPeriod.overdues || []).filter(o => o && o.customerName && o.customerName.trim() === name.trim());
-        const prizes = (this.currentPeriod.prizes || []).filter(z => z && z.customerName && z.customerName.trim() === name.trim());
+        if (!this.currentPeriod || !name) return { hasActivity: false, normalGrossUnpaid: 0, normalDiscountAmount: 0, normalNet: 0, runGrossUnpaid: 0, runNet: 0, overdueUnpaid: 0, totalPayable: 0, isFullyPaid: false, hasDeductWon: false, settledNote: '' };
+        const cleanName = (name || '').trim();
+        const bills = this.getCustomerBills(cleanName);
+        let disc = this.getCustomerDiscount(cleanName);
+        const overdues = (this.currentPeriod.overdues || []).filter(o => o && (o.customerName || '').trim() === cleanName);
+        const prizes = (this.currentPeriod.prizes || []).filter(z => z && (z.customerName || '').trim() === cleanName);
         const hasActivity = bills.length > 0 || overdues.length > 0 || prizes.length > 0;
 
         let nGrossUnpaid = 0, rGrossUnpaid = 0;
         let allBillsSettled = bills.length > 0;
         let hasDeductWon = false;
+        let settledNote = '';
 
         bills.forEach(b => {
+          if (b.settledNote) settledNote = b.settledNote;
           const isDeductWon = b.isWonPrize && b.isDeduct;
           if (isDeductWon) {
             hasDeductWon = true;
@@ -1231,21 +1238,24 @@ formatNum(val) {
           overdueUnpaid: odUnpaid,
           totalPayable,
           isFullyPaid,
-          hasDeductWon
+          hasDeductWon,
+          settledNote
         };
       },
 
       async toggleCustomerPayment(name, status) {
         if (!this.currentPeriod || !name) return;
+        const cleanName = (name || '').trim();
         
         (this.currentPeriod.bills || []).forEach(b => {
-          if (b && b.customerName && b.customerName.trim() === name.trim()) {
+          if (b && (b.customerName || '').trim() === cleanName) {
             b.isPaid = status;
+            if (!status) b.settledNote = '';
           }
         });
 
         (this.currentPeriod.overdues || []).forEach(o => {
-          if (o && o.customerName && o.customerName.trim() === name.trim()) {
+          if (o && (o.customerName || '').trim() === cleanName) {
             o.isPaid = status;
           }
         });
@@ -1432,7 +1442,6 @@ formatNum(val) {
         return this.currentPeriod.bills.filter(b => b && b.customerName && b.customerName.trim() === name.trim());
       },
 
-      // บันทึกรูปบิลแจ้งยอดจากหน้าแดชบอร์ดแบบเต็มความสูง (เห็นครบทุกบิล)
       async saveDashboardBillImage() {
         const el = document.getElementById('dashboard-client-bill');
         if (!el) return;
@@ -1455,7 +1464,6 @@ formatNum(val) {
         this.isSavingImg = false;
       },
 
-      // บันทึกรูปการ์ดสรุปรางวัลจากหน้าสรุปโอนรางวัล
       async saveClientReceiptImage() {
         const el = document.getElementById('client-share-card');
         if (!el) return;
