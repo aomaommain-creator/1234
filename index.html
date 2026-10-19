@@ -215,13 +215,15 @@
           </div>
         </div>
 
-        <!-- กล่องกำไรสุทธิ: คลิกเพื่อเปิดหน้าต่างวิเคราะห์จัดอันดับกำไร + รวมหลายงวด -->
-        <div @click="openProfitModal" 
-             class="glass-panel p-5 rounded-3xl flex flex-col justify-between relative overflow-hidden border-2 border-indigo-400/40 dark:border-sky-400/40 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg group">
+        <!-- กล่องกำไรสุทธิ: คลิกเพื่อเปิด/ปิดกราฟแท่งวิเคราะห์กำไรด้านล่าง -->
+        <div @click="toggleProfitChart" 
+             class="glass-panel p-5 rounded-3xl flex flex-col justify-between relative overflow-hidden border-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg group"
+             :class="showProfitChart ? 'border-pink-500 ring-4 ring-pink-500/20' : 'border-indigo-400/40 dark:border-sky-400/40'">
           <div class="flex justify-between items-center">
             <span class="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500 uppercase tracking-wider">กำไรสุทธิงวดนี้</span>
-            <span class="text-[10px] neu-flat text-indigo-600 dark:text-sky-400 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 group-hover:bg-indigo-500 group-hover:text-white transition">
-              <i class="fa-solid fa-chart-line"></i> ดูจัดอันดับ
+            <span class="text-[10px] neu-flat text-indigo-600 dark:text-sky-400 px-2.5 py-0.5 rounded-lg font-bold flex items-center gap-1 group-hover:bg-gradient-to-r group-hover:from-indigo-500 group-hover:to-pink-500 group-hover:text-white transition">
+              <i class="fa-solid" :class="showProfitChart ? 'fa-chevron-up' : 'fa-chart-simple'"></i>
+              <span>{{ showProfitChart ? 'ซ่อนกราฟ' : 'ดูกราฟกำไร' }}</span>
             </span>
           </div>
           <div class="my-2.5 text-2xl lg:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500">฿{{ formatNum(overallStats.netProfit) }}</div>
@@ -230,6 +232,119 @@
             <span v-if="overallStats.totalPrizeBonus > 0" class="font-bold text-pink-500">+โบนัส ฿{{ formatNum(overallStats.totalPrizeBonus) }}</span>
           </div>
         </div>
+      </div>
+
+      <!-- ========================================================
+           📊 ส่วนแสดงผล: กราฟแท่งจัดอันดับกำไรลูกค้า (Inline Cyber Glass Chart)
+           ======================================================== -->
+      <div v-if="showProfitChart" class="glass-panel p-5 md:p-6 rounded-3xl space-y-5 border-2 border-indigo-400/30 dark:border-sky-400/30 shadow-xl transition-all">
+        
+        <!-- ส่วนหัวกราฟ & ตัวเลือกรวมงวด -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200/50 dark:border-white/10">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 to-pink-500 text-white flex items-center justify-center text-lg shadow-md shadow-pink-500/20">
+              <i class="fa-solid fa-chart-column"></i>
+            </div>
+            <div>
+              <h3 class="text-sm md:text-base font-black text-slate-900 dark:text-white uppercase leading-tight">
+                กราฟจัดอันดับลูกค้าสร้างกำไรสูงสุด (Profit Leaderboard)
+              </h3>
+              <p class="text-[11px] text-indigo-600 dark:text-sky-400 font-semibold">
+                คำนวณจากกำไรบิลจริง + โบนัสรางวัลส่วนต่างแบบแยกรายคน
+              </p>
+            </div>
+          </div>
+
+          <!-- ตัวสลับโหมดงวด -->
+          <div class="flex items-center gap-1.5 neu-inset p-1 rounded-2xl">
+            <button @click="profitScope = 'current'" 
+                    :class="profitScope === 'current' ? 'neu-flat text-indigo-600 dark:text-sky-400 font-bold' : 'text-slate-400'" 
+                    class="px-3 py-1 rounded-xl transition text-xs">งวดปัจจุบัน</button>
+            <button @click="profitScope = 'all'" 
+                    :class="profitScope === 'all' ? 'neu-flat text-indigo-600 dark:text-sky-400 font-bold' : 'text-slate-400'" 
+                    class="px-3 py-1 rounded-xl transition text-xs">รวมทุกงวด</button>
+            <button @click="profitScope = 'custom'" 
+                    :class="profitScope === 'custom' ? 'neu-flat text-indigo-600 dark:text-sky-400 font-bold' : 'text-slate-400'" 
+                    class="px-3 py-1 rounded-xl transition text-xs">เลือกงวดเอง</button>
+          </div>
+        </div>
+
+        <!-- ตัวเลือกติ๊กงวดอิสระ (กรณีเลือกโหมด custom) -->
+        <div v-if="profitScope === 'custom'" class="neu-inset p-3.5 rounded-2xl flex flex-wrap items-center gap-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">เลือกงวดที่ต้องการรวม:</span>
+          <label v-for="p in periods" :key="p.id" class="inline-flex items-center gap-1.5 neu-flat px-3 py-1 rounded-xl text-xs font-semibold cursor-pointer select-none">
+            <input type="checkbox" :value="p.id" v-model="selectedProfitPeriodIds" class="w-3.5 h-3.5 accent-indigo-600 rounded">
+            <span>{{ p.name }}</span>
+          </label>
+        </div>
+
+        <!-- กล่องสรุปผลรวมของการวิเคราะห์ -->
+        <div class="grid grid-cols-3 gap-3">
+          <div class="neu-inset p-3 rounded-2xl text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">จำนวนงวดที่คิด</span>
+            <span class="text-sm md:text-base font-black text-indigo-600 dark:text-sky-400">{{ analyzedPeriodsCount }} งวด</span>
+          </div>
+          <div class="neu-inset p-3 rounded-2xl text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">ยอดซื้อรวมของลูกค้า</span>
+            <span class="text-sm md:text-base font-black text-slate-800 dark:text-white">฿{{ formatNum(analyzedTotalGross) }}</span>
+          </div>
+          <div class="neu-inset p-3 rounded-2xl text-center border border-indigo-400/30">
+            <span class="text-[10px] font-bold text-pink-500 uppercase block">กำไรสุทธิรวม</span>
+            <span class="text-sm md:text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500">฿{{ formatNum(analyzedTotalProfit) }}</span>
+          </div>
+        </div>
+
+        <!-- รายการกราฟแท่งแนวนอน (Horizontal Cyber Bar Chart) -->
+        <div class="space-y-3.5 pt-2">
+          <div v-for="(item, rank) in customerProfitRankings" :key="item.name" 
+               class="neu-flat p-4 rounded-2xl space-y-2 hover:scale-[1.01] transition-all">
+            
+            <!-- แถวด้านบนของแท่ง: อันดับ, ชื่อ, ยอดซื้อ, ตัวเลขกำไร -->
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-7 h-7 rounded-xl font-black text-xs flex items-center justify-center shrink-0 shadow-sm"
+                      :class="rank === 0 ? 'bg-amber-400 text-slate-900 font-bold' : (rank === 1 ? 'bg-slate-300 text-slate-800' : (rank === 2 ? 'bg-amber-600 text-white' : 'neu-inset text-slate-400'))">
+                  <span v-if="rank === 0">🥇</span>
+                  <span v-else-if="rank === 1">🥈</span>
+                  <span v-else-if="rank === 2">🥉</span>
+                  <span v-else>{{ rank + 1 }}</span>
+                </span>
+                <span class="font-extrabold text-sm text-slate-900 dark:text-white truncate">คุณ {{ item.name }}</span>
+                <span class="text-[11px] text-slate-400 hidden sm:inline">(ซื้อรวม: ฿{{ formatNum(item.grossAmount) }})</span>
+                <span v-if="item.bonusProfit > 0" class="text-[10px] px-2 py-0.5 rounded-md bg-pink-500/10 text-pink-500 font-bold border border-pink-500/20">
+                  +โบนัส ฿{{ formatNum(item.bonusProfit) }}
+                </span>
+              </div>
+
+              <div class="text-right">
+                <span class="text-xs text-slate-400 mr-1.5 font-medium">กำไรสุทธิ:</span>
+                <span class="text-base font-black" :class="item.totalProfit >= 0 ? 'text-indigo-600 dark:text-sky-400' : 'text-rose-500'">
+                  ฿{{ formatNum(item.totalProfit) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- ตัวแท่งกราฟ (Bar Track & Fill) -->
+            <div class="w-full h-3 rounded-full neu-inset overflow-hidden p-0.5 relative">
+              <div class="h-full rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-sm shadow-indigo-500/50 transition-all duration-700 relative"
+                   :style="{ width: getProfitBarPercentage(item.totalProfit) + '%' }">
+                <!-- แสง Glow ที่ปลายแท่งกราฟ -->
+                <div class="absolute right-0 top-0 bottom-0 w-2 bg-white rounded-full opacity-70 blur-[1px]"></div>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center text-[10px] text-slate-400 pt-0.5">
+              <span>สัดส่วนกำไร: {{ ((item.totalProfit / Math.max(analyzedTotalProfit, 1)) * 100).toFixed(1) }}%</span>
+              <span>กำไรบิลปกติ: ฿{{ formatNum(item.salesProfit) }}</span>
+            </div>
+          </div>
+
+          <div v-if="customerProfitRankings.length === 0" class="text-center py-10 text-xs text-slate-400 neu-inset rounded-2xl">
+            <i class="fa-solid fa-chart-column text-2xl block mb-2 opacity-40"></i>
+            ไม่พบข้อมูลการซื้อหรือกำไรในงวดที่เลือก
+          </div>
+        </div>
+
       </div>
 
       <!-- แถบตัวกรอง (Filter Toolbar) หน้าแดชบอร์ด -->
@@ -964,127 +1079,6 @@
 
   </main>
 
-  <!-- ========================================================
-       🏆 MODAL: วิเคราะห์จัดอันดับกำไร + สรุปรวมหลายงวด (Profit Analytics Modal)
-       ======================================================== -->
-  <div v-if="showProfitModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all">
-    <div class="glass-panel w-full max-w-2xl rounded-3xl shadow-2xl p-6 space-y-5 border border-white/30 dark:border-white/10 max-h-[90vh] flex flex-col">
-      
-      <!-- หัว Modal & ปุ่มปิด -->
-      <div class="flex justify-between items-center pb-3 border-b border-slate-200/50 dark:border-white/10">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-amber-400 to-pink-500 text-white flex items-center justify-center text-sm shadow-md">
-            <i class="fa-solid fa-trophy"></i>
-          </div>
-          <div>
-            <h3 class="text-base font-black text-slate-900 dark:text-white uppercase leading-tight">จัดอันดับลูกค้าสร้างกำไรสูงสุด</h3>
-            <p class="text-[11px] text-indigo-600 dark:text-sky-400 font-semibold">วิเคราะห์กำไรรายบุคคล พร้อมตัวเลือกรวมหลายงวด</p>
-          </div>
-        </div>
-        <button @click="showProfitModal = false" class="neu-flat w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-500 transition">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <!-- แถบเลือกโหมดรวมงวด (Period Selector) -->
-      <div class="space-y-2">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-calendar-check text-indigo-500"></i> เลือกงวดที่ต้องการวิเคราะห์:
-          </span>
-          <div class="flex items-center gap-1.5 text-xs">
-            <button @click="profitScope = 'current'" 
-                    :class="profitScope === 'current' ? 'bg-indigo-600 text-white font-bold shadow-md' : 'neu-flat text-slate-500'" 
-                    class="px-2.5 py-1 rounded-xl transition text-[11px]">งวดปัจจุบัน</button>
-            <button @click="profitScope = 'all'" 
-                    :class="profitScope === 'all' ? 'bg-indigo-600 text-white font-bold shadow-md' : 'neu-flat text-slate-500'" 
-                    class="px-2.5 py-1 rounded-xl transition text-[11px]">รวมทุกงวด</button>
-            <button @click="profitScope = 'custom'" 
-                    :class="profitScope === 'custom' ? 'bg-indigo-600 text-white font-bold shadow-md' : 'neu-flat text-slate-500'" 
-                    class="px-2.5 py-1 rounded-xl transition text-[11px]">เลือกเอง</button>
-          </div>
-        </div>
-
-        <!-- กล่องติ๊กเลือกหลายงวด (แสดงเมื่อเลือกโหมด custom) -->
-        <div v-if="profitScope === 'custom'" class="neu-inset p-3 rounded-2xl flex flex-wrap gap-2 max-h-24 overflow-y-auto">
-          <label v-for="p in periods" :key="p.id" class="inline-flex items-center gap-1.5 neu-flat px-2.5 py-1 rounded-xl text-xs font-semibold cursor-pointer select-none">
-            <input type="checkbox" :value="p.id" v-model="selectedProfitPeriodIds" class="w-3.5 h-3.5 accent-indigo-600 rounded">
-            <span>{{ p.name }}</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- กล่องสรุปผลรวมของการวิเคราะห์ -->
-      <div class="grid grid-cols-3 gap-3">
-        <div class="neu-inset p-3 rounded-2xl text-center">
-          <span class="text-[10px] font-bold text-slate-400 uppercase block">งวดที่นำมาคิด</span>
-          <span class="text-sm font-black text-indigo-600 dark:text-sky-400">{{ analyzedPeriodsCount }} งวด</span>
-        </div>
-        <div class="neu-inset p-3 rounded-2xl text-center">
-          <span class="text-[10px] font-bold text-slate-400 uppercase block">ยอดขายรวม</span>
-          <span class="text-sm font-black text-slate-800 dark:text-white">฿{{ formatNum(analyzedTotalGross) }}</span>
-        </div>
-        <div class="neu-inset p-3 rounded-2xl text-center border border-indigo-400/30">
-          <span class="text-[10px] font-bold text-pink-500 uppercase block">กำไรสุทธิรวม</span>
-          <span class="text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500">฿{{ formatNum(analyzedTotalProfit) }}</span>
-        </div>
-      </div>
-
-      <!-- ตารางจัดอันดับกำไรรายบุคคล (Scrollable) -->
-      <div class="overflow-y-auto max-h-80 neu-inset rounded-2xl p-2 hide-scrollbar">
-        <div class="space-y-2">
-          <div v-for="(item, rank) in customerProfitRankings" :key="item.name" 
-               class="neu-flat p-3.5 rounded-2xl flex items-center justify-between gap-3 hover:scale-[1.01] transition">
-            
-            <!-- อันดับ & ชื่อลูกค้า -->
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center shrink-0 shadow-sm"
-                   :class="rank === 0 ? 'bg-amber-400 text-slate-900 shadow-amber-400/30' : (rank === 1 ? 'bg-slate-300 text-slate-800' : (rank === 2 ? 'bg-amber-600 text-white' : 'neu-inset text-slate-400'))">
-                <span v-if="rank === 0">🥇</span>
-                <span v-else-if="rank === 1">🥈</span>
-                <span v-else-if="rank === 2">🥉</span>
-                <span v-else>{{ rank + 1 }}</span>
-              </div>
-              <div class="min-w-0">
-                <h4 class="font-bold text-xs text-slate-900 dark:text-white truncate">คุณ {{ item.name }}</h4>
-                <div class="text-[10px] text-slate-400 flex items-center gap-2 mt-0.5">
-                  <span>ซื้อรวม: ฿{{ formatNum(item.grossAmount) }}</span>
-                  <span v-if="item.bonusProfit > 0" class="text-pink-500 font-bold">+โบนัส ฿{{ formatNum(item.bonusProfit) }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- ตัวเลขกำไร & แถบสัดส่วน -->
-            <div class="text-right shrink-0">
-              <span class="text-[10px] text-slate-400 block font-medium">กำไรที่เราได้</span>
-              <span class="text-sm font-black" :class="item.totalProfit >= 0 ? 'text-indigo-600 dark:text-sky-400' : 'text-rose-500'">
-                ฿{{ formatNum(item.totalProfit) }}
-              </span>
-              <div class="w-24 h-1.5 rounded-full bg-slate-200 dark:bg-white/10 mt-1 overflow-hidden ml-auto">
-                <div class="h-full bg-gradient-to-r from-indigo-500 to-pink-500 rounded-full" 
-                     :style="{ width: getProfitBarPercentage(item.totalProfit) + '%' }"></div>
-              </div>
-            </div>
-
-          </div>
-
-          <div v-if="customerProfitRankings.length === 0" class="text-center py-10 text-xs text-slate-400">
-            <i class="fa-solid fa-chart-pie text-2xl block mb-2 opacity-50"></i>
-            ไม่พบข้อมูลการซื้อหรือกำไรในงวดที่เลือก
-          </div>
-        </div>
-      </div>
-
-      <!-- ปุ่มปิดด้านล่าง -->
-      <div class="pt-2 flex justify-end">
-        <button @click="showProfitModal = false" class="neu-flat px-5 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-indigo-600 transition">
-          ปิดหน้าต่าง
-        </button>
-      </div>
-
-    </div>
-  </div>
-
   <!-- Mobile Bottom Navigation Bar สไตล์ Glassmorphism -->
   <nav class="no-print md:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-white/30 dark:border-white/5 px-2 py-2 flex justify-around">
     <button v-for="tab in tabs" :key="tab.id" @click="currentTab = tab.id"
@@ -1138,8 +1132,8 @@
         filterMaxAmount: null,
         filterHideNoActivity: false,
 
-        // ตัวแปรสำหรับหน้าต่างจัดอันดับกำไร + วิเคราะห์หลายงวด
-        showProfitModal: false,
+        // ตัวแปรสำหรับแผงกราฟแท่งจัดอันดับกำไร (Inline Expandable Chart)
+        showProfitChart: false,
         profitScope: 'current', // 'current', 'all', 'custom'
         selectedProfitPeriodIds: [],
 
@@ -1256,7 +1250,7 @@
         };
       },
 
-      // คำนวณงวดที่ถูกเลือกสำหรับนำมาวิเคราะห์กำไร
+      // เลือกรวมงวดสำหรับคำนวณกราฟ
       targetProfitPeriods() {
         if (this.profitScope === 'current') {
           return this.currentPeriod ? [this.currentPeriod] : [];
@@ -1270,12 +1264,11 @@
       analyzedPeriodsCount() {
         return this.targetProfitPeriods.length;
       },
-      // คำนวณจัดอันดับลูกค้าตามกำไรสุทธิที่เราได้รับ
+      // จัดอันดับลูกค้าที่ทำกำไรให้เราสูงสุด
       customerProfitRankings() {
         const statsMap = {};
 
         this.targetProfitPeriods.forEach(p => {
-          // 1. คำนวณกำไรจากยอดขายบิล
           (p.bills || []).forEach(b => {
             if (!b.customerName) return;
             const cName = b.customerName.trim();
@@ -1292,7 +1285,6 @@
             statsMap[cName].salesProfit += (customerPay - sendBoss);
           });
 
-          // 2. คำนวณกำไรจากส่วนต่างโบนัสรางวัล (เบิกเจ้านาย - จ่ายลูกค้า)
           (p.prizes || []).forEach(z => {
             if (!z.customerName) return;
             const cName = z.customerName.trim();
@@ -1307,13 +1299,11 @@
           });
         });
 
-        // รวมกำไรสุทธิของลูกค้าแต่ละคน
         const list = Object.values(statsMap).map(item => ({
           ...item,
           totalProfit: item.salesProfit + item.bonusProfit
         }));
 
-        // จัดเรียงจากกำไรมากที่สุดไปน้อยที่สุด (Descending)
         list.sort((a, b) => b.totalProfit - a.totalProfit);
         return list;
       },
@@ -1346,22 +1336,20 @@
         this.filterHideNoActivity = false;
       },
 
-      // เปิดหน้าต่างจัดอันดับกำไร
-      openProfitModal() {
-        this.profitScope = 'current';
-        if (this.currentPeriod) {
+      // สลับเปิด/ปิดแถบกราฟแท่งแนวนอนใต้การ์ดกำไร
+      toggleProfitChart() {
+        this.showProfitChart = !this.showProfitChart;
+        if (this.showProfitChart && this.currentPeriod && this.selectedProfitPeriodIds.length === 0) {
           this.selectedProfitPeriodIds = [this.currentPeriod.id];
         }
-        this.showProfitModal = true;
       },
-      // คำนวณความยาว Progress bar ของกำไร
       getProfitBarPercentage(profit) {
         if (!this.customerProfitRankings || this.customerProfitRankings.length === 0) return 0;
         const maxProfit = Math.max(...this.customerProfitRankings.map(x => x.totalProfit), 1);
-        return Math.max(5, Math.min(100, (profit / maxProfit) * 100));
+        return Math.max(6, Math.min(100, (profit / maxProfit) * 100));
       },
 
-      // ฟังก์ชันจัดการคีย์บอร์ดเสมือน Excel
+      // จัดการการกด Enter ในตารางลงบิล
       setInputRef(field, idx, el) {
         if (el) this.inputRefs[field][idx] = el;
       },
@@ -1678,4 +1666,357 @@
       },
 
       getCustomerSummary(name) {
-        if (!this.currentPeriod || !name) return { hasActivity: false, normalGrossUnpaid: 0, normalDiscountAmount: 0, normalNet: 0, runGrossUnpaid: 0, runNet: 0, overdueUnpaid: 0, isOverdueCutDiscount: false
+        if (!this.currentPeriod || !name) return { hasActivity: false, normalGrossUnpaid: 0, normalDiscountAmount: 0, normalNet: 0, runGrossUnpaid: 0, runNet: 0, overdueUnpaid: 0, isOverdueCutDiscount: false, totalPayable: 0, isFullyPaid: false, hasDeductWon: false, settledNote: '' };
+        const cleanName = (name || '').trim();
+        const bills = this.getCustomerBills(cleanName);
+        let disc = this.getCustomerDiscount(cleanName);
+        const overdues = (this.currentPeriod.overdues || []).filter(o => o && (o.customerName || '').trim() === cleanName);
+        const prizes = (this.currentPeriod.prizes || []).filter(z => z && (z.customerName || '').trim() === cleanName);
+        const hasActivity = bills.length > 0 || overdues.length > 0 || prizes.length > 0;
+
+        let nGrossUnpaid = 0, rGrossUnpaid = 0;
+        let allBillsSettled = bills.length > 0;
+        let hasDeductWon = false;
+        let settledNote = '';
+
+        bills.forEach(b => {
+          if (b.settledNote) settledNote = b.settledNote;
+          const isDeductWon = b.isWonPrize && b.isDeduct;
+          if (isDeductWon) {
+            hasDeductWon = true;
+          }
+
+          if (!b.isPaid && !isDeductWon) {
+            allBillsSettled = false;
+            nGrossUnpaid += Number(b.normalAmount) || 0;
+            rGrossUnpaid += Number(b.runAmount) || 0;
+          }
+        });
+
+        const nNet = nGrossUnpaid - (nGrossUnpaid * (disc.normal / 100));
+        const rNet = rGrossUnpaid - (rGrossUnpaid * (disc.run / 100));
+
+        let odUnpaid = 0;
+        let allOverduesPaid = true;
+        let isOverdueCutDiscount = false;
+
+        overdues.forEach(o => {
+          if (!o.isPaid && !o.settledNote) {
+            allOverduesPaid = false;
+            if (this.isOverduePastDueDays(o) && this.settings.autoCutDiscount && o.rawGrossAmount) {
+              odUnpaid += Number(o.rawGrossAmount);
+              isOverdueCutDiscount = true;
+            } else {
+              odUnpaid += Number(o.amount) || 0;
+            }
+          }
+        });
+
+        const isFullyPaid = (bills.length > 0 || overdues.length > 0) && allBillsSettled && allOverduesPaid;
+        const totalPayable = isFullyPaid ? 0 : (nNet + rNet + odUnpaid);
+
+        return {
+          hasActivity,
+          normalGrossUnpaid: nGrossUnpaid,
+          normalDiscountAmount: nGrossUnpaid * (disc.normal / 100),
+          normalNet: nNet,
+          runGrossUnpaid: rGrossUnpaid,
+          runNet: rNet,
+          overdueUnpaid: odUnpaid,
+          isOverdueCutDiscount,
+          totalPayable,
+          isFullyPaid,
+          hasDeductWon,
+          settledNote
+        };
+      },
+
+      async toggleCustomerPayment(name, status) {
+        if (!this.currentPeriod || !name) return;
+        const cleanName = (name || '').trim();
+        
+        (this.currentPeriod.bills || []).forEach(b => {
+          if (b && (b.customerName || '').trim() === cleanName) {
+            b.isPaid = status;
+            if (!status) b.settledNote = '';
+          }
+        });
+
+        (this.currentPeriod.overdues || []).forEach(o => {
+          if (o && (o.customerName || '').trim() === cleanName && !o.settledNote) {
+            o.isPaid = status;
+          }
+        });
+
+        this.showToast(`ปรับสถานะคุณ ${name} เป็น "${status ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}" เรียบร้อย`);
+        await this.saveToStorage();
+      },
+
+      async fetchData() {
+        try {
+          const res = await fetch(SCRIPT_URL);
+          const data = await res.json();
+          this.customers = data.customers || [];
+          this.bankInfo = data.bankInfo || this.bankInfo;
+          this.settings = data.settings || this.settings;
+          this.periods = (data.periods || []).map(p => {
+            if (!p.bills) p.bills = [];
+            else {
+              p.bills = p.bills.map(b => ({
+                ...b,
+                isPaid: b.isPaid === true || b.isPaid === 'true',
+                isWonPrize: b.isWonPrize === true || b.isWonPrize === 'true',
+                isDeduct: b.isDeduct !== undefined ? (b.isDeduct === true || b.isDeduct === 'true') : true,
+                settledNote: b.settledNote || ''
+              }));
+            }
+            if (!p.overdues) p.overdues = [];
+            else p.overdues = p.overdues.map(o => ({ 
+              ...o, 
+              isPaid: o.isPaid === true || o.isPaid === 'true',
+              settledNote: o.settledNote || '' 
+            }));
+            if (!p.prizes) p.prizes = [];
+            else p.prizes = p.prizes.map(z => ({ 
+              ...z, 
+              isHalf: (z.isHalf === true || z.isHalf === 'true') && !this.isRunType(z.type),
+              isDeduct: z.isDeduct !== undefined ? (z.isDeduct === true || z.isDeduct === 'true') : true
+            }));
+            return p;
+          });
+          if (this.periods.length > 0 && !this.selectedPeriodId) {
+            this.selectedPeriodId = this.periods[0].id;
+          }
+          this.showToast('ดึงข้อมูลล่าสุดเรียบร้อย');
+        } catch(e) {
+          console.error('Fetch error:', e);
+        }
+      },
+
+      async saveToStorage() {
+        this.isSaving = true;
+        try {
+          const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'save', payload: { customers: this.customers, bankInfo: this.bankInfo, settings: this.settings, periods: this.periods } })
+          });
+          const result = await res.json();
+          if (result.status === 'success') {
+            this.showToast('บันทึกข้อมูลเรียบร้อยแล้ว');
+          } else {
+            alert('บันทึกล้มเหลว: ' + (result.error || 'ระบบขัดข้อง'));
+          }
+        } catch(e) {
+          alert('ระบบคลาวด์ขัดข้อง กรุณาลองใหม่อีกครั้ง');
+        } finally {
+          this.isSaving = false;
+        }
+      },
+
+      async saveCustomer() {
+        if (!this.customerForm.name.trim()) return alert('ระบุชื่อลูกค้า');
+        if (this.editingCustomerIndex === -1) this.customers.push({ ...this.customerForm });
+        else { this.customers[this.editingCustomerIndex] = { ...this.customerForm }; this.editingCustomerIndex = -1; }
+        this.resetCustomerForm();
+        await this.saveToStorage();
+      },
+      editCustomer(idx) {
+        this.editingCustomerIndex = idx;
+        const c = this.customers[idx];
+        this.customerForm = { ...c, rate2Digit: c.rate2Digit !== undefined ? c.rate2Digit : 60 };
+      },
+      async deleteCustomer(idx) {
+        if (confirm('ยืนยันลบลูกค้า?')) { this.customers.splice(idx, 1); await this.saveToStorage(); }
+      },
+      resetCustomerForm() {
+        this.customerForm = { name: '', normalDiscount: 0, runDiscount: 0, rate2Digit: 60, rate3Direct: 500, rate3Tod: 90, rate3Bottom: 100, rateRunTop: 3, rateRunBottom: 4, bankAccount: '' };
+        this.editingCustomerIndex = -1;
+      },
+      
+      async createNewPeriod() {
+        if (!this.newPeriodName.trim()) return alert('ระบุชื่องวด');
+        
+        const rolloverOverdues = [];
+        if (this.currentPeriod) {
+          this.allDisplayCustomers.forEach(cName => {
+            const summary = this.getCustomerSummary(cName);
+            if (summary.totalPayable > 0) {
+              const due = new Date();
+              due.setDate(due.getDate() + (this.settings.dueDays || 3));
+              rolloverOverdues.push({
+                id: 'od_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                fromPeriodName: this.currentPeriod.name,
+                customerName: cName,
+                amount: Math.ceil(summary.totalPayable),
+                rawGrossAmount: Math.ceil(summary.normalGrossUnpaid + summary.runGrossUnpaid),
+                isPaid: false,
+                dueDate: due.toISOString().split('T')[0],
+                settledNote: ''
+              });
+            }
+          });
+        }
+
+        const newP = { id: 'p_' + Date.now(), name: this.newPeriodName.trim(), createdDate: new Date().toISOString(), bills: [], overdues: rolloverOverdues, prizes: [] };
+        this.periods.unshift(newP);
+        this.selectedPeriodId = newP.id;
+        this.newPeriodName = '';
+        await this.saveToStorage();
+      },
+
+      addEmptyBillRow() {
+        if (!this.currentPeriod.bills) this.currentPeriod.bills = [];
+        this.currentPeriod.bills.push({ id: 'b_' + Date.now(), customerName: '', normalAmount: 0, runAmount: 0, isPaid: false, isWonPrize: false, isDeduct: false });
+      },
+      removeBillRow(idx) {
+        const bill = this.currentPeriod.bills[idx];
+        if (bill && bill.id) {
+          this.currentPeriod.prizes = (this.currentPeriod.prizes || []).filter(p => p.billId !== bill.id);
+        }
+        this.currentPeriod.bills.splice(idx, 1);
+      },
+
+      addOverdueRow() {
+        if (!this.currentPeriod.overdues) this.currentPeriod.overdues = [];
+        const due = new Date();
+        due.setDate(due.getDate() + (this.settings.dueDays || 3));
+        this.currentPeriod.overdues.push({
+          id: 'od_' + Date.now(),
+          fromPeriodName: 'งวดก่อนหน้า',
+          customerName: '',
+          amount: 0,
+          rawGrossAmount: 0,
+          isPaid: false,
+          dueDate: due.toISOString().split('T')[0],
+          settledNote: ''
+        });
+      },
+      removeOverdueRow(idx) { this.currentPeriod.overdues.splice(idx, 1); },
+
+      removePrizeRow(idx) { this.currentPeriod.prizes.splice(idx, 1); },
+
+      onPrizeTypeChange(pz) {
+        if (this.isRunType(pz.type)) pz.isHalf = false;
+        this.updatePrizeRates(pz);
+      },
+      updatePrizeRates(pz) {
+        const c = this.customers.find(x => x && x.name && x.name.trim() === (pz.customerName || '').trim());
+        let bRate = 70, cRate = 60;
+        if (pz.type === '3_DIRECT') { bRate = 500; cRate = c ? (c.rate3Direct || 500) : 500; }
+        else if (pz.type === '3_TOD') { bRate = 100; cRate = c ? (c.rate3Tod || 90) : 90; }
+        else if (pz.type === '3_BOTTOM') { bRate = 100; cRate = c ? (c.rate3Bottom || 100) : 100; }
+        else if (pz.type === '2_DIGIT') { bRate = 70; cRate = c ? (c.rate2Digit !== undefined ? c.rate2Digit : 60) : 60; }
+        else if (pz.type === 'RUN_TOP') { bRate = 3; cRate = c ? (c.rateRunTop || 3) : 3; pz.isHalf = false; }
+        else if (pz.type === 'RUN_BOTTOM') { bRate = 4; cRate = c ? (c.rateRunBottom || 4) : 4; pz.isHalf = false; }
+
+        if (pz.isHalf && !this.isRunType(pz.type)) { bRate /= 2; cRate /= 2; }
+        pz.bossRate = bRate; pz.customerRate = cRate;
+      },
+
+      processPaste() {
+        if (!this.pasteText.trim()) return;
+        const rows = this.pasteText.trim().split('\n');
+        let added = 0;
+        if (!this.currentPeriod.bills) this.currentPeriod.bills = [];
+        rows.forEach(r => {
+          const raw = r.trim().replace(/,/g, '');
+          if (!isNaN(Number(raw)) && raw !== '') {
+            this.currentPeriod.bills.push({ id: 'b_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4), customerName: '', normalAmount: Number(raw), runAmount: 0, isPaid: false, isWonPrize: false, isDeduct: false });
+            added++;
+          }
+        });
+        this.pasteText = '';
+        if (added > 0) this.showToast(`เพิ่มบิล ${added} รายการ`);
+      },
+
+      getCustomerDiscount(name) {
+        if (!name) return { normal: 0, run: 0 };
+        const c = this.customers.find(x => x && x.name && x.name.trim() === name.trim());
+        return { normal: c ? (c.normalDiscount || 0) : 0, run: c ? (c.runDiscount || 0) : 0 };
+      },
+      getCustomerBills(name) {
+        if (!this.currentPeriod || !this.currentPeriod.bills || !name) return [];
+        return this.currentPeriod.bills.filter(b => b && b.customerName && b.customerName.trim() === name.trim());
+      },
+
+      // บันทึกรูปบิลแจ้งยอดจากหน้าแดชบอร์ด
+      async saveDashboardBillImage() {
+        const el = document.getElementById('dashboard-client-bill');
+        if (!el) return alert('ไม่พบส่วนที่ต้องการบันทึกภาพ');
+        this.isSavingImg = true;
+        try {
+          const canvas = await html2canvas(el, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false
+          });
+          
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              alert('สร้างรูปภาพไม่สำเร็จ');
+              this.isSavingImg = false;
+              return;
+            }
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `บิล_${this.selectedCustomerBill}_${this.currentPeriod.name}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            this.showToast('บันทึกรูปบิลเรียบร้อยแล้ว');
+          }, 'image/png');
+        } catch(e) {
+          console.error(e);
+          alert('สร้างรูปภาพไม่สำเร็จ: ' + (e.message || e));
+        } finally {
+          this.isSavingImg = false;
+        }
+      },
+
+      // บันทึกรูปการ์ดสรุปรางวัล
+      async saveClientReceiptImage() {
+        const el = document.getElementById('client-share-card');
+        if (!el) return alert('ไม่พบส่วนที่ต้องการบันทึกภาพ');
+        this.isSavingImg = true;
+        try {
+          const canvas = await html2canvas(el, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false
+          });
+          
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              alert('สร้างรูปภาพไม่สำเร็จ');
+              this.isSavingImg = false;
+              return;
+            }
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `สรุปรางวัล_${this.selectedPrizeCustomer}_${this.currentPeriod.name}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            this.showToast('บันทึกรูปสรุปรางวัลเรียบร้อยแล้ว');
+          }, 'image/png');
+        } catch(e) {
+          console.error(e);
+          alert('สร้างรูปภาพไม่สำเร็จ: ' + (e.message || e));
+        } finally {
+          this.isSavingImg = false;
+        }
+      }
+    }
+  }).mount('#app');
+</script>
+</body>
+</html>
