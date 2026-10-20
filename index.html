@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prestige Sales & Rewards - Column K Customer Deduct Edition</title>
+  <title>Prestige Sales & Rewards - Permanent Memory Edition</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -1836,47 +1836,67 @@
 
       async fetchData() {
         try {
+          // โหลดข้อมูลสำรองจากเบราว์เซอร์ (LocalStorage) ก่อนทันทีเพื่อให้แสดงผลทันใจ ไม่ต้องรอเน็ต
+          const localBackup = localStorage.getItem('prestige_pro_backup');
+          if (localBackup) {
+            try {
+              const localData = JSON.parse(localBackup);
+              if (localData && localData.customers) {
+                this.customers = localData.customers;
+                this.bankInfo = localData.bankInfo || this.bankInfo;
+                this.settings = localData.settings || this.settings;
+                this.periods = localData.periods || [];
+                if (this.periods.length > 0 && !this.selectedPeriodId) {
+                  this.selectedPeriodId = this.periods[0].id;
+                }
+              }
+            } catch(e) {}
+          }
+
+          // โหลดข้อมูลล่าสุดจาก Cloud (Google Sheets)
           const res = await fetch(SCRIPT_URL);
           const data = await res.json();
-          this.customers = (data.customers || []).map(c => ({
-            ...c,
-            defaultDeduct: c.defaultDeduct !== undefined ? (c.defaultDeduct === true || c.defaultDeduct === 'true') : true
-          }));
-          this.bankInfo = data.bankInfo || this.bankInfo;
-          this.settings = data.settings || this.settings;
-          this.periods = (data.periods || []).map(p => {
-            if (!p.bills) p.bills = [];
-            else {
-              p.bills = p.bills.map(b => {
-                const defDeduct = this.getCustomerDefaultDeduct(b.customerName);
-                return {
-                  ...b,
-                  isPaid: b.isPaid === true || b.isPaid === 'true',
-                  isWonPrize: b.isWonPrize === true || b.isWonPrize === 'true',
-                  isDeduct: b.isDeduct !== undefined ? (b.isDeduct === true || b.isDeduct === 'true') : defDeduct,
-                  settledNote: b.settledNote || ''
+          if (data && data.customers) {
+            this.customers = (data.customers || []).map(c => ({
+              ...c,
+              defaultDeduct: c.defaultDeduct !== undefined ? (c.defaultDeduct === true || c.defaultDeduct === 'true') : true
+            }));
+            this.bankInfo = data.bankInfo || this.bankInfo;
+            this.settings = data.settings || this.settings;
+            this.periods = (data.periods || []).map(p => {
+              if (!p.bills) p.bills = [];
+              else {
+                p.bills = p.bills.map(b => {
+                  const defDeduct = this.getCustomerDefaultDeduct(b.customerName);
+                  return {
+                    ...b,
+                    isPaid: b.isPaid === true || b.isPaid === 'true',
+                    isWonPrize: b.isWonPrize === true || b.isWonPrize === 'true',
+                    isDeduct: b.isDeduct !== undefined ? (b.isDeduct === true || b.isDeduct === 'true') : defDeduct,
+                    settledNote: b.settledNote || ''
+                  };
+                });
+              }
+              if (!p.overdues) p.overdues = [];
+              else p.overdues = p.overdues.map(o => ({ 
+                ...o, 
+                isPaid: o.isPaid === true || o.isPaid === 'true',
+                settledNote: o.settledNote || '' 
+              }));
+              if (!p.prizes) p.prizes = [];
+              else p.prizes = p.prizes.map(z => {
+                const defDeduct = this.getCustomerDefaultDeduct(z.customerName);
+                return { 
+                  ...z, 
+                  isHalf: (z.isHalf === true || z.isHalf === 'true') && !this.isRunType(z.type),
+                  isDeduct: z.isDeduct !== undefined ? (z.isDeduct === true || z.isDeduct === 'true') : defDeduct
                 };
               });
-            }
-            if (!p.overdues) p.overdues = [];
-            else p.overdues = p.overdues.map(o => ({ 
-              ...o, 
-              isPaid: o.isPaid === true || o.isPaid === 'true',
-              settledNote: o.settledNote || '' 
-            }));
-            if (!p.prizes) p.prizes = [];
-            else p.prizes = p.prizes.map(z => {
-              const defDeduct = this.getCustomerDefaultDeduct(z.customerName);
-              return { 
-                ...z, 
-                isHalf: (z.isHalf === true || z.isHalf === 'true') && !this.isRunType(z.type),
-                isDeduct: z.isDeduct !== undefined ? (z.isDeduct === true || z.isDeduct === 'true') : defDeduct
-              };
+              return p;
             });
-            return p;
-          });
-          if (this.periods.length > 0 && !this.selectedPeriodId) {
-            this.selectedPeriodId = this.periods[0].id;
+            if (this.periods.length > 0 && !this.selectedPeriodId) {
+              this.selectedPeriodId = this.periods[0].id;
+            }
           }
           this.showToast('ดึงข้อมูลล่าสุดเรียบร้อย');
         } catch(e) {
@@ -1893,6 +1913,10 @@
             settings: this.settings,
             periods: this.periods
           };
+          
+          // บันทึกสำรองไว้ในเครื่องทันที ป้องกันข้อมูลหาย
+          localStorage.setItem('prestige_pro_backup', JSON.stringify(payloadData));
+
           const res = await fetch(SCRIPT_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1905,7 +1929,7 @@
             alert('บันทึกล้มเหลว: ' + (result.error || 'ระบบขัดข้อง'));
           }
         } catch(e) {
-          alert('ระบบคลาวด์ขัดข้อง กรุณาลองใหม่อีกครั้ง');
+          alert('ระบบคลาวด์ขัดข้อง แต่ระบบได้บันทึกสำรองไว้ในเครื่องให้แล้ว');
         } finally {
           this.isSaving = false;
         }
@@ -1915,13 +1939,20 @@
         if (!this.customerForm.name.trim()) return alert('ระบุชื่อลูกค้า');
         if (this.editingCustomerIndex === -1) this.customers.push({ ...this.customerForm });
         else { this.customers[this.editingCustomerIndex] = { ...this.customerForm }; this.editingCustomerIndex = -1; }
-        this.resetCustomerForm();
+        
+        // บันทึกทันทีเมื่อกดอัปเดตข้อมูลลูกค้า
         await this.saveToStorage();
+        this.resetCustomerForm();
+        this.showToast('อัปเดตข้อมูลลูกค้าและบันทึกค่าหวยเรียบร้อย');
       },
       editCustomer(idx) {
         this.editingCustomerIndex = idx;
         const c = this.customers[idx];
-        this.customerForm = { ...c, rate2Digit: c.rate2Digit !== undefined ? c.rate2Digit : 60, defaultDeduct: c.defaultDeduct !== undefined ? c.defaultDeduct : true };
+        this.customerForm = { 
+          ...c, 
+          rate2Digit: c.rate2Digit !== undefined ? c.rate2Digit : 60, 
+          defaultDeduct: c.defaultDeduct !== undefined ? (c.defaultDeduct === true || c.defaultDeduct === 'true') : true 
+        };
       },
       async deleteCustomer(idx) {
         if (confirm('ยืนยันลบลูกค้า?')) { this.customers.splice(idx, 1); await this.saveToStorage(); }
