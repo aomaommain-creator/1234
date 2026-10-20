@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prestige Sales & Rewards - Customer Default Deduct Edition</title>
+  <title>Prestige Sales & Rewards - Race Bar Chart Edition</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -713,7 +713,7 @@
       </div>
     </section>
 
-    <!-- 3. ลูกค้า & เรท (Customers) - เพิ่มค่าเริ่มต้นการหักค่าหวย -->
+    <!-- 3. ลูกค้า & เรท (Customers) -->
     <section v-if="currentTab === 'customers'" class="space-y-4">
       <div class="glass-panel p-5 rounded-3xl space-y-3">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white flex items-center gap-2">
@@ -1537,13 +1537,12 @@
         if (!this.currentPeriod.prizes) this.currentPeriod.prizes = [];
 
         if (bill.isWonPrize) {
-          bill.isDeduct = this.getCustomerDefaultDeduct(bill.customerName);
           const exists = this.currentPeriod.prizes.find(p => p.billId === bill.id);
           if (!exists) {
             const pz = {
               billId: bill.id,
               customerName: bill.customerName,
-              isDeduct: bill.isDeduct,
+              isDeduct: bill.isDeduct !== undefined ? bill.isDeduct : this.getCustomerDefaultDeduct(bill.customerName),
               type: '2_DIGIT',
               isHalf: false,
               amount: 0,
