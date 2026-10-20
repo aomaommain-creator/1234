@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prestige Sales & Rewards - Race Bar Chart Edition</title>
+  <title>Prestige Sales & Rewards - Customer Default Deduct Edition</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -651,6 +651,7 @@
                 <td class="py-2 px-3">
                   <input list="cust-list" 
                          v-model="b.customerName" 
+                         @change="onCustomerNameChangeInBill(b)"
                          @keydown.enter.prevent="focusNextRow('customer', idx)"
                          :ref="el => setInputRef('customer', idx, el)"
                          placeholder="ชื่อลูกค้า" 
@@ -712,13 +713,13 @@
       </div>
     </section>
 
-    <!-- 3. ลูกค้า & เรท (Customers) -->
+    <!-- 3. ลูกค้า & เรท (Customers) - เพิ่มค่าเริ่มต้นการหักค่าหวย -->
     <section v-if="currentTab === 'customers'" class="space-y-4">
       <div class="glass-panel p-5 rounded-3xl space-y-3">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white flex items-center gap-2">
-          <i class="fa-solid fa-user-plus text-indigo-500"></i> ลูกค้า & เรทรางวัล & บัญชีธนาคาร
+          <i class="fa-solid fa-user-plus text-indigo-500"></i> ลูกค้า & เรทรางวัล & ตั้งค่าหวยประจำตัว
         </h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-2.5 items-end">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-10 gap-2.5 items-end">
           <div class="col-span-2">
             <label class="text-[11px] text-slate-400">ชื่อลูกค้า</label>
             <input v-model="customerForm.name" class="neu-inset w-full p-2 rounded-xl text-xs font-bold outline-none">
@@ -751,18 +752,27 @@
             <label class="text-[11px] text-slate-400">จ่าย วิ่งบน</label>
             <input v-model.number="customerForm.rateRunTop" type="number" class="neu-inset w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none">
           </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 items-end">
           <div>
             <label class="text-[11px] text-slate-400">จ่าย วิ่งล่าง</label>
             <input v-model.number="customerForm.rateRunBottom" type="number" class="neu-inset w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none">
           </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end pt-2">
           <div class="md:col-span-2">
             <label class="text-[11px] text-slate-400">เลขบัญชี / พร้อมเพย์ลูกค้า (สำหรับโอนเงินรางวัล)</label>
-            <input v-model="customerForm.bankAccount" placeholder="เช่น กสิกร 123-4-56789-0" class="neu-inset w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none">
+            <input v-model="customerForm.bankAccount" placeholder="เช่น กสิกร 123-4-56789-0" class="neu-inset w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs outline-none">
+          </div>
+          <div class="neu-inset p-3 rounded-2xl flex items-center justify-between">
+            <div>
+              <div class="text-xs font-bold text-slate-800 dark:text-white">ค่าเริ่มต้น: หักค่าหวยเมื่อถูกรางวัล?</div>
+              <div class="text-[10px] text-slate-400">ตั้งค่าว่าลูกค้าคนนี้เมื่อถูกรางวัล จะให้หักค่าหวยหรือไม่</div>
+            </div>
+            <input type="checkbox" v-model="customerForm.defaultDeduct" class="w-5 h-5 rounded accent-indigo-600 cursor-pointer">
           </div>
         </div>
-        <div class="pt-1 flex gap-2">
+
+        <div class="pt-2 flex gap-2">
           <button @click="saveCustomer" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-pink-500 text-white text-xs font-bold shadow-md hover:opacity-95 transition active:scale-95">
             {{ editingCustomerIndex === -1 ? '+ เพิ่มลูกค้า' : 'อัปเดตข้อมูลลูกค้า' }}
           </button>
@@ -776,6 +786,7 @@
             <thead class="bg-black/5 dark:bg-white/5 text-slate-400 border-b border-slate-200/50 dark:border-white/5">
               <tr>
                 <th class="py-3 px-4">ชื่อลูกค้า</th>
+                <th class="py-3 px-4 text-center">หักค่าหวยปกติ?</th>
                 <th class="py-3 px-4 text-right">ลดปกติ</th>
                 <th class="py-3 px-4 text-right">ลดวิ่ง</th>
                 <th class="py-3 px-4 text-right text-pink-500 font-bold">2 ตัว</th>
@@ -789,6 +800,11 @@
             <tbody class="divide-y divide-slate-200/40 dark:divide-white/5">
               <tr v-for="(c, idx) in customers" :key="idx" class="hover:bg-white/30 dark:hover:bg-white/5">
                 <td class="py-3 px-4 font-bold text-slate-800 dark:text-slate-100">{{ c.name }}</td>
+                <td class="py-3 px-4 text-center">
+                  <span class="px-2 py-0.5 rounded-md font-bold text-[10px]" :class="c.defaultDeduct !== false ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700'">
+                    {{ c.defaultDeduct !== false ? '✓ หักค่าหวย' : '✕ ไม่หัก' }}
+                  </span>
+                </td>
                 <td class="py-3 px-4 text-right text-emerald-500 font-medium">{{ c.normalDiscount || 0 }}%</td>
                 <td class="py-3 px-4 text-right text-indigo-500 dark:text-sky-400 font-medium">{{ c.runDiscount || 0 }}%</td>
                 <td class="py-3 px-4 text-right text-pink-500 font-bold">฿{{ c.rate2Digit || 60 }}</td>
@@ -901,7 +917,7 @@
                 </td>
                 
                 <td class="py-2.5 px-3">
-                  <select v-model="pz.billId" class="neu-inset p-1.5 rounded-lg font-semibold outline-none text-xs">
+                  <select v-model="pz.billId" @change="onSelectBillForPrize(pz, $event.target.value)" class="neu-inset p-1.5 rounded-lg font-semibold outline-none text-xs">
                     <option value="">-- ไม่ผูกบิล (บิลพิเศษ) --</option>
                     <option v-for="opt in getAvailableBillsForCustomer(pz.customerName)" :key="opt.id" :value="opt.id">
                       {{ opt.label }}
@@ -1154,7 +1170,7 @@
           { id: 'settings', name: 'ตั้งค่า', shortName: 'ตั้งค่า', icon: 'fa-solid fa-gear' }
         ],
         customers: [],
-        customerForm: { name: '', normalDiscount: 0, runDiscount: 0, rate2Digit: 60, rate3Direct: 500, rate3Tod: 90, rate3Bottom: 100, rateRunTop: 3, rateRunBottom: 4, bankAccount: '' },
+        customerForm: { name: '', normalDiscount: 0, runDiscount: 0, rate2Digit: 60, rate3Direct: 500, rate3Tod: 90, rate3Bottom: 100, rateRunTop: 3, rateRunBottom: 4, bankAccount: '', defaultDeduct: true },
         editingCustomerIndex: -1,
         bankInfo: '— ธ.กรุงศรี 0594166287 * ♡ Ⓜ️📖 𝐍𝐀𝐌𝐄 : พรพิมล เพิ่มไธสง 👓',
         periods: [],
@@ -1419,6 +1435,21 @@
         });
       },
 
+      getCustomerDefaultDeduct(name) {
+        if (!name) return true;
+        const c = this.customers.find(x => x && x.name && x.name.trim() === name.trim());
+        if (c && c.defaultDeduct !== undefined) {
+          return c.defaultDeduct === true || c.defaultDeduct === 'true';
+        }
+        return true;
+      },
+
+      onCustomerNameChangeInBill(bill) {
+        if (bill && bill.customerName) {
+          bill.isDeduct = this.getCustomerDefaultDeduct(bill.customerName);
+        }
+      },
+
       getCustomerBankAccount(name) {
         if (!name) return '';
         const c = this.customers.find(x => x && x.name && x.name.trim() === name.trim());
@@ -1467,6 +1498,7 @@
       },
 
       onPrizeCustomerChange(pz) {
+        pz.isDeduct = this.getCustomerDefaultDeduct(pz.customerName);
         this.updatePrizeRates(pz);
         pz.billId = '';
       },
@@ -1505,12 +1537,13 @@
         if (!this.currentPeriod.prizes) this.currentPeriod.prizes = [];
 
         if (bill.isWonPrize) {
+          bill.isDeduct = this.getCustomerDefaultDeduct(bill.customerName);
           const exists = this.currentPeriod.prizes.find(p => p.billId === bill.id);
           if (!exists) {
             const pz = {
               billId: bill.id,
               customerName: bill.customerName,
-              isDeduct: bill.isDeduct !== undefined ? bill.isDeduct : true,
+              isDeduct: bill.isDeduct,
               type: '2_DIGIT',
               isHalf: false,
               amount: 0,
@@ -1806,20 +1839,25 @@
         try {
           const res = await fetch(SCRIPT_URL);
           const data = await res.json();
-          this.customers = data.customers || [];
+          this.customers = (data.customers || []).map(c => ({
+            ...c,
+            defaultDeduct: c.defaultDeduct !== undefined ? (c.defaultDeduct === true || c.defaultDeduct === 'true') : true
+          }));
           this.bankInfo = data.bankInfo || this.bankInfo;
           this.settings = data.settings || this.settings;
           this.periods = (data.periods || []).map(p => {
             if (!p.bills) p.bills = [];
             else {
-              p.bills = p.bills.map(b => ({
-                ...b,
-                isPaid: b.isPaid === true || b.isPaid === 'true',
-                isWonPrize: b.isWonPrize === true || b.isWonPrize === 'true',
-                // อ่านค่า isDeduct ตามจริง ไม่บังคับทับ
-                isDeduct: b.isDeduct !== undefined ? (b.isDeduct === true || b.isDeduct === 'true') : true,
-                settledNote: b.settledNote || ''
-              }));
+              p.bills = p.bills.map(b => {
+                const defDeduct = this.getCustomerDefaultDeduct(b.customerName);
+                return {
+                  ...b,
+                  isPaid: b.isPaid === true || b.isPaid === 'true',
+                  isWonPrize: b.isWonPrize === true || b.isWonPrize === 'true',
+                  isDeduct: b.isDeduct !== undefined ? (b.isDeduct === true || b.isDeduct === 'true') : defDeduct,
+                  settledNote: b.settledNote || ''
+                };
+              });
             }
             if (!p.overdues) p.overdues = [];
             else p.overdues = p.overdues.map(o => ({ 
@@ -1828,12 +1866,14 @@
               settledNote: o.settledNote || '' 
             }));
             if (!p.prizes) p.prizes = [];
-            else p.prizes = p.prizes.map(z => ({ 
-              ...z, 
-              isHalf: (z.isHalf === true || z.isHalf === 'true') && !this.isRunType(z.type),
-              // อ่านค่า isDeduct ของรางวัลตามจริง
-              isDeduct: z.isDeduct !== undefined ? (z.isDeduct === true || z.isDeduct === 'true') : true
-            }));
+            else p.prizes = p.prizes.map(z => {
+              const defDeduct = this.getCustomerDefaultDeduct(z.customerName);
+              return { 
+                ...z, 
+                isHalf: (z.isHalf === true || z.isHalf === 'true') && !this.isRunType(z.type),
+                isDeduct: z.isDeduct !== undefined ? (z.isDeduct === true || z.isDeduct === 'true') : defDeduct
+              };
+            });
             return p;
           });
           if (this.periods.length > 0 && !this.selectedPeriodId) {
@@ -1882,13 +1922,13 @@
       editCustomer(idx) {
         this.editingCustomerIndex = idx;
         const c = this.customers[idx];
-        this.customerForm = { ...c, rate2Digit: c.rate2Digit !== undefined ? c.rate2Digit : 60 };
+        this.customerForm = { ...c, rate2Digit: c.rate2Digit !== undefined ? c.rate2Digit : 60, defaultDeduct: c.defaultDeduct !== undefined ? c.defaultDeduct : true };
       },
       async deleteCustomer(idx) {
         if (confirm('ยืนยันลบลูกค้า?')) { this.customers.splice(idx, 1); await this.saveToStorage(); }
       },
       resetCustomerForm() {
-        this.customerForm = { name: '', normalDiscount: 0, runDiscount: 0, rate2Digit: 60, rate3Direct: 500, rate3Tod: 90, rate3Bottom: 100, rateRunTop: 3, rateRunBottom: 4, bankAccount: '' };
+        this.customerForm = { name: '', normalDiscount: 0, runDiscount: 0, rate2Digit: 60, rate3Direct: 500, rate3Tod: 90, rate3Bottom: 100, rateRunTop: 3, rateRunBottom: 4, bankAccount: '', defaultDeduct: true };
         this.editingCustomerIndex = -1;
       },
       
