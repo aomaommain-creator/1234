@@ -333,7 +333,6 @@
               <div v-for="(item, rank) in customerProfitRankings" :key="item.name" 
                    class="flex flex-col items-center h-full justify-end group shrink-0 w-20">
                 
-                <!-- ป้ายจรวด MVP สำหรับอันดับ 1 -->
                 <div v-if="rank === 0" class="mb-1 animate-bounce">
                   <span class="text-base">🚀</span>
                 </div>
@@ -345,7 +344,6 @@
                 </div>
 
                 <div class="flex items-end gap-1.5 h-full max-h-[180px]">
-                  <!-- แท่งที่ 1: กำไรปกติ (อนิเมชั่นพุ่งตัว) -->
                   <div class="w-6 sm:w-7 rounded-t-lg bg-gradient-to-t from-indigo-600 to-indigo-400 hover:brightness-110 shadow-md shadow-indigo-500/30 flex flex-col justify-start items-center pt-1 relative animate-boost"
                        :style="{ height: getVerticalBarHeight(item.salesProfit) + '%' }">
                     <span v-if="getVerticalBarHeight(item.salesProfit) > 25" class="text-[9px] font-black text-white transform -rotate-90 origin-center whitespace-nowrap mt-4">
@@ -353,7 +351,6 @@
                     </span>
                   </div>
 
-                  <!-- แท่งที่ 2: กำไรโบนัส (อนิเมชั่นพุ่งตัว) -->
                   <div class="w-6 sm:w-7 rounded-t-lg bg-pink-400 hover:brightness-110 shadow-md shadow-pink-500/20 flex flex-col justify-start items-center pt-1 relative animate-boost"
                        :style="{ height: getVerticalBarHeight(item.bonusProfit) + '%' }">
                     <span v-if="getVerticalBarHeight(item.bonusProfit) > 25" class="text-[9px] font-black text-white/90 transform -rotate-90 origin-center whitespace-nowrap mt-4">
@@ -869,7 +866,7 @@
       </div>
     </section>
 
-    <!-- 5. ถูกรางวัล (Prizes) - รองรับ 1 บิลถูกหลายรางวัล -->
+    <!-- 5. ถูกรางวัล (Prizes) -->
     <section v-if="currentTab === 'prizes'" class="space-y-4">
       <div class="glass-panel rounded-3xl overflow-hidden shadow-sm">
         <div class="p-4 border-b border-slate-200/50 dark:border-white/5 flex justify-between items-center">
@@ -1819,6 +1816,7 @@
                 ...b,
                 isPaid: b.isPaid === true || b.isPaid === 'true',
                 isWonPrize: b.isWonPrize === true || b.isWonPrize === 'true',
+                // อ่านค่า isDeduct ตามจริง ไม่บังคับทับ
                 isDeduct: b.isDeduct !== undefined ? (b.isDeduct === true || b.isDeduct === 'true') : true,
                 settledNote: b.settledNote || ''
               }));
@@ -1833,6 +1831,7 @@
             else p.prizes = p.prizes.map(z => ({ 
               ...z, 
               isHalf: (z.isHalf === true || z.isHalf === 'true') && !this.isRunType(z.type),
+              // อ่านค่า isDeduct ของรางวัลตามจริง
               isDeduct: z.isDeduct !== undefined ? (z.isDeduct === true || z.isDeduct === 'true') : true
             }));
             return p;
@@ -1849,14 +1848,20 @@
       async saveToStorage() {
         this.isSaving = true;
         try {
+          const payloadData = {
+            customers: this.customers,
+            bankInfo: this.bankInfo,
+            settings: this.settings,
+            periods: this.periods
+          };
           const res = await fetch(SCRIPT_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'save', payload: { customers: this.customers, bankInfo: this.bankInfo, settings: this.settings, periods: this.periods } })
+            body: JSON.stringify({ action: 'save', payload: payloadData })
           });
           const result = await res.json();
           if (result.status === 'success') {
-            this.showToast('บันทึกข้อมูลเรียบร้อยแล้ว');
+            this.showToast('บันทึกข้อมูลขึ้น Cloud สำเร็จแล้ว!');
           } else {
             alert('บันทึกล้มเหลว: ' + (result.error || 'ระบบขัดข้อง'));
           }
