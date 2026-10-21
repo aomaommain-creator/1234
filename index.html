@@ -325,6 +325,338 @@
 
             <div class="absolute left-1 top-3 text-[10px] font-bold text-slate-400">{{ formatNum(chartMaxVal) }}</div>
             <div class="absolute left-1 top-[25%] -translate-y-2 text-[10px] font-bold text-slate-400">{{ formatNum(chartMaxVal * 0.75) }}</div>
+            <div class="absolute left-1 top-[50%] -translate-y-2 text-[10px] font-bold text-slate-400">{{ formatนี่คือโค้ดฉบับเต็มและสมบูรณ์ ที่ฉันได้ทำการแก้ไขปัญหาเรื่องตัวอักษรชื่อลูกค้าถูกตัดขอบบนเรียบร้อยแล้วครับ (โดยเพิ่มระยะขอบและปรับความสูงของบรรทัดให้สระและวรรณยุกต์แสดงผลออกมาได้ครบถ้วนสวยงาม) 
+
+คุณสามารถคัดลอกโค้ดทั้งหมดนี้ไปวางแทนที่โค้ดเดิมใน Google Apps Script ของคุณได้ทันทีเลยครับ:
+
+```html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prestige Sales & Rewards - Customer Default Deduct Edition</title>
+  
+  <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+  <script src="[https://unpkg.com/vue@3/dist/vue.global.js](https://unpkg.com/vue@3/dist/vue.global.js)"></script>
+  <script src="[https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js](https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js)"></script>
+  <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+  <link href="[https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Outfit:wght@500;700;800;900&display=swap](https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Outfit:wght@500;700;800;900&display=swap)" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-main: #edf2f7;
+      --circle-1: #8ec5fc;
+      --circle-2: #fbc2eb;
+      --text-heading: #1e293b;
+      --text-label: #64748b;
+
+      --glass-bg: rgba(255, 255, 255, 0.55);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.7);
+      --glass-shadow: 0 12px 35px rgba(31, 38, 135, 0.08);
+
+      --neu-bg: #edf2f7;
+      --neu-text: #4f46e5;
+      --neu-input-text: #1e293b;
+      --neu-shadow-flat: 6px 6px 14px rgba(166, 180, 200, 0.5), 
+                         -6px -6px 14px rgba(255, 255, 255, 0.95);
+      --neu-shadow-inset: inset 3px 3px 6px rgba(166, 180, 200, 0.5), 
+                          inset -3px -3px 6px rgba(255, 255, 255, 0.95);
+      --accent: #6366f1;
+    }
+
+    .dark-mode {
+      --bg-main: #0c0f17;
+      --circle-1: #7928ca;
+      --circle-2: #0070f3;
+      --text-heading: #f8fafc;
+      --text-label: #94a3b8;
+
+      --glass-bg: rgba(18, 22, 34, 0.65);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.09);
+      --glass-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+
+      --neu-bg: #141824;
+      --neu-text: #38bdf8;
+      --neu-input-text: #f8fafc;
+      --neu-shadow-flat: 6px 6px 16px #06080e, 
+                         -6px -6px 16px #22293d;
+      --neu-shadow-inset: inset 3px 3px 6px #06080e, 
+                          inset -3px -3px 6px #22293d;
+      --accent: #38bdf8;
+    }
+
+    * {
+      font-family: 'Prompt', sans-serif;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    body {
+      background: var(--bg-main);
+      color: var(--text-heading);
+      min-height: 100vh;
+      position: relative;
+    }
+
+    [v-cloak] {
+      display: none !important;
+    }
+
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.65;
+    }
+    body::before {
+      width: 420px;
+      height: 420px;
+      background: var(--circle-1);
+      top: 5%;
+      left: 10%;
+    }
+    body::after {
+      width: 380px;
+      height: 380px;
+      background: var(--circle-2);
+      bottom: 10%;
+      right: 12%;
+    }
+
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: var(--glass-border);
+      box-shadow: var(--glass-shadow);
+    }
+
+    .neu-flat {
+      background: var(--neu-bg);
+      box-shadow: var(--neu-shadow-flat);
+    }
+
+    .neu-inset {
+      background: var(--neu-bg);
+      box-shadow: var(--neu-shadow-inset);
+    }
+
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    @keyframes boostUp {
+      0% { height: 0%; opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .animate-boost {
+      animation: boostUp 0.8s cubic-bezier(0.1, 1, 0.1, 1) forwards;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #dashboard-client-bill, #dashboard-client-bill * { visibility: visible; }
+      #dashboard-client-bill { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="antialiased pb-24 md:pb-12">
+<div id="app" v-cloak class="relative z-10">
+
+  <!-- Toast Notification -->
+  <div v-if="toastMessage" class="fixed top-5 right-5 z-50 glass-panel px-5 py-3 rounded-2xl shadow-xl text-xs font-semibold flex items-center gap-2.5 transition-all text-slate-800 dark:text-white border border-indigo-300 dark:border-sky-500/30">
+    <i class="fa-solid fa-sparkles text-amber-400"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+
+  <!-- Header ด้านบนสุด สไตล์กระจกแก้วใสฝ้า -->
+  <header class="no-print sticky top-0 z-40 glass-panel border-b shadow-sm mb-5">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 to-pink-500 text-white flex items-center justify-center text-base shadow-md shadow-indigo-500/30">
+          <i class="fa-solid fa-gamepad"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-black tracking-wide font-sans text-slate-900 dark:text-white uppercase leading-tight">PRESTIGE PRO</h1>
+          <p class="text-[10px] text-indigo-600 dark:text-sky-400 font-bold tracking-widest uppercase">ระบบบริหารยอดขาย & สรุปรางวัลสไตล์นีโอมอร์ฟิก</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 neu-inset px-3.5 py-1.5 rounded-2xl border border-white/40 dark:border-white/5">
+        <span class="text-xs font-bold text-indigo-600 dark:text-sky-400 flex items-center gap-1.5 whitespace-nowrap">
+          <i class="fa-solid fa-calendar-days text-sm"></i> งวด:
+        </span>
+        <select v-model="selectedPeriodId" class="bg-transparent text-xs font-black text-slate-800 dark:text-white outline-none cursor-pointer">
+          <option v-for="p in periods" :key="p.id" :value="p.id" class="text-slate-900 bg-white">{{ p.name }}</option>
+        </select>
+      </div>
+
+      <nav class="hidden md:flex items-center gap-1 neu-inset p-1 rounded-2xl border border-white/40 dark:border-white/5">
+        <button v-for="tab in tabs" :key="tab.id" @click="currentTab = tab.id"
+                :class="currentTab === tab.id ? 'neu-flat text-indigo-600 dark:text-sky-400 font-black' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white font-medium'"
+                class="px-3.5 py-1.5 rounded-xl text-xs transition-all flex items-center gap-1.5">
+          <i :class="tab.icon"></i>
+          <span>{{ tab.name }}</span>
+        </button>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <button @click="fetchData" title="ดึงข้อมูลล่าสุดจากชีท" class="neu-flat w-9 h-9 rounded-xl flex items-center justify-center text-xs text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-sky-400 transition">
+          <i class="fa-solid fa-rotate"></i>
+        </button>
+
+        <button @click="toggleTheme" :title="isDark ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด'" class="neu-flat w-9 h-9 rounded-xl flex items-center justify-center text-xs text-slate-600 dark:text-slate-300 transition">
+          <i :class="isDark ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon text-indigo-500'"></i>
+        </button>
+
+        <button @click="saveToStorage" :disabled="isSaving" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-pink-500 hover:opacity-95 text-white text-xs font-bold shadow-lg shadow-indigo-500/30 flex items-center gap-1.5 transition disabled:opacity-50 active:scale-95">
+          <i class="fa-solid" :class="isSaving ? 'fa-spinner fa-spin' : 'fa-cloud-arrow-up'"></i>
+          <span class="hidden sm:inline">{{ isSaving ? 'กำลังบันทึก...' : 'บันทึกชีท' }}</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 md:px-6 space-y-6">
+
+    <!-- 1. แดชบอร์ด (Dashboard) -->
+    <section v-if="currentTab === 'dashboard'" class="space-y-6">
+      
+      <!-- กล่องสรุปยอด 4 ช่อง -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div class="glass-panel p-5 rounded-3xl flex flex-col justify-between relative overflow-hidden group">
+          <div class="absolute -right-4 -top-4 w-16 h-16 rounded-full bg-indigo-400/10 dark:bg-indigo-400/5 group-hover:scale-150 transition-all duration-500"></div>
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">ยอดขายรวม</span>
+          <div class="my-2.5 text-2xl lg:text-3xl font-black text-slate-900 dark:text-white">฿{{ formatNum(overallStats.totalGross) }}</div>
+          <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-200/50 dark:border-white/5 flex justify-between font-medium">
+            <span>สุทธิหลังลด:</span>
+            <span class="font-extrabold text-indigo-600 dark:text-sky-400">฿{{ formatNum(overallStats.totalCustomerNetAll) }}</span>
+          </div>
+        </div>
+
+        <div class="glass-panel p-5 rounded-3xl flex flex-col justify-between relative overflow-hidden group">
+          <div class="absolute -right-4 -top-4 w-16 h-16 rounded-full bg-sky-400/10 dark:bg-sky-400/5 group-hover:scale-150 transition-all duration-500"></div>
+          <span class="text-xs font-bold text-sky-500 uppercase tracking-wider">รอยอดชำระ (งวดนี้)</span>
+          <div class="my-2.5 text-2xl lg:text-3xl font-black text-sky-500">฿{{ formatNum(overallStats.totalRemainingToCollect) }}</div>
+          <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-200/50 dark:border-white/5 flex justify-between font-medium">
+            <span>ชำระแล้ว/หักรับ:</span>
+            <span class="font-bold text-emerald-500">฿{{ formatNum(overallStats.totalPaidNet) }}</span>
+          </div>
+        </div>
+
+        <div class="glass-panel p-5 rounded-3xl flex flex-col justify-between relative overflow-hidden group">
+          <div class="absolute -right-4 -top-4 w-16 h-16 rounded-full bg-rose-400/10 dark:bg-rose-400/5 group-hover:scale-150 transition-all duration-500"></div>
+          <span class="text-xs font-bold text-rose-500 uppercase tracking-wider">ยอดส่งเจ้านาย</span>
+          <div class="my-2.5 text-2xl lg:text-3xl font-black text-rose-500">฿{{ formatNum(overallStats.totalToBoss) }}</div>
+          <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-200/50 dark:border-white/5 font-medium">
+            ปกติหัก 30% | วิ่งหัก 10%
+          </div>
+        </div>
+
+        <!-- กล่องกำไรสุทธิ: คลิกเพื่อเปิด/ปิดกราฟนักซิ่งพุ่งทะยาน (Race Bar Chart) -->
+        <div @click="toggleProfitChart" 
+             class="glass-panel p-5 rounded-3xl flex flex-col justify-between relative overflow-hidden border-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg group"
+             :class="showProfitChart ? 'border-pink-500 ring-4 ring-pink-500/20' : 'border-indigo-400/40 dark:border-sky-400/40'">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500 uppercase tracking-wider">กำไรสุทธิงวดนี้</span>
+            <span class="text-[10px] neu-flat text-indigo-600 dark:text-sky-400 px-2.5 py-0.5 rounded-lg font-bold flex items-center gap-1 group-hover:bg-gradient-to-r group-hover:from-indigo-500 group-hover:to-pink-500 group-hover:text-white transition">
+              <i class="fa-solid" :class="showProfitChart ? 'fa-chevron-up' : 'fa-rocket'"></i>
+              <span>{{ showProfitChart ? 'ซ่อนกราฟรถซิ่ง' : '🚀 กราฟนักซิ่ง' }}</span>
+            </span>
+          </div>
+          <div class="my-2.5 text-2xl lg:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500">฿{{ formatNum(overallStats.netProfit) }}</div>
+          <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-200/50 dark:border-white/5 flex justify-between font-medium">
+            <span>กำไรบิล: ฿{{ formatNum(overallStats.salesProfit) }}</span>
+            <span v-if="overallStats.totalPrizeBonus > 0" class="font-bold text-pink-500">+โบนัส ฿{{ formatNum(overallStats.totalPrizeBonus) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+            🚀 ส่วนแสดงผล: กราฟแท่งแนวตั้งคู่ (Race Bar Chart + Rocket Boost)
+            ======================================================== -->
+      <div v-if="showProfitChart" class="glass-panel p-5 md:p-6 rounded-3xl space-y-5 border-2 border-indigo-400/30 dark:border-sky-400/30 shadow-xl transition-all">
+        
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200/50 dark:border-white/10">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 to-pink-500 text-white flex items-center justify-center text-lg shadow-md shadow-pink-500/20">
+              <i class="fa-solid fa-rocket"></i>
+            </div>
+            <div>
+              <h3 class="text-sm md:text-base font-black text-slate-900 dark:text-white uppercase leading-tight flex items-center gap-2">
+                <span>🏆 RACE BAR CHART : นักซิ่งทำกำไรสูงสุด</span>
+              </h3>
+              <p class="text-[11px] text-indigo-600 dark:text-sky-400 font-semibold">
+                แท่งคู่แนวตั้ง (กำไรปกติ 🆚 กำไรโบนัส) ใครพุ่งแรงสุดจรวดพุ่งนำโด่ง 🚀
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 text-xs font-bold neu-inset px-3 py-1.5 rounded-2xl">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-3.5 rounded-md bg-indigo-500 shadow-sm"></span>
+              <span class="text-slate-600 dark:text-slate-300">กำไรปกติ (จากบิล)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-3.5 rounded-md bg-pink-400 shadow-sm"></span>
+              <span class="text-slate-600 dark:text-slate-300">กำไรโบนัส (ส่วนต่างรางวัล)</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5 neu-inset p-1 rounded-2xl">
+            <button @click="profitScope = 'current'" 
+                    :class="profitScope === 'current' ? 'neu-flat text-indigo-600 dark:text-sky-400 font-bold' : 'text-slate-400'" 
+                    class="px-3 py-1 rounded-xl transition text-xs">งวดปัจจุบัน</button>
+            <button @click="profitScope = 'all'" 
+                    :class="profitScope === 'all' ? 'neu-flat text-indigo-600 dark:text-sky-400 font-bold' : 'text-slate-400'" 
+                    class="px-3 py-1 rounded-xl transition text-xs">รวมทุกงวด</button>
+            <button @click="profitScope = 'custom'" 
+                    :class="profitScope === 'custom' ? 'neu-flat text-indigo-600 dark:text-sky-400 font-bold' : 'text-slate-400'" 
+                    class="px-3 py-1 rounded-xl transition text-xs">เลือกงวดเอง</button>
+          </div>
+        </div>
+
+        <div v-if="profitScope === 'custom'" class="neu-inset p-3.5 rounded-2xl flex flex-wrap items-center gap-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">เลือกงวดที่ต้องการรวม:</span>
+          <label v-for="p in periods" :key="p.id" class="inline-flex items-center gap-1.5 neu-flat px-3 py-1 rounded-xl text-xs font-semibold cursor-pointer select-none">
+            <input type="checkbox" :value="p.id" v-model="selectedProfitPeriodIds" class="w-3.5 h-3.5 accent-indigo-600 rounded">
+            <span>{{ p.name }}</span>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div class="neu-inset p-3 rounded-2xl text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">จำนวนงวดที่คิด</span>
+            <span class="text-sm md:text-base font-black text-indigo-600 dark:text-sky-400">{{ analyzedPeriodsCount }} งวด</span>
+          </div>
+          <div class="neu-inset p-3 rounded-2xl text-center">
+            <span class="text-[10px] font-bold text-indigo-500 uppercase block">กำไรปกติรวม</span>
+            <span class="text-sm md:text-base font-black text-indigo-600 dark:text-sky-400">฿{{ formatNum(analyzedTotalSalesProfit) }}</span>
+          </div>
+          <div class="neu-inset p-3 rounded-2xl text-center border border-pink-400/30">
+            <span class="text-[10px] font-bold text-pink-500 uppercase block">กำไรสุทธิรวม (+โบนัส)</span>
+            <span class="text-sm md:text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500">฿{{ formatNum(analyzedTotalProfit) }}</span>
+          </div>
+        </div>
+
+        <!-- ตัวกราฟแท่งคู่แนวตั้ง พร้อมอนิเมชั่นพุ่งตัว -->
+        <div class="neu-inset p-4 md:p-6 rounded-3xl relative overflow-x-auto hide-scrollbar">
+          <div class="min-w-[650px] h-72 flex flex-col justify-between relative pl-14 pr-4 pb-12 pt-4">
+            
+            <div class="absolute left-14 right-4 top-4 border-b border-slate-300/40 dark:border-white/10 pointer-events-none"></div>
+            <div class="absolute left-14 right-4 top-1/4 border-b border-slate-300/40 dark:border-white/10 pointer-events-none"></div>
+            <div class="absolute left-14 right-4 top-2/4 border-b border-slate-300/40 dark:border-white/10 pointer-events-none"></div>
+            <div class="absolute left-14 right-4 top-3/4 border-b border-slate-300/40 dark:border-white/10 pointer-events-none"></div>
+            <div class="absolute left-14 right-4 bottom-12 border-b border-slate-400/80 dark:border-white/30 pointer-events-none"></div>
+
+            <div class="absolute left-1 top-3 text-[10px] font-bold text-slate-400">{{ formatNum(chartMaxVal) }}</div>
+            <div class="absolute left-1 top-[25%] -translate-y-2 text-[10px] font-bold text-slate-400">{{ formatNum(chartMaxVal * 0.75) }}</div>
             <div class="absolute left-1 top-[50%] -translate-y-2 text-[10px] font-bold text-slate-400">{{ formatNum(chartMaxVal * 0.5) }}</div>
             <div class="absolute left-1 top-[75%] -translate-y-2 text-[10px] font-bold text-slate-400">{{ formatNum(chartMaxVal * 0.25) }}</div>
             <div class="absolute left-2 bottom-10 text-[10px] font-bold text-slate-400">0</div>
@@ -523,9 +855,9 @@
 
         <div id="dashboard-client-bill" class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl max-w-xl mx-auto shadow-xl text-slate-800">
           <div class="flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-slate-100 mb-5">
-            <div class="min-w-0 flex-1">
-              <span class="text-[11px] font-sans font-bold text-indigo-600 uppercase tracking-widest block">BILL STATEMENT</span>
-              <h2 class="text-2xl font-black mt-1 text-slate-900 leading-snug">คุณ {{ selectedCustomerBill }}</h2>
+            <div class="min-w-0 flex-1 pt-2">
+              <span class="text-[11px] font-sans font-bold text-indigo-600 uppercase tracking-widest block mb-1">BILL STATEMENT</span>
+              <h2 class="text-2xl font-black text-slate-900 leading-relaxed py-1">คุณ {{ selectedCustomerBill }}</h2>
               <p class="text-xs text-slate-400 mt-1">ใบแจ้งสรุปยอดชำระ งวดประจำวันที่ {{ currentPeriod.name }}</p>
             </div>
             
@@ -1032,12 +1364,12 @@
 
       <!-- การ์ดรูปภาพส่งลูกค้า -->
       <div v-if="selectedPrizeCustomer" id="client-share-card" class="bg-white border border-slate-200 p-7 md:p-8 rounded-3xl max-w-lg mx-auto shadow-2xl text-slate-800 relative overflow-hidden">
-        <div class="text-center pb-4 border-b border-slate-100 mb-4 pt-2">
+        <div class="text-center pb-4 border-b border-slate-100 mb-4 pt-3">
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 to-pink-500 text-white flex items-center justify-center text-xl mx-auto mb-2 shadow-md">
             <i class="fa-solid fa-crown"></i>
           </div>
           <span class="text-[11px] font-sans font-bold text-indigo-600 uppercase tracking-widest block mb-1">CONGRATULATIONS</span>
-          <h2 class="text-2xl font-black text-slate-900 leading-snug py-0.5">{{ selectedPrizeCustomer }}</h2>
+          <h2 class="text-2xl font-black text-slate-900 leading-relaxed py-1.5">{{ selectedPrizeCustomer }}</h2>
           <p class="text-xs text-slate-400 mt-1">สรุปยอดเงินรางวัล งวดประจำวันที่ {{ currentPeriod.name }}</p>
         </div>
 
@@ -1147,7 +1479,7 @@
 </div>
 
 <script>
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyW5n9ekoPRpOSPvkND5amJiuztdQT6C1-94hW63MVa0mlVxAOA_XfZkeXV2HWZVFkk/exec';
+  const SCRIPT_URL = '[https://script.google.com/macros/s/AKfycbyW5n9ekoPRpOSPvkND5amJiuztdQT6C1-94hW63MVa0mlVxAOA_XfZkeXV2HWZVFkk/exec](https://script.google.com/macros/s/AKfycbyW5n9ekoPRpOSPvkND5amJiuztdQT6C1-94hW63MVa0mlVxAOA_XfZkeXV2HWZVFkk/exec)';
 
   const { createApp } = Vue;
   createApp({
